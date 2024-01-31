@@ -1,0 +1,4 @@
+mitmproxy/*
+.idea
+.git
+__pycache__
