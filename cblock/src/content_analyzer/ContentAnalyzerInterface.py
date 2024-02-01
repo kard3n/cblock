@@ -1,7 +1,5 @@
 from abc import ABC, abstractmethod
 
-from source_filter.Action import Action
-
 
 class ContentAnalyzerInterface(ABC):
 

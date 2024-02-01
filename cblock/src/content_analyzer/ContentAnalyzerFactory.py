@@ -1,5 +1,5 @@
-from content_analyzer.ContentAnalyzerInterface import ContentAnalyzerInterface
-from content_analyzer.analyzers.SimpleContentAnalyzer import SimpleContentAnalyzer
+from src.content_analyzer.ContentAnalyzerInterface import ContentAnalyzerInterface
+from src.content_analyzer.analyzers.SimpleContentAnalyzer import SimpleContentAnalyzer
 
 
 class ContentAnalyzerFactory():

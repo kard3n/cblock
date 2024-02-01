@@ -6,14 +6,18 @@ cd mitmproxy
 pip install -e .[dev]
 cd ..
 mitmproxy -m regular -s cblock.py
+
+
+Enable utf-8 support (needs to be done only oncer per environment):
+conda env config vars set PYTHONUTF8=1
 """
 import logging
 
-from content_analyzer.ContentAnalyzerFactory import ContentAnalyzerFactory
+from src.content_analyzer import ContentAnalyzerFactory
 from mitmproxy import http
 
-from source_filter.Action import Action
-from source_filter.SourceFilterFactory import SourceFilterFactory
+from src.source_filter import SourceAction
+from src.source_filter import SourceFilterFactory
 
 # TODO class to load config
 
@@ -26,7 +30,7 @@ class Main:
         self.content_analyzer_factory = ContentAnalyzerFactory()
 
     def response(self, flow: http.HTTPFlow):
-        if self.source_filter_factory.get_source_filter("url").get_action(flow.request.pretty_host) == Action.FILTER:
+        if self.source_filter_factory.get_source_filter("url").get_action(flow.request.pretty_host) == SourceAction.FILTER:
             try:
                 logging.info(f"Host: {flow.request.pretty_host}")
                 #logging.info(f"Decoded response: {flow.response.text}")
@@ -34,8 +38,9 @@ class Main:
                 #if flow.response.headers.get('content-type') == "text/html":
                 #    flow.response.text = flow.response.text.replace("para", "LMAO")
                 logging.info(f"""Analyzer return: {self.content_analyzer_factory
-                             .get_content_analyzer(flow.response.headers.get('content-type'))
+                             .get_content_analyzer()
                              .analyze(flow.response.text)}""")
+                logging.info(f"Path: {flow.request.path}")
             except ValueError as e:
                 logging.info("Flow could not be parsed" + e.__str__())
 

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from source_filter.Action import Action
+from src.source_filter.SourceAction import SourceAction
 
 
 # The source filter returns the action the application should take for every request or response
@@ -8,5 +8,5 @@ from source_filter.Action import Action
 class SourceFilterInterface(ABC):
 
     @abstractmethod
-    def get_action(self, source: str) -> Action:
+    def get_action(self, source: str) -> SourceAction:
         raise NotImplementedError("Not implemented")

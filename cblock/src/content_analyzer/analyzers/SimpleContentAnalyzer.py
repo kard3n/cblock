@@ -1,6 +1,4 @@
-import logging
-
-from content_analyzer.ContentAnalyzerInterface import ContentAnalyzerInterface
+from src.content_analyzer.ContentAnalyzerInterface import ContentAnalyzerInterface
 
 
 class SimpleContentAnalyzer(ContentAnalyzerInterface):
