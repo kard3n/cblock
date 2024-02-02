@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from src.content_editor.editors.json_editor.ContentTag import ContentTag
 from src.content_editor.editors.json_editor.ElementContainer import ElementContainer, ValueType
 from utils.SchemaParsingException import SchemaParsingException
@@ -5,9 +7,9 @@ from utils.SchemaParsingException import SchemaParsingException
 class JsonSchemaParser:
 
     @classmethod
-    def parse_schema(cls, schema: str) -> dict:
-        result: dict = {}
-        item_name: str = ''
+    def parse_schema(cls, schema: str) -> ElementContainer:
+        #result: dict = {}
+        #item_name: str = ''
         element_container: ElementContainer = ElementContainer()
 
         pos: int = 0
@@ -16,7 +18,7 @@ class JsonSchemaParser:
         while schema[pos] in ['\n', " "]:
             pos += 1
 
-        if schema[pos] == '"':
+        """if schema[pos] == '"':
             pos += 1
             while schema[pos] != '"' and schema[pos -1] != '\\':
                 item_name += schema[pos]
@@ -26,9 +28,9 @@ class JsonSchemaParser:
             raise SchemaParsingException(f"Unexpected character {schema[pos]} at position {pos}")
 
 
-        result[item_name] = cls.__parse_schema_element(schema[pos +1:], comes_with_tags=True)
+        result[item_name] = cls.__parse_schema_element(schema[pos +1:], comes_with_tags=True)"""
 
-        return result
+        return cls.__parse_schema_element(schema[pos:], comes_with_tags=False)
 
     # converts the received element to an ElementContainer. element must start with the tags followed by a ":"
     # and then the content (list, dict or string)
@@ -38,9 +40,10 @@ class JsonSchemaParser:
                              comes_with_tags: bool = True) -> ElementContainer:
         element_container: ElementContainer = ElementContainer()
 
+        #print(f"received element {element}")
         # add inherited tags to initially empty tag list
         if inherited_tags is not None:
-            element_container.tags = inherited_tags
+            element_container.tags = deepcopy(inherited_tags)
 
         pos: int = 0
 
@@ -96,6 +99,7 @@ class JsonSchemaParser:
         # it's a dictionary. all elements need to be parsed to ElementContainer and saved
         # with their respective names
         elif element[pos] == '{':
+            #print(f"It's a dictionary: {element[pos:]}")
             element_container.value_type = ValueType.DICT
             element_container.value = {}
             open_dividers: int = 1  # counts the currently non-closed dividers such as {} and []
@@ -109,7 +113,6 @@ class JsonSchemaParser:
             while element[pos] in ['\n', " "]:
                 pos += 1
 
-            print(8)
             # get the name
             if element[pos] == '"':
                 pos += 1
@@ -117,7 +120,7 @@ class JsonSchemaParser:
                     current_item_name += element[pos]
                     pos += 1
 
-
+            #print(f"Current item name: {current_item_name}")
 
             if element[pos] != '"':
                 raise SchemaParsingException(f"Unexpected character {element[pos]} at position {pos}")
@@ -129,23 +132,28 @@ class JsonSchemaParser:
             while element[pos] in ['\n', " "]:
                 pos += 1
 
+            #print(f"Currently remaining: {element[pos:]}")
+
             # extract all text until the comma that denotes the end of the element
             while open_dividers > 0:
-                if element[pos] in ['[', '{'] and element[pos - 1] != '\\':
-                    open_dividers += 1
-                elif element[pos] in [']', '}'] and element[pos - 1] != '\\':
-                    open_dividers -= 1
+                #print(f"Currently remaining: {element[pos:]} with {open_dividers} open dividers. Current child value: {current_child_value}. Pos: {element[pos]}")
+
+
+
 
                 if open_dividers > 0:
                     current_child_value += element[pos]
-                if open_dividers == 1 and element[pos] == ',':
-                    print(element[0:pos])
-                    print(element[pos:])
-                    print(f"current_child_value 1: {current_child_value}")
+                if open_dividers == 1 and element[pos] == '}': # or element[pos] == '}'
+                    #print(f"current_child_value 1: {current_child_value}")
                     element_container.value[current_item_name] = (
                         cls.__parse_schema_element(current_child_value,
                                                     element_container.tags,
                                                     True))
+
+                if element[pos] in ['[', '{'] and element[pos - 1] != '\\':
+                    open_dividers += 1
+                elif element[pos] in [']', '}'] and element[pos - 1] != '\\':
+                    open_dividers -= 1
 
                 pos += 1
 
