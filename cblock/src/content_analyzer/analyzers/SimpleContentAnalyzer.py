@@ -3,6 +3,6 @@ from src.content_analyzer.ContentAnalyzerInterface import ContentAnalyzerInterfa
 
 class SimpleContentAnalyzer(ContentAnalyzerInterface):
     def analyze(self, content: str) -> bool:
-        if content.__contains__('fuck'):
+        if content.__contains__("fuck"):
             return True
         return False

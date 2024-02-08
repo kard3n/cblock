@@ -82,16 +82,13 @@ ElementContainer: class that contains:
 * value content
 * tags of current elements
 
-    def json_schema_to_object(self, json_schema: str):
-        in_dict: bool = False
-        in_name: bool = False
-        current_name: str = ''
-        result: dict = {}
-        current_container: ElementContainer = ElementContainer()
-        stage: int = 0 # 1: found name for variable, get tags
-
-
-
+  def json_schema_to_object(self, json_schema: str):
+  in_dict: bool = False
+  in_name: bool = False
+  current_name: str = ''
+  result: dict = {}
+  current_container: ElementContainer = ElementContainer()
+  stage: int = 0 # 1: found name for variable, get tags
 
         for char in json_schema:
             if char == '"' and in_name is False: #TODO escaped chars
