@@ -1,10 +1,12 @@
 from src.schemas.generic_schema.GenericSchemaParser import GenericSchemaParser
 from src.schemas.json_schema.JSONSchemaParser import JsonSchemaParser
 
-schema: str = """{"second_name"t: {"dicty": "Big"}, "firstName"t: "John", }"""
-schema_: str = """{"second_name"t: {"firstName"t: "John", "dicty": "Big"}, }"""
+schema: str = """{"second_name"e: {"dicty": "Big"}, "firstName"p: "John", }"""
+schema_: str = (
+    """{"second_name"e: {"firstName"t: "John", "life"s: "Summary of his life"}, }"""
+)
 
-schema2: str = '''{"contained_list"r: [{"picture"p:"pic.jpg",}]}"'''
+schema2: str = '''{"contained_list"e: [{"picture"p:"pic.jpg",}]}"'''
 
 schema3: str = '''{"contained_dictionary"r:{"picture"p:"pic.jpg,"},}"'''
 schema4: str = (
@@ -28,7 +30,7 @@ print(d["list_"])"""
 
 # print(f"Result: {JsonSchemaParser.parse_schema(schema)}\n")
 
-# print(f"Result: {JsonSchemaParser.parse_schema(schema_)}\n")
+print(f"Result: {JsonSchemaParser.parse_schema(schema_)}\n")
 
 # print(f"Result: {JsonSchemaParser.parse_schema(schema2)}\n")
 

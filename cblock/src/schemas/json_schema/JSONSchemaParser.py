@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from src.schemas.json_schema.Schema import ContentTag
+from src.schemas.json_schema.ContentTag import ContentTag
 from src.schemas.json_schema.JSONSchema import JSONSchema, ValueType
 from utils.SchemaParsingException import SchemaParsingException
 from utils.string_utils import jump_whitespaces_linebreaks
@@ -25,9 +25,9 @@ class JsonSchemaParser:
     ) -> JSONSchema:
         element_container: JSONSchema = JSONSchema()
 
-        # add inherited tags to initially empty tag list
-        if inherited_tags is not None:
-            element_container.tags = deepcopy(inherited_tags)
+        # add inherited tags to initially empty tag list. Disables dor now, maybe remove later
+        # if inherited_tags is not None:
+        #    element_container.tags = deepcopy(inherited_tags)
 
         pos: int = 0
 

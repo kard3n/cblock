@@ -15,4 +15,4 @@ class JSONSchema:
         None  # if another editor should be used for this content, it is specified here
     )
     value_type: ValueType | None = None
-    value: dict | str | None = None  # TODO | ElementContainer gives error?
+    value: dict | str | None = None  # TODO | JSONSchema gives error?

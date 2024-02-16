@@ -5,4 +5,4 @@ class SimpleContentAnalyzer(ContentAnalyzerInterface):
     def analyze(self, content: str) -> bool:
         if content.__contains__("fuck"):
             return True
-        return False
+        return True
