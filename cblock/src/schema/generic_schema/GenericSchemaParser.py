@@ -1,7 +1,8 @@
-import re
+import regex
 
-from src.schemas.generic_schema.GenericSchema import GenericSchemaElement, GenericSchema
-from utils.SchemaParsingException import SchemaParsingException
+from src.schema.ContentTag import ContentTag
+from src.schema.generic_schema.GenericSchema import GenericSchema
+from src.exceptions.SchemaParsingException import SchemaParsingException
 from utils.string_utils import (
     jump_whitespaces,
     extract_from_inbetween_symbol,
@@ -30,17 +31,20 @@ class GenericSchemaParser:
         return result
 
     @classmethod
-    def parse_element_single(cls, element: str) -> GenericSchemaElement:
-        result = GenericSchemaElement()
+    def parse_element_single(cls, element: str) -> GenericSchema:
+        result = GenericSchema()
         for item in element.split(","):
             # remove whitespaces
             item = item[jump_whitespaces(item, 0) :]
-            if item.startswith("open:"):
-                result.open = re.compile(extract_from_inbetween_symbol(item[5:], '"'))
-            elif item.startswith("close:"):
-                result.close = re.compile(extract_from_inbetween_symbol(item[6:], '"'))
-            elif item.startswith("action:"):
-                pass
+            if item.startswith("pattern:"):
+                result.pattern = regex.compile(
+                    extract_from_inbetween_symbol(item[8:], '"')
+                )
+            elif item.startswith("tags:"):
+                for letter in extract_from_inbetween_symbol(item[5:], '"'):
+                    if ContentTag(letter) in ContentTag:
+                        result.tags.append(ContentTag[ContentTag(letter).name])
+
             elif item.startswith("schema_id:"):
                 id_pos: int = jump_whitespaces(item, 10)
 
@@ -64,10 +68,10 @@ class GenericSchemaParser:
     def parse_list(cls, line_list: list) -> list:
         line_position: int = 0
         child_line_position: int = 0
-        result: list[GenericSchemaElement] = []
+        result: list[GenericSchema] = []
 
         while line_position < len(line_list):
-            current_element: GenericSchemaElement
+            current_element: GenericSchema
             if count_continuous(line_list[line_position], " ", 0) == 0:
                 current_element = cls.parse_element_single(line_list[line_position])
                 line_position += 1
@@ -77,7 +81,6 @@ class GenericSchemaParser:
                     child_line_position < len(line_list)
                     and count_continuous(line_list[child_line_position], " ", 0) > 0
                 ):
-                    print(1)
                     child_line_position += 1
 
                 if child_line_position > line_position:

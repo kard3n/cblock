@@ -5,8 +5,8 @@ from src.content_analyzer.ContentAnalyzerInterface import ContentAnalyzerInterfa
 from src.content_factory.Content import Content
 from src.content_factory.ContentFactory import ContentFactory
 from src.editor.EditorInterface import EditorInterface
-from src.schemas.json_schema.ContentTag import ContentTag
-from src.schemas.json_schema.JSONSchema import JSONSchema, ValueType
+from src.schema.ContentTag import ContentTag
+from src.schema.json_schema.JSONSchema import JSONSchema, ValueType
 
 
 class JSONEditor(EditorInterface):

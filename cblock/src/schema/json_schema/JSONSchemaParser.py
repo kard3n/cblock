@@ -1,8 +1,6 @@
-from copy import deepcopy
-
-from src.schemas.json_schema.ContentTag import ContentTag
-from src.schemas.json_schema.JSONSchema import JSONSchema, ValueType
-from utils.SchemaParsingException import SchemaParsingException
+from src.schema.ContentTag import ContentTag
+from src.schema.json_schema.JSONSchema import JSONSchema, ValueType
+from src.exceptions.SchemaParsingException import SchemaParsingException
 from utils.string_utils import jump_whitespaces_linebreaks
 
 

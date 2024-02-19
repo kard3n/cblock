@@ -1,5 +1,5 @@
-from src.schemas.generic_schema.GenericSchemaParser import GenericSchemaParser
-from src.schemas.json_schema.JSONSchemaParser import JsonSchemaParser
+from src.schema.generic_schema.GenericSchemaParser import GenericSchemaParser
+from src.schema.json_schema.JSONSchemaParser import JsonSchemaParser
 
 schema: str = """{"second_name"e: {"dicty": "Big"}, "firstName"p: "John", }"""
 schema_: str = (
@@ -8,9 +8,9 @@ schema_: str = (
 
 schema2: str = '''{"contained_list"e: [{"picture"p:"pic.jpg",}]}"'''
 
-schema3: str = '''{"contained_dictionary"r:{"picture"p:"pic.jpg,"},}"'''
+schema3: str = '''{"contained_dictionary"e:{"picture"p:"pic.jpg,"},}"'''
 schema4: str = (
-    '''{"contained_dictionary"r:{"dict2":{"firstName"t: "John"},"picture"p:"pic.jpg",}}"'''
+    '''{"contained_dictionary"e:{"dict2":{"firstName"t: "John"},"picture"p:"pic.jpg",}}"'''
 )
 
 yahoo_schema: str = """{
@@ -32,20 +32,10 @@ print(d["list_"])"""
 
 print(f"Result: {JsonSchemaParser.parse_schema(schema_)}\n")
 
-# print(f"Result: {JsonSchemaParser.parse_schema(schema2)}\n")
+print(f"Result: {JsonSchemaParser.parse_schema(schema2)}\n")
 
-# print(f"Result: {JsonSchemaParser.parse_schema(schema3)}\n")
+print(f"Result: {JsonSchemaParser.parse_schema(schema3)}\n")
 
-# print(f"Result: {JsonSchemaParser.parse_schema(schema4)}")
+print(f"Result: {JsonSchemaParser.parse_schema(schema4)}")
 
-# print(f"Result: {JsonSchemaParser.parse_schema(yahoo_schema)}")
-
-generic_schema: str = """open:"a", close:"b", schema_id: 1234"""
-generic_schema2: str = """open:"a", close:"b", schema_id: 1234
-    open:"c", close:"d", schema_id: 1"""
-
-# print(GenericSchemaParser.parse_element_single(generic_schema))
-
-print(GenericSchemaParser.parse_string(generic_schema))
-
-print(GenericSchemaParser.parse_string(generic_schema2))
+print(f"Result: {JsonSchemaParser.parse_schema(yahoo_schema)}")

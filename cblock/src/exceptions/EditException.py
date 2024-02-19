@@ -1,0 +1,2 @@
+class EditException(Exception):
+    pass

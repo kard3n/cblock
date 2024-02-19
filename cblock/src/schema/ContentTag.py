@@ -23,3 +23,14 @@ class ContentTag(str, Enum):
     )
     DONT_ANALYZE = "d"  # For elements that should be replaced according to another tag, but do not need to be analyzed
     ANALYZE = "a"  # Needs to be set for every item that should be analyzed
+
+    @classmethod
+    def get_leaf_tags(cls) -> list:
+        return [
+            cls.SUMMARY,
+            cls.FULL_CONTENT,
+            cls.PICTURE,
+            cls.VIDEO,
+            cls.CATEGORIES,
+            cls.ANALYZE,
+        ]
