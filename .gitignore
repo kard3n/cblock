@@ -2,3 +2,4 @@ mitmproxy/*
 .idea
 .git
 __pycache__
+.db

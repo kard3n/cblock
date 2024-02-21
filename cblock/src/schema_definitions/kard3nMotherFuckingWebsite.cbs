@@ -1,0 +1,4 @@
+url: motherfuckingwebsite.com/
+type: generic
+schema:
+pattern:"(?P<content>fuck)", tags:"at"

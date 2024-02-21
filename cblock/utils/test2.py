@@ -3,12 +3,12 @@ import json
 from src.content_analyzer.analyzers.SimpleContentAnalyzer import SimpleContentAnalyzer
 from src.content_factory.ContentFactory import ContentFactory
 from src.editor.editors.json_editor.JSONEditor import JSONEditor
-from src.schema.json_schema.JSONSchemaParser import JsonSchemaParser
+from src.schema.json_schema.JSONSchemaParser import JSONSchemaParser
 
 schema: str = (
     """{"first_item"e: {"dicty"at: "Big", "list": [{"item"as: "items value"}]}, "second_item"eap: "John", }"""
 )
-parsed_schema = JsonSchemaParser.parse_schema(schema)
+parsed_schema = JSONSchemaParser.parse_string(schema)
 test_value: str = (
     """{"first_item": {"dicty": "Big", "list": [{"item": "items value"}, {"item": "items value"}]}, "second_item": "John"}"""
 )

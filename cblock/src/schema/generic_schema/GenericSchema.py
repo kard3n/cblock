@@ -13,7 +13,7 @@ class GenericSchema:
     # be ignored (but still evaluated as part of the regex)
     pattern: Pattern = None
     tags: list[ContentTag] = field(default_factory=list[ContentTag])
-    schema_id: int | None = (
+    schema_id: str | None = (
         None  # Can be specified, if a different schema (and therefore editor) should be used for the matched content
     )
     children: None | list = (

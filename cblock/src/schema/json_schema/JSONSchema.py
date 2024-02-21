@@ -11,8 +11,8 @@ class ValueType(Enum):
 @dataclass
 class JSONSchema:
     tags: list = field(default_factory=list)
-    editor_id: int | None = (
-        None  # if another editor should be used for this content, it is specified here
+    schema_id: str | None = (
+        None  # if another schema should be used for this content, it is specified here
     )
     value_type: ValueType | None = None
     value: any = None  # TODO | JSONSchema gives error?

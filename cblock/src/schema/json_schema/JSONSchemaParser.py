@@ -1,13 +1,14 @@
 from src.schema.ContentTag import ContentTag
+from src.schema.SchemaParserInterface import SchemaParserInterface
 from src.schema.json_schema.JSONSchema import JSONSchema, ValueType
 from src.exceptions.SchemaParsingException import SchemaParsingException
 from utils.string_utils import jump_whitespaces_linebreaks
 
 
-class JsonSchemaParser:
+class JSONSchemaParser(SchemaParserInterface):
 
     @classmethod
-    def parse_schema(cls, schema: str) -> JSONSchema:
+    def parse_string(cls, schema: str) -> JSONSchema:
         pos: int = 0
 
         jump_whitespaces_linebreaks(schema, pos)
@@ -30,24 +31,37 @@ class JsonSchemaParser:
         pos: int = 0
 
         # check if the passed element has tags, if it does adds them
-        if element[pos].isalpha() or element[pos] == ":":
+        if element[pos].isalpha() or element[pos] == ":" or element[pos] == "(":
             while element[pos] != ":":
-                if ContentTag(element[pos]) in ContentTag:
+                try:
                     element_container.tags.append(
                         ContentTag[ContentTag(element[pos]).name]
                     )
                     pos += 1
-                elif element[pos].isnumeric():
-                    editor_id: str = ""
-                    while element[pos].isnumeric():
-                        editor_id += element[pos]
+                except ValueError:
+                    # The following content is the name of an embedded schema, so it's read
+                    if element[pos] == "(":
                         pos += 1
-                    element_container.editor_id = int(editor_id)
+                        schema_id: str = ""
+                        while (
+                            element[pos] != ")"
+                            and element[pos] != ":"
+                            and element[pos].isalpha()
+                        ):
+                            schema_id += element[pos]
+                            pos += 1
 
-                else:
-                    raise SchemaParsingException(
-                        f'Invalid content tag "{element[pos]}" at position {pos}'
-                    )
+                        if element[pos] != ")":
+                            raise SchemaParsingException(
+                                f'Embedded Schema ID "{schema_id}" did not have an ending parenthesis.'
+                            )
+
+                        pos += 1
+                        element_container.schema_id = schema_id
+                    else:
+                        raise SchemaParsingException(
+                            f'Invalid content tag "{element[pos]}" at position {pos}'
+                        )
 
             # jump ':'
             pos += 1

@@ -1,12 +1,12 @@
 from src.schema.generic_schema.GenericSchemaParser import GenericSchemaParser
-from src.schema.json_schema.JSONSchemaParser import JsonSchemaParser
+from src.schema.json_schema.JSONSchemaParser import JSONSchemaParser
 
 schema: str = """{"second_name"e: {"dicty": "Big"}, "firstName"p: "John", }"""
 schema_: str = (
     """{"second_name"e: {"firstName"t: "John", "life"s: "Summary of his life"}, }"""
 )
 
-schema2: str = '''{"contained_list"e: [{"picture"p:"pic.jpg",}]}"'''
+schema2: str = '''{"contained_list"e: [{"picture"p(testName):"pic.jpg",}]}"'''
 
 schema3: str = '''{"contained_dictionary"e:{"picture"p:"pic.jpg,"},}"'''
 schema4: str = (
@@ -30,12 +30,12 @@ print(d["list_"])"""
 
 # print(f"Result: {JsonSchemaParser.parse_schema(schema)}\n")
 
-print(f"Result: {JsonSchemaParser.parse_schema(schema_)}\n")
+print(f"Result: {JSONSchemaParser.parse_string(schema_)}\n")
 
-print(f"Result: {JsonSchemaParser.parse_schema(schema2)}\n")
+print(f"Result: {JSONSchemaParser.parse_string(schema2)}\n")
 
-print(f"Result: {JsonSchemaParser.parse_schema(schema3)}\n")
+print(f"Result: {JSONSchemaParser.parse_string(schema3)}\n")
 
-print(f"Result: {JsonSchemaParser.parse_schema(schema4)}")
+print(f"Result: {JSONSchemaParser.parse_string(schema4)}")
 
-print(f"Result: {JsonSchemaParser.parse_schema(yahoo_schema)}")
+print(f"Result: {JSONSchemaParser.parse_string(yahoo_schema)}")

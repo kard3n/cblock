@@ -1,0 +1,4 @@
+url: basic_web.com/data
+type: json
+schema:
+{"contained_list"e: [{"picture"p(testName):"pic.jpg",}]}

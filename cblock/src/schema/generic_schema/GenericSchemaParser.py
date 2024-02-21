@@ -1,6 +1,7 @@
 import regex
 
 from src.schema.ContentTag import ContentTag
+from src.schema.SchemaParserInterface import SchemaParserInterface
 from src.schema.generic_schema.GenericSchema import GenericSchema
 from src.exceptions.SchemaParsingException import SchemaParsingException
 from utils.string_utils import (
@@ -10,15 +11,15 @@ from utils.string_utils import (
 )
 
 
-class GenericSchemaParser:
+class GenericSchemaParser(SchemaParserInterface):
 
     @classmethod
-    def parse_string(cls, input: str) -> GenericSchema:
+    def parse_string(cls, schema: str) -> GenericSchema:
         result: GenericSchema = GenericSchema()
 
         cleaned_list: list[str] = []
 
-        for line in input.split("\n"):
+        for line in schema.split("\n"):
             if not line.isspace() or len(line) == 0:
                 cleaned_list.append(line)
 
@@ -49,12 +50,12 @@ class GenericSchemaParser:
                 id_pos: int = jump_whitespaces(item, 10)
 
                 num: str = ""
-                while id_pos < len(item) and item[id_pos].isnumeric():
+                while id_pos < len(item) and item[id_pos].isalnum():
                     num += item[id_pos]
                     id_pos += 1
 
                 if num != "":
-                    result.schema_id = int(num)
+                    result.schema_id = num
                 else:
                     raise SchemaParsingException(
                         '"editor_id" tag must be followed by an ID.'

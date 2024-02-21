@@ -40,3 +40,32 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
         assert (
             self.editor.extract_content(input_value="bb_hola_bb", schema=schema) == ""
         )
+
+    def test_extract_content_two(self):
+        schema: GenericSchema = GenericSchema(
+            pattern=None,
+            tags=[],
+            schema_id=None,
+            children=[
+                GenericSchema(
+                    pattern=regex.Regex("_(?P<content>(<p>.*</p>)+)_"),
+                    tags=[ContentTag.ELEMENT],
+                    schema_id=20,
+                    children=[
+                        GenericSchema(
+                            pattern=regex.Regex("<p>(?P<content>abc)</p>"),
+                            tags=[ContentTag.ANALYZE],
+                            schema_id=20,
+                            children=None,
+                        )
+                    ],
+                )
+            ],
+        )
+
+        assert (
+            self.editor.extract_content(
+                input_value="_<p>abc</p><p>abc</p>_", schema=schema
+            )
+            == "abcabc"
+        )
