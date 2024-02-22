@@ -2,7 +2,9 @@
 Schemas tell ContentBlock which web requests to filter and how to interpret their content.
 Each schema has a name (or ID), a type and an associated specific schema like a JSON or Generic schema.
 All schemas ContentBlock should use must be saved in the schema_definitions directory, with the name of their file
-being their own name followed by `.cbs` (ContentBlockSchema).
+being their own name followed by `.cbs` (ContentBlockSchema). Root schemas (those that aren't embedded in another one)
+also have an URL attribute (the name followed by the website, like "mywebsite.com") and a PATH attribute (for example, "/files").
+While the URL attribute is a normal string, PATH can (and often must) be a regular expression.
 
 An example file could look like this:
 
@@ -12,7 +14,8 @@ Name:
 Content:
 
 ```
-url: basic_web.com/data
+url: basic_web.com
+path: /data
 type: json
 schema: # after the schema line, the definition of the underlying specialized schema is specified.
 {}
@@ -48,3 +51,7 @@ Example: A list that serves as a container for multiple dictionaries which conta
     ]
 }
 ```
+
+
+### generic -> GenericSchema
+All leaves must be children of an element with the ELEMENT tag, or have one themselves

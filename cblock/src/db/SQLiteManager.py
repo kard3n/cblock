@@ -15,10 +15,21 @@ class SQLiteManager(DBManagerInterface):
         self.cursor = self.connection.cursor()
         self.table_name = table_name
 
+    # return True if a database already exists, if not returns False
+    def has_database(self) -> bool:
+        if (
+            self.cursor.execute(
+                f"SELECT name FROM sqlite_schema WHERE name='{self.table_name}'"
+            ).fetchone()
+            is None
+        ):
+            return False
+        return True
+
     def create_schema_table(self) -> None:
         self.__create_table(
             id_column="schema_id",
-            non_id_columns=["name", "url", "schema_type", "schema"],
+            non_id_columns=["url", "path", "schema_type", "schema"],
             columns_to_index=["url"],
         )
 
@@ -66,16 +77,16 @@ class SQLiteManager(DBManagerInterface):
 
         return res[:-1]
 
-    def insert(self, table_name: str, values: list[any]):
+    def insert(self, values: list[any]):
         self.cursor.execute(
-            f"INSERT INTO {table_name} VALUES ({self.__list_to_comma_separated(values)}"
+            f"INSERT INTO {self.table_name} VALUES ({self.__list_to_comma_separated(values)}"
         )
         self.connection.commit()
 
-    def insert_multiple(self, table_name: str, values: list[list[any]]):
+    def insert_multiple(self, values: list[list[any]]):
         for value in values:
             self.cursor.execute(
-                f"INSERT INTO {table_name} VALUES ({self.__list_to_comma_separated(value)}"
+                f"INSERT INTO {self.table_name} VALUES ({self.__list_to_comma_separated(value)})"
             )
 
         self.connection.commit()
@@ -83,14 +94,21 @@ class SQLiteManager(DBManagerInterface):
     def __list_to_comma_separated(self, items: list[str]):
         res: str = ""
         for item in items:
-            res += item + ","
+            res += "'" + item + "',"
 
         return res[:-1]
 
     def check_url_has_schema(self, url: str) -> bool:
         if (
-            self.cursor.execute(f"SELECT url FROM  WHERE url = '{url}'").fetchone()
+            self.cursor.execute(
+                f"SELECT url FROM {self.table_name} WHERE url = '{url}'"
+            ).fetchone()
             is not None
         ):
             return True
         return False
+
+    def get_schema(self, url: str) -> tuple[str, str]:
+        return self.cursor.execute(
+            f"SELECT schema_type, schema FROM {self.table_name} WHERE url = '{url}'"
+        ).fetchone()

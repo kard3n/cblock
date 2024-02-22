@@ -14,6 +14,7 @@ class SchemaType(str, Enum):
 class Schema:
     id: str
     url: str = None
+    path: str = None
     schema_type: SchemaType = None
     schema: JSONSchema | GenericSchema = None
 

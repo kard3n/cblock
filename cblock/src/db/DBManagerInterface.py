@@ -8,13 +8,22 @@ class DBManagerInterface(ABC):
         raise NotImplementedError("Not yet implemented")
 
     @abstractmethod
-    def insert(self, table_name: str, values: list[any]):
+    def insert(self, values: list[any]):
         raise NotImplementedError("Not yet implemented")
 
     @abstractmethod
-    def insert_multiple(self, table_name: str, values: list[list[any]]):
+    def insert_multiple(self, values: list[list[any]]):
         raise NotImplementedError("Not yet implemented")
 
     @abstractmethod
     def check_url_has_schema(self, url: str) -> bool:
+        raise NotImplementedError("Not yet implemented")
+
+    # return True if a database already exists, if not returns False
+    @abstractmethod
+    def has_database(self) -> bool:
+        raise NotImplementedError("Not yet implemented")
+
+    @abstractmethod
+    def get_schema(self, url: str) -> tuple[str, str]:
         raise NotImplementedError("Not yet implemented")

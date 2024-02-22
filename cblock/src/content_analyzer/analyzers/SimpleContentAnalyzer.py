@@ -1,4 +1,4 @@
-from src.content_analyzer.ContentAnalyzerInterface import ContentAnalyzerInterface
+from content_analyzer.ContentAnalyzerInterface import ContentAnalyzerInterface
 
 
 class SimpleContentAnalyzer(ContentAnalyzerInterface):

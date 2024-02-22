@@ -1,3 +1,5 @@
+import logging
+
 import regex
 
 from schema.ContentTag import ContentTag
@@ -15,6 +17,7 @@ class GenericSchemaParser(SchemaParserInterface):
 
     @classmethod
     def parse_string(cls, schema: str) -> GenericSchema:
+        logging.info(schema)
         result: GenericSchema = GenericSchema()
 
         cleaned_list: list[str] = []

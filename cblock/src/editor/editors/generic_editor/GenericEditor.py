@@ -1,3 +1,5 @@
+import logging
+
 from regex import Match, regex
 
 from content_analyzer.ContentAnalyzerInterface import ContentAnalyzerInterface
@@ -25,11 +27,13 @@ class GenericEditor(EditorInterface):
         # the current schema's pattern was evaluated in the previous recursion, and input_raw is its "content"
         # group that was passed. If input_raw is the root, it works the same way (it's as if the "previous" one just
         # matched the whole text)
+
         for child_schema in schema.children:
             matches_iter = regex.finditer(child_schema.pattern, input_raw)
             match_list: list[Match] = []
 
             for match in matches_iter:
+                logging.info(match.group("content"))
 
                 if match.group("content") is not None:
                     # found a substring that matches, so we have to check for tags and do something

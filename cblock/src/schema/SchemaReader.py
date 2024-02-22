@@ -1,6 +1,10 @@
+import logging
 import os
 
+from dependency_injector.schema import SchemaError
+
 from db.DBManagerInterface import DBManagerInterface
+from exceptions.SchemaParsingException import SchemaParsingException
 from schema.Schema import SchemaType
 from schema.SchemaParserFactory import SchemaParserFactory
 from utils import string_utils
@@ -15,7 +19,6 @@ class SchemaReader:
     def __init__(self, db_manager: DBManagerInterface, schema_location: str):
         self.db_manager = db_manager
         self.schema_location = schema_location
-        self.table_name = "cbschema"
 
     def run(self):
         filename_list = os.listdir(f"{self.schema_location}/")
@@ -24,21 +27,31 @@ class SchemaReader:
 
         data_to_insert = []
         for filename in filename_list:
+            result: any
             if filename.endswith(".cbs"):
-                data_to_insert.append(
-                    self.read_schema(filename=self.schema_location + "/" + filename)
-                )
-
-        self.db_manager.insert_multiple(
-            table_name=self.table_name, values=data_to_insert
-        )
+                try:
+                    result = self.read_schema(
+                        directory=self.schema_location, filename=filename
+                    )
+                except SchemaParsingException as e:
+                    logging.warning(f"Exception parsing schema '{filename}: {e}'")
+                if type(result) is not str:
+                    data_to_insert.append(
+                        self.read_schema(
+                            directory=self.schema_location, filename=filename
+                        )
+                    )
+                else:
+                    raise SchemaParsingException(result)
+        self.db_manager.insert_multiple(values=data_to_insert)
 
     # Returns a list, with the following content (order): schema name, url, schema type, underlying schema (as string)
-    def read_schema(self, filename: str) -> list | str:
+    def read_schema(self, directory: str, filename: str) -> list | str:
         schema_type: str | None = None
         url: str | None = None
+        path: str | None = None
         factory: SchemaParserFactory = SchemaParserFactory()
-        with open(filename) as file:
+        with open(directory + "/" + filename) as file:
             file_content = file.read()
 
         pos: int = 0
@@ -47,6 +60,11 @@ class SchemaReader:
             if file_content[pos:].startswith("url:"):
                 pos = string_utils.jump_whitespaces(string=file_content, pos=pos + 4)
                 url = string_utils.extract_until_symbols(
+                    string=file_content, symbols=["\n"], start_pos=pos, end_pos=None
+                )
+            if file_content[pos:].startswith("path:"):
+                pos = string_utils.jump_whitespaces(string=file_content, pos=pos + 5)
+                path = string_utils.extract_until_symbols(
                     string=file_content, symbols=["\n"], start_pos=pos, end_pos=None
                 )
             if file_content[pos:].startswith("type:"):
@@ -70,7 +88,8 @@ class SchemaReader:
                     factory.getParser(schema_type).parse_string(file_content[pos:])
                 except Exception as e:
                     return f"Underlying {schema_type} schema could not be parsed: {e}"
-                pos = len(file_content)
+                break
+
             else:
                 # invalid row, jump to next
                 while file_content[pos] != "\n" and pos < len(file_content):
@@ -78,4 +97,12 @@ class SchemaReader:
 
                 pos += 1
 
-        return [filename[:-4], url, schema_type, file_content[pos:]]
+        if (
+            url is None
+            or path is None
+            or schema_type is None
+            or file_content[pos:] == ""
+        ):
+            raise SchemaError("Schema is missing fields.")
+
+        return [filename[:-4], url, path, schema_type, file_content[pos:]]

@@ -1,4 +1,4 @@
-from src.content_factory.Content import Content
+from content_factory.Content import Content
 
 
 class ContentFactory:

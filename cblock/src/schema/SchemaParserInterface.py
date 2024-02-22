@@ -2,7 +2,6 @@ import abc
 from abc import ABC
 
 
-
 class SchemaParserInterface(ABC):
     @classmethod
     @abc.abstractmethod
