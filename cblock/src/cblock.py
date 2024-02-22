@@ -14,8 +14,11 @@ conda env config vars set PYTHONUTF8=1
 
 import logging
 
+import regex
+
 from content_analyzer.ContentAnalyzerFactory import ContentAnalyzerFactory
 from content_factory.ContentFactory import ContentFactory
+from db.PathSearchResult import PathSearchResult
 from db.SQLiteManager import SQLiteManager
 from editor.ContentEditorFactory import ContentEditorFactory
 from mitmproxy import http
@@ -57,25 +60,23 @@ class Main:
                 print(e.__traceback__)
 
     async def response(self, flow: http.HTTPFlow):
-        logging.info(f"URI: {flow.request.pretty_host + flow.request.path}")
-        if self.db_manager.check_url_has_schema(
-            flow.request.pretty_host + flow.request.path
-        ):
-            flow.response.text = await self.__edit(
-                url=flow.request.pretty_host + flow.request.path,
-                content=flow.response.text,
-            )
+        # logging.info(f"URI: {flow.request.pretty_host + flow.request.path}")
+        paths: list[PathSearchResult] = self.db_manager.get_paths_for_url(
+            url=flow.request.pretty_host
+        )
 
-        # if flow.request.pretty_host + flow.request.path == "motherfuckingwebsite.com/":
-        #    flow.response.text = flow.response.text.replace("fuck", "****")
+        for search_result in paths:
+            if regex.compile(search_result.path).match(flow.request.path) is not None:
+                flow.response.text = await self.__edit(
+                    schema_id=search_result.id,
+                    content=flow.response.text,
+                )
 
-    # URL is the full URI of the resource, and content is the content to edit
-
-    async def __edit(self, url: str, content: str) -> str:
+    async def __edit(self, schema_id: str, content: str) -> str:
 
         # logging.warning(self.db_manager.get_schema(url=url))
-        schema_type, schema = self.db_manager.get_schema(url=url)
-        logging.info(f"Schema: {schema}")
+        schema_type, schema = self.db_manager.get_schema(schema_id=schema_id)
+
         logging.info(
             f"Parsed: {self.schema_parser_factory.getParser(parser_type=schema_type).parse_string(schema)}"
         )

@@ -1,5 +1,8 @@
 from abc import ABC, abstractmethod
 
+from db import SchemaSearchResult
+from db.PathSearchResult import PathSearchResult
+
 
 class DBManagerInterface(ABC):
 
@@ -25,5 +28,9 @@ class DBManagerInterface(ABC):
         raise NotImplementedError("Not yet implemented")
 
     @abstractmethod
-    def get_schema(self, url: str) -> tuple[str, str]:
+    def get_schema(self, schema_id: str) -> SchemaSearchResult:
+        raise NotImplementedError("Not yet implemented")
+
+    @abstractmethod
+    def get_paths_for_url(self, url: str) -> list[PathSearchResult]:
         raise NotImplementedError("Not yet implemented")

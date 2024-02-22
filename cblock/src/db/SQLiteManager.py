@@ -1,6 +1,9 @@
 import sqlite3
 
 from db.DBManagerInterface import DBManagerInterface
+from db.SchemaSearchResult import SchemaSearchResult
+
+from db.PathSearchResult import PathSearchResult
 
 
 class SQLiteManager(DBManagerInterface):
@@ -108,7 +111,18 @@ class SQLiteManager(DBManagerInterface):
             return True
         return False
 
-    def get_schema(self, url: str) -> tuple[str, str]:
-        return self.cursor.execute(
-            f"SELECT schema_type, schema FROM {self.table_name} WHERE url = '{url}'"
+    def get_schema(self, schema_id: str) -> SchemaSearchResult:
+        result = self.cursor.execute(
+            f"SELECT schema_type, schema FROM {self.table_name} WHERE id = '{id}'"
         ).fetchone()
+
+        return SchemaSearchResult(schema_type=result[0], schema=result[1])
+
+    def get_paths_for_url(self, url: str) -> list[PathSearchResult]:
+        result: list[PathSearchResult] = list()
+        for item in self.cursor.execute(
+            f"SELECT schema_id, path FROM {self.table_name} WHERE url = '{url}'"
+        ).fetchall():
+            result.append(PathSearchResult(id=item[0], path=item[1]))
+
+        return result

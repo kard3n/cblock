@@ -1,7 +1,6 @@
 import logging
 import os
 
-from dependency_injector.schema import SchemaError
 
 from db.DBManagerInterface import DBManagerInterface
 from exceptions.SchemaParsingException import SchemaParsingException
@@ -103,6 +102,6 @@ class SchemaReader:
             or schema_type is None
             or file_content[pos:] == ""
         ):
-            raise SchemaError("Schema is missing fields.")
+            raise SchemaParsingException("Schema is missing fields.")
 
         return [filename[:-4], url, path, schema_type, file_content[pos:]]
