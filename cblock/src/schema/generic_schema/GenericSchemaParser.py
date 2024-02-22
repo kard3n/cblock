@@ -1,9 +1,9 @@
 import regex
 
-from src.schema.ContentTag import ContentTag
-from src.schema.SchemaParserInterface import SchemaParserInterface
-from src.schema.generic_schema.GenericSchema import GenericSchema
-from src.exceptions.SchemaParsingException import SchemaParsingException
+from schema.ContentTag import ContentTag
+from schema.SchemaParserInterface import SchemaParserInterface
+from schema.generic_schema.GenericSchema import GenericSchema
+from exceptions.SchemaParsingException import SchemaParsingException
 from utils.string_utils import (
     jump_whitespaces,
     extract_from_inbetween_symbol,

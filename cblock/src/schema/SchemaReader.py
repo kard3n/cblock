@@ -1,8 +1,8 @@
 import os
 
-from src.db.DBManagerInterface import DBManagerInterface
-from src.schema.Schema import SchemaType
-from src.schema.SchemaParserFactory import SchemaParserFactory
+from db.DBManagerInterface import DBManagerInterface
+from schema.Schema import SchemaType
+from schema.SchemaParserFactory import SchemaParserFactory
 from utils import string_utils
 
 

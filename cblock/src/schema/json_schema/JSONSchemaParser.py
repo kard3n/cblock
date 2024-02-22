@@ -1,7 +1,7 @@
-from src.schema.ContentTag import ContentTag
-from src.schema.SchemaParserInterface import SchemaParserInterface
-from src.schema.json_schema.JSONSchema import JSONSchema, ValueType
-from src.exceptions.SchemaParsingException import SchemaParsingException
+from schema.ContentTag import ContentTag
+from schema.SchemaParserInterface import SchemaParserInterface
+from schema.json_schema.JSONSchema import JSONSchema, ValueType
+from exceptions.SchemaParsingException import SchemaParsingException
 from utils.string_utils import jump_whitespaces_linebreaks
 
 

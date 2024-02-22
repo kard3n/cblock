@@ -1,7 +1,6 @@
 import abc
-from abc import ABC, abstractmethod
+from abc import ABC
 
-from src.schema.json_schema.JSONSchema import JSONSchema
 
 
 class SchemaParserInterface(ABC):

@@ -1,12 +1,12 @@
 from regex import Match, regex
 
-from src.content_analyzer.ContentAnalyzerInterface import ContentAnalyzerInterface
-from src.content_factory.Content import Content
-from src.content_factory.ContentFactory import ContentFactory
-from src.editor.EditorInterface import EditorInterface
-from src.exceptions.EditException import EditException
-from src.schema.ContentTag import ContentTag
-from src.schema.generic_schema.GenericSchema import GenericSchema
+from content_analyzer.ContentAnalyzerInterface import ContentAnalyzerInterface
+from content_factory.Content import Content
+from content_factory.ContentFactory import ContentFactory
+from editor.EditorInterface import EditorInterface
+from exceptions.EditException import EditException
+from schema.ContentTag import ContentTag
+from schema.generic_schema.GenericSchema import GenericSchema
 
 
 class GenericEditor(EditorInterface):

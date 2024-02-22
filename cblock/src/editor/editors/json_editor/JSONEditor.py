@@ -1,12 +1,12 @@
 import json
 import logging
 
-from src.content_analyzer.ContentAnalyzerInterface import ContentAnalyzerInterface
-from src.content_factory.Content import Content
-from src.content_factory.ContentFactory import ContentFactory
-from src.editor.EditorInterface import EditorInterface
-from src.schema.ContentTag import ContentTag
-from src.schema.json_schema.JSONSchema import JSONSchema, ValueType
+from content_analyzer.ContentAnalyzerInterface import ContentAnalyzerInterface
+from content_factory.Content import Content
+from content_factory.ContentFactory import ContentFactory
+from editor.EditorInterface import EditorInterface
+from schema.ContentTag import ContentTag
+from schema.json_schema.JSONSchema import JSONSchema, ValueType
 
 
 class JSONEditor(EditorInterface):

@@ -14,8 +14,9 @@ conda env config vars set PYTHONUTF8=1
 
 import logging
 
+from db.SQLiteManager import SQLiteManager
 from mitmproxy import http
-from src.db.DBManagerInterface import DBManagerInterface
+from db.DBManagerInterface import DBManagerInterface
 
 
 # TODO class to load config
@@ -31,12 +32,14 @@ class Main:
         logging.info("Starting CBlock")
         # self.source_filter_factory = SourceFilterFactory()
         # self.content_analyzer_factory = ContentAnalyzerFactory()
-        self.db_manager: DBManagerInterface = DBManagerInterface()
+        self.db_manager = SQLiteManager(database_name="cbdb", table_name="cb_schema")
 
     def response(self, flow: http.HTTPFlow):
         logging.info(
             f"Pretty host plus path: {flow.request.pretty_host}{flow.request.path}"
         )
+        if flow.request.pretty_host + flow.request.path == "motherfuckingwebsite.com/":
+            flow.response.text = flow.response.text.replace("fuck", "****")
         """if (
             self.source_filter_factory.get_source_filter("url").get_action(
                 flow.request.pretty_host

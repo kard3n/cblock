@@ -1,8 +1,6 @@
-from enum import Enum
-
-from src.schema.SchemaParserInterface import SchemaParserInterface
-from src.schema.generic_schema.GenericSchemaParser import GenericSchemaParser
-from src.schema.json_schema import JSONSchemaParser
+from schema.SchemaParserInterface import SchemaParserInterface
+from schema.generic_schema.GenericSchemaParser import GenericSchemaParser
+from schema.json_schema import JSONSchemaParser
 
 
 class SchemaParserFactory:

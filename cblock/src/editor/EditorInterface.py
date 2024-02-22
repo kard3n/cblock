@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
-from src.content_analyzer.ContentAnalyzerInterface import ContentAnalyzerInterface
-from src.content_factory.ContentFactory import ContentFactory
+from content_analyzer.ContentAnalyzerInterface import ContentAnalyzerInterface
+from content_factory.ContentFactory import ContentFactory
 
 
 class EditorInterface(ABC):

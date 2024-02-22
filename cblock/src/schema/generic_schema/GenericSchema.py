@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 
 from regex import Pattern
 
-from src.schema.ContentTag import ContentTag
+from schema.ContentTag import ContentTag
 
 
 @dataclass

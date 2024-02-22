@@ -1,6 +1,6 @@
 import sqlite3
 
-from src.db.DBManagerInterface import DBManagerInterface
+from db.DBManagerInterface import DBManagerInterface
 
 
 class SQLiteManager(DBManagerInterface):
@@ -16,7 +16,7 @@ class SQLiteManager(DBManagerInterface):
         self.table_name = table_name
 
     def create_schema_table(self) -> None:
-        self.create_table(
+        self.__create_table(
             id_column="schema_id",
             non_id_columns=["name", "url", "schema_type", "schema"],
             columns_to_index=["url"],
