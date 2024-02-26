@@ -1,11 +1,10 @@
-import logging
-
 import regex
 
 from schema.ContentTag import ContentTag
-from schema.SchemaParserInterface import SchemaParserInterface
+from schema.parser.SchemaParserInterface import SchemaParserInterface
 from schema.generic_schema.GenericSchema import GenericSchema
 from exceptions.SchemaParsingException import SchemaParsingException
+from utils.Singleton import Singleton
 from utils.string_utils import (
     jump_whitespaces,
     extract_from_inbetween_symbol,
@@ -57,7 +56,7 @@ class GenericSchemaParser(SchemaParserInterface):
                     id_pos += 1
 
                 if num != "":
-                    result.schema_id = num
+                    result.embedded_schema = num
                 else:
                     raise SchemaParsingException(
                         '"editor_id" tag must be followed by an ID.'

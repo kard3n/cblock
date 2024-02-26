@@ -4,9 +4,11 @@ from regex import regex
 
 from content_analyzer.analyzers.SimpleContentAnalyzer import SimpleContentAnalyzer
 from content_factory.ContentFactory import ContentFactory
+from db.SQLiteManager import SQLiteManager
 from editor.editors.generic_editor.GenericEditor import GenericEditor
 from schema.ContentTag import ContentTag
 from schema.generic_schema.GenericSchema import GenericSchema
+from schema.parser.SchemaReader import SchemaReader
 
 
 class GenericSchemaEditorUnitTest(unittest.TestCase):
@@ -14,20 +16,35 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        db_manager = SQLiteManager(database_name="cb_test.db", table_name="cb_schema")
+
+        if not db_manager.has_database():
+            db_manager.create_schema_table()
+
+            try:
+                schema_reader: SchemaReader = SchemaReader(
+                    db_manager=db_manager, schema_location="../schema_definitions/"
+                )
+                schema_reader.run()
+            except Exception as e:
+                print(e.__traceback__)
+
         cls.editor: GenericEditor = GenericEditor(
-            content_analyzer=SimpleContentAnalyzer(), content_factory=ContentFactory()
+            content_analyzer=SimpleContentAnalyzer(),
+            content_factory=ContentFactory(),
+            db_manager=db_manager,
         )
 
     def test_extract_content_one(self):
         schema: GenericSchema = GenericSchema(
             pattern=None,
             tags=[],
-            schema_id=None,
+            embedded_schema=None,
             children=[
                 GenericSchema(
                     pattern=regex.Regex("bb(?P<content>hola)bb"),
                     tags=[ContentTag.ANALYZE],
-                    schema_id=20,
+                    embedded_schema=None,
                     children=None,
                 )
             ],
@@ -45,17 +62,17 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
         schema: GenericSchema = GenericSchema(
             pattern=None,
             tags=[],
-            schema_id=None,
+            embedded_schema=None,
             children=[
                 GenericSchema(
                     pattern=regex.Regex("_(?P<content>(<p>.*</p>)+)_"),
                     tags=[ContentTag.ELEMENT],
-                    schema_id=20,
+                    embedded_schema=None,
                     children=[
                         GenericSchema(
                             pattern=regex.Regex("<p>(?P<content>abc)</p>"),
                             tags=[ContentTag.ANALYZE],
-                            schema_id=20,
+                            embedded_schema=None,
                             children=None,
                         )
                     ],

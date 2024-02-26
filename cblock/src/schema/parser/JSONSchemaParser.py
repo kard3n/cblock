@@ -1,13 +1,12 @@
 from schema.ContentTag import ContentTag
-from schema.SchemaParserInterface import SchemaParserInterface
+from schema.parser.SchemaParserInterface import SchemaParserInterface
 from schema.json_schema.JSONSchema import JSONSchema, ValueType
 from exceptions.SchemaParsingException import SchemaParsingException
+from utils.Singleton import Singleton
 from utils.string_utils import jump_whitespaces_linebreaks
 
 
 class JSONSchemaParser(SchemaParserInterface):
-    def __init__(self):
-        pass
 
     @classmethod
     def parse_string(cls, schema: str) -> JSONSchema:

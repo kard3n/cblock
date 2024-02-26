@@ -5,7 +5,7 @@ import os
 from db.DBManagerInterface import DBManagerInterface
 from exceptions.SchemaParsingException import SchemaParsingException
 from schema.Schema import SchemaType
-from schema.SchemaParserFactory import SchemaParserFactory
+from schema.parser.SchemaParserFactory import SchemaParserFactory
 from utils import string_utils
 
 

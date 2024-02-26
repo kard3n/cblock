@@ -22,8 +22,8 @@ from db.PathSearchResult import PathSearchResult
 from db.SQLiteManager import SQLiteManager
 from editor.ContentEditorFactory import ContentEditorFactory
 from mitmproxy import http
-from schema.SchemaParserFactory import SchemaParserFactory
-from schema.SchemaReader import SchemaReader
+from schema.parser.SchemaParserFactory import SchemaParserFactory
+from schema.parser.SchemaReader import SchemaReader
 
 
 # TODO class to load config
@@ -38,13 +38,16 @@ class Main:
     def __init__(self):
         logging.info("Starting CBlock")
         self.content_analyzer_factory = ContentAnalyzerFactory()
-        self.content_editor_factory = ContentEditorFactory(
-            content_analyzer=self.content_analyzer_factory.get_content_analyzer(),
-            content_factory=ContentFactory(),
-        )
+
         self.schema_parser_factory = SchemaParserFactory()
         self.db_manager = SQLiteManager(
             database_name="cb_database.db", table_name="cb_schema"
+        )
+
+        self.content_editor_factory = ContentEditorFactory(
+            content_analyzer=self.content_analyzer_factory.get_content_analyzer(),
+            content_factory=ContentFactory(),
+            db_manager=self.db_manager,
         )
 
         if not self.db_manager.has_database():
@@ -83,7 +86,7 @@ class Main:
 
         logging.info(
             f"""Result: {self.content_editor_factory.get_content_editor(
-                editor_type=schema_type
+                schema_type=schema_type
             ).edit(
                 input_raw=content,
                 schema=self.schema_parser_factory.getParser(
@@ -95,7 +98,7 @@ class Main:
         )
 
         return self.content_editor_factory.get_content_editor(
-            editor_type=schema_type
+            schema_type=schema_type
         ).edit(
             input_raw=content,
             schema=self.schema_parser_factory.getParser(

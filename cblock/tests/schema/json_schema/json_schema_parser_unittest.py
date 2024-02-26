@@ -2,7 +2,7 @@ import unittest
 
 from schema.ContentTag import ContentTag
 from schema.json_schema.JSONSchema import JSONSchema, ValueType
-from schema.json_schema.JSONSchemaParser import JSONSchemaParser
+from schema.parser.JSONSchemaParser import JSONSchemaParser
 
 
 class TestJsonSchemaParser(unittest.TestCase):

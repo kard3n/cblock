@@ -4,7 +4,7 @@ from regex import regex
 
 from schema.ContentTag import ContentTag
 from schema.generic_schema.GenericSchema import GenericSchema
-from schema.generic_schema.GenericSchemaParser import GenericSchemaParser
+from schema.parser.GenericSchemaParser import GenericSchemaParser
 
 
 class TestGenericSchemaParser(unittest.TestCase):
@@ -19,12 +19,12 @@ class TestGenericSchemaParser(unittest.TestCase):
             == GenericSchema(
                 pattern=None,
                 tags=[],
-                schema_id=None,
+                embedded_schema=None,
                 children=[
                     GenericSchema(
                         pattern=regex.Regex("bb(?P<content>hola)bb"),
                         tags=[ContentTag.ANALYZE],
-                        schema_id=20,
+                        embedded_schema=20,
                         children=None,
                     )
                 ],
@@ -39,17 +39,17 @@ class TestGenericSchemaParser(unittest.TestCase):
             == GenericSchema(
                 pattern=None,
                 tags=[],
-                schema_id=None,
+                embedded_schema=None,
                 children=[
                     GenericSchema(
                         pattern=regex.Regex("bb(?P<content>xxholaxx)bb"),
                         tags=[ContentTag.ELEMENT],
-                        schema_id=20,
+                        embedded_schema=20,
                         children=[
                             GenericSchema(
                                 pattern=regex.Regex("xx(?P<content>hola)xx"),
                                 tags=[ContentTag.ANALYZE, ContentTag.TITLE],
-                                schema_id=None,
+                                embedded_schema=None,
                                 children=None,
                             )
                         ],
