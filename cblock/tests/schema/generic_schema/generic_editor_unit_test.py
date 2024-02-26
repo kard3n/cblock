@@ -2,11 +2,11 @@ import unittest
 
 from regex import regex
 
-from src.content_analyzer.analyzers.SimpleContentAnalyzer import SimpleContentAnalyzer
-from src.content_factory.ContentFactory import ContentFactory
-from src.editor.editors.generic_editor.GenericEditor import GenericEditor
-from src.schema.ContentTag import ContentTag
-from src.schema.generic_schema.GenericSchema import GenericSchema
+from content_analyzer.analyzers.SimpleContentAnalyzer import SimpleContentAnalyzer
+from content_factory.ContentFactory import ContentFactory
+from editor.editors.generic_editor.GenericEditor import GenericEditor
+from schema.ContentTag import ContentTag
+from schema.generic_schema.GenericSchema import GenericSchema
 
 
 class GenericSchemaEditorUnitTest(unittest.TestCase):

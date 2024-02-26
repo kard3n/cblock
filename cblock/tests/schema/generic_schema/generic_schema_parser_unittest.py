@@ -1,11 +1,10 @@
 import unittest
 
-import pytest
 from regex import regex
 
-from src.schema.ContentTag import ContentTag
-from src.schema.generic_schema.GenericSchema import GenericSchema
-from src.schema.generic_schema.GenericSchemaParser import GenericSchemaParser
+from schema.ContentTag import ContentTag
+from schema.generic_schema.GenericSchema import GenericSchema
+from schema.generic_schema.GenericSchemaParser import GenericSchemaParser
 
 
 class TestGenericSchemaParser(unittest.TestCase):
