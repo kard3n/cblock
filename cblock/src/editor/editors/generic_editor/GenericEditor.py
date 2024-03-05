@@ -43,7 +43,6 @@ class GenericEditor(EditorInterface):
             match_list: list[Match] = []
 
             for match in matches_iter:
-                logging.info(match.group("content"))
 
                 if match.group("content") is not None:
                     # found a substring that matches, so we have to check for tags and do something
@@ -65,8 +64,12 @@ class GenericEditor(EditorInterface):
                         child_schema.embedded_schema
                     )
                 )
+                next_schema = self.schema_factory.get_schema_by_id(
+                    child_schema.embedded_schema
+                )
             else:
                 next_editor: EditorInterface = self
+                next_schema = child_schema
 
             for match in match_list:
                 content_start: int = (
@@ -83,16 +86,14 @@ class GenericEditor(EditorInterface):
                 if (
                     ContentTag.ELEMENT in child_schema.tags
                     and self.content_analyzer.analyze(
-                        next_editor.extract_content(
-                            match.group("content"), child_schema
-                        )
+                        next_editor.extract_content(match.group("content"), next_schema)
                     )
                 ):
                     input_raw = (
                         input_raw[:content_start]
                         + next_editor.apply_action(
                             match.group("content"),
-                            schema,
+                            next_schema,
                             content=self.content_factory.get_content(),
                         )
                         + input_raw[content_end:]
@@ -103,7 +104,7 @@ class GenericEditor(EditorInterface):
                         input_raw[:content_start]
                         + next_editor.edit(
                             match.group("content"),
-                            schema,
+                            next_schema,
                         )
                         + input_raw[content_end:]
                     )

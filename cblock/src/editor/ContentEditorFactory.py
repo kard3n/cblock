@@ -26,6 +26,7 @@ class ContentEditorFactory(metaclass=Singleton):
             return JSONEditor(
                 content_analyzer=self.content_analyzer,
                 content_factory=self.content_factory,
+                db_manager=self.db_manager,
             )
         if schema_type == "generic":
             from editor.editors.generic_editor.GenericEditor import GenericEditor

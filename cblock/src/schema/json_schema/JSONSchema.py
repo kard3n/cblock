@@ -11,7 +11,7 @@ class ValueType(Enum):
 @dataclass
 class JSONSchema:
     tags: list = field(default_factory=list)
-    schema_id: str | None = (
+    embedded_schema: str | None = (
         None  # if another schema should be used for this content, it is specified here
     )
     value_type: ValueType | None = None

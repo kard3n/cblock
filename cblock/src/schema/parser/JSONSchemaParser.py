@@ -58,7 +58,7 @@ class JSONSchemaParser(SchemaParserInterface):
                             )
 
                         pos += 1
-                        element_container.schema_id = schema_id
+                        element_container.embedded_schema = schema_id
                     else:
                         raise SchemaParsingException(
                             f'Invalid content tag "{element[pos]}" at position {pos}'
