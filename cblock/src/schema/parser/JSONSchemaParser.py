@@ -1,3 +1,5 @@
+import logging
+
 from schema.ContentTag import ContentTag
 from schema.parser.SchemaParserInterface import SchemaParserInterface
 from schema.json_schema.JSONSchema import JSONSchema, ValueType
@@ -227,6 +229,14 @@ class JSONSchemaParser(SchemaParserInterface):
         else:
             raise SchemaParsingException(
                 f"Symbol does not correspond to a type: {element[pos]}"
+            )
+
+        if (
+            element_container.embedded_schema is not None
+            and element_container.value != []
+        ):
+            raise SchemaParsingException(
+                f"The resulting schema '{element_container}' has both an embedded schema and tags."
             )
 
         return element_container
