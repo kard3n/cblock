@@ -64,6 +64,11 @@ class GenericSchemaParser(SchemaParserInterface):
             else:
                 raise SchemaParsingException(f'"{item} is not a valid field"')
 
+        if result.embedded_schema is not None and result.tags != []:
+            raise SchemaParsingException(
+                f"The resulting schema '{result}' has both an embedded schema and tags."
+            )
+
         return result
 
     @classmethod

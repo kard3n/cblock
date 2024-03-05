@@ -233,7 +233,7 @@ class JSONSchemaParser(SchemaParserInterface):
 
         if (
             element_container.embedded_schema is not None
-            and element_container.value != []
+            and element_container.tags != []
         ):
             raise SchemaParsingException(
                 f"The resulting schema '{element_container}' has both an embedded schema and tags."
