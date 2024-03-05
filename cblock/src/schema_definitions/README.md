@@ -6,6 +6,10 @@ being their own name followed by `.cbs` (ContentBlockSchema). Root schemas (thos
 also have an URL attribute (the name followed by the website, like "mywebsite.com") and a PATH attribute (for example, "/files").
 While the URL attribute is a normal string, PATH can (and often must) be a regular expression.
 
+A schema may have embedded schemas of a different type than that of itself. They may only be set for leaf elements,
+or in other words, elements that have a basic value (and therefore no children) and can not be interpreted by
+the current schema type.
+
 An example file could look like this:
 
 Name:
