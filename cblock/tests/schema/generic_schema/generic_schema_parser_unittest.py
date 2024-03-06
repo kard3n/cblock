@@ -1,7 +1,9 @@
 import unittest
 
+from pytest import raises
 from regex import regex
 
+from exceptions.SchemaParsingException import SchemaParsingException
 from schema.ContentTag import ContentTag
 from schema.generic_schema.GenericSchema import GenericSchema
 from schema.parser.GenericSchemaParser import GenericSchemaParser
@@ -13,7 +15,7 @@ class TestGenericSchemaParser(unittest.TestCase):
         cls.parser: GenericSchemaParser = GenericSchemaParser()
 
     def test_parse_string_one(self):
-        schema: str = r'pattern:"bb(?P<content>hola)bb", tags:"a", schema_id: 20'
+        schema: str = r'pattern:"bb(?P<content>hola)bb", tags:"a"'
         assert (
             self.parser.parse_string(schema).__str__()
             == GenericSchema(
@@ -24,7 +26,7 @@ class TestGenericSchemaParser(unittest.TestCase):
                     GenericSchema(
                         pattern=regex.Regex("bb(?P<content>hola)bb"),
                         tags=[ContentTag.ANALYZE],
-                        embedded_schema=20,
+                        embedded_schema=None,
                         children=None,
                     )
                 ],
@@ -32,7 +34,7 @@ class TestGenericSchemaParser(unittest.TestCase):
         )
 
     def test_parse_string_two(self):
-        schema: str = r'''pattern:"bb(?P<content>xxholaxx)bb", tags:"e", schema_id: 20
+        schema: str = r'''pattern:"bb(?P<content>xxholaxx)bb", tags:"e"
     pattern:"xx(?P<content>hola)xx", tags:"at"'''
         assert (
             self.parser.parse_string(schema).__str__()
@@ -44,7 +46,7 @@ class TestGenericSchemaParser(unittest.TestCase):
                     GenericSchema(
                         pattern=regex.Regex("bb(?P<content>xxholaxx)bb"),
                         tags=[ContentTag.ELEMENT],
-                        embedded_schema=20,
+                        embedded_schema=None,
                         children=[
                             GenericSchema(
                                 pattern=regex.Regex("xx(?P<content>hola)xx"),
@@ -57,3 +59,9 @@ class TestGenericSchemaParser(unittest.TestCase):
                 ],
             ).__str__()
         )
+
+    def test_parse_string_conflict_tags_and_embedded(self):
+        schema: str = r'pattern:"bb(?P<content>hola)bb", tags:"a", schema_id=20'
+
+        with raises(SchemaParsingException):
+            self.parser.parse_string(schema)
