@@ -4,7 +4,6 @@ import logging
 from content_analyzer.ContentAnalyzerInterface import ContentAnalyzerInterface
 from content_factory.Content import Content
 from content_factory.ContentFactory import ContentFactory
-from db.DBManagerInterface import DBManagerInterface
 from editor.ContentEditorFactory import ContentEditorFactory
 from editor.ContentEditorInterface import ContentEditorInterface
 from schema.ContentTag import ContentTag
@@ -100,11 +99,12 @@ class JSONContentEditor(ContentEditorInterface):
 
         # If an embedded schema is specified, it gets applied instead
         if schema.embedded_schema is not None:
-            return self.__get_editor_by_schema_id(
-                schema.embedded_schema
-            ).extract_content(
-                input_value=input_value,
-                schema=self.__get_schema_by_id(schema.embedded_schema),
+            return (
+                self.__get_editor_by_schema_id(schema.embedded_schema).extract_content(
+                    input_value=input_value,
+                    schema=self.__get_schema_by_id(schema.embedded_schema),
+                )
+                + " "
             )
 
         if schema.value_type == ValueType.DICT:
@@ -114,9 +114,10 @@ class JSONContentEditor(ContentEditorInterface):
             for elem in input_value:
                 # This is correct, in the case of lists, the value is directly a JSONSchema
                 result += self.extract_content(elem, schema.value)
+
         elif schema.value_type == ValueType.LEAF:
             if ContentTag.ANALYZE in schema.tags:
-                result += input_value
+                result += input_value + " "
 
         return result
 
