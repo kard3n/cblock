@@ -11,7 +11,7 @@ from content_factory.ContentFactory import ContentFactory
 from db.DBManagerInterface import DBManagerInterface
 from editor.ContentEditorFactory import ContentEditorFactory
 from editor.ContentEditorInterface import ContentEditorInterface
-from editor.editors.generic_editor.GenericEditor import GenericContentEditor
+from editor.editors.generic_editor.GenericContentEditor import GenericContentEditor
 from schema.ContentTag import ContentTag
 from schema.SchemaFactory import SchemaFactory
 from schema.generic_schema.GenericSchema import GenericSchema

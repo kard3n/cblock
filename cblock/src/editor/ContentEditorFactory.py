@@ -28,7 +28,7 @@ class ContentEditorFactory(metaclass=Singleton):
         # Imports are needed due to circular imports. Editors are singletons, so there's no major performance impact
         if schema_type == "json":
 
-            from editor.editors.json_editor.JSONEditor import JSONContentEditor
+            from editor.editors.json_editor.JSONContentEditor import JSONContentEditor
 
             return JSONContentEditor(
                 content_analyzer=self.content_analyzer,
@@ -36,7 +36,7 @@ class ContentEditorFactory(metaclass=Singleton):
                 db_manager=self.db_manager,
             )
         if schema_type == "generic":
-            from editor.editors.generic_editor.GenericEditor import GenericContentEditor
+            from editor.editors.generic_editor.GenericContentEditor import GenericContentEditor
 
             return GenericContentEditor(
                 content_analyzer=self.content_analyzer,
