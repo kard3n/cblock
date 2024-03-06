@@ -33,7 +33,8 @@ class ContentEditorFactory(metaclass=Singleton):
             return JSONContentEditor(
                 content_analyzer=self.content_analyzer,
                 content_factory=self.content_factory,
-                db_manager=self.db_manager,
+                editor_factory=self.editor_factory,
+                schema_factory=self.schema_factory,
             )
         if schema_type == "generic":
             from editor.editors.generic_editor.GenericContentEditor import (

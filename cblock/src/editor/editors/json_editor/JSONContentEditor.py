@@ -20,16 +20,13 @@ class JSONContentEditor(ContentEditorInterface):
         self,
         content_analyzer: ContentAnalyzerInterface,
         content_factory: ContentFactory,
-        db_manager: DBManagerInterface,
+        schema_factory: SchemaFactory,
+        editor_factory: ContentEditorFactory,
     ) -> None:
         self.content_analyzer = content_analyzer
         self.content_factory = content_factory
-        self.editor_factory = ContentEditorFactory(
-            content_analyzer=content_analyzer,
-            content_factory=content_factory,
-            db_manager=db_manager,
-        )
-        self.schema_factory = SchemaFactory(db_manager=db_manager)
+        self.editor_factory = editor_factory
+        self.schema_factory = schema_factory
 
     def edit(self, input_raw: str, schema: JSONSchema) -> str:
         try:
