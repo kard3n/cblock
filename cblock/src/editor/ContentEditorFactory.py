@@ -36,7 +36,9 @@ class ContentEditorFactory(metaclass=Singleton):
                 db_manager=self.db_manager,
             )
         if schema_type == "generic":
-            from editor.editors.generic_editor.GenericContentEditor import GenericContentEditor
+            from editor.editors.generic_editor.GenericContentEditor import (
+                GenericContentEditor,
+            )
 
             return GenericContentEditor(
                 content_analyzer=self.content_analyzer,
