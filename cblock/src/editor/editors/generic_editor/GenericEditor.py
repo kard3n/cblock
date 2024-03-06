@@ -5,16 +5,15 @@ from regex import Match, regex
 from content_analyzer.ContentAnalyzerInterface import ContentAnalyzerInterface
 from content_factory.Content import Content
 from content_factory.ContentFactory import ContentFactory
-from db import DBManagerInterface
 from editor.ContentEditorFactory import ContentEditorFactory
-from editor.EditorInterface import EditorInterface
+from editor.ContentEditorInterface import ContentEditorInterface
 from exceptions.EditException import EditException
 from schema.ContentTag import ContentTag
 from schema.SchemaFactory import SchemaFactory
 from schema.generic_schema.GenericSchema import GenericSchema
 
 
-class GenericEditor(EditorInterface):
+class GenericContentEditor(ContentEditorInterface):
     content_analyzer: ContentAnalyzerInterface
     content_factory: ContentFactory
 
@@ -22,16 +21,13 @@ class GenericEditor(EditorInterface):
         self,
         content_analyzer: ContentAnalyzerInterface,
         content_factory: ContentFactory,
-        db_manager: DBManagerInterface,
+        schema_factory: SchemaFactory,
+        editor_factory: ContentEditorFactory,
     ) -> None:
         self.content_analyzer = content_analyzer
         self.content_factory = content_factory
-        self.editor_factory = ContentEditorFactory(
-            content_analyzer=content_analyzer,
-            content_factory=content_factory,
-            db_manager=db_manager,
-        )
-        self.schema_factory = SchemaFactory(db_manager=db_manager)
+        self.editor_factory = editor_factory
+        self.schema_factory = schema_factory
 
     def edit(self, input_raw: str, schema: GenericSchema) -> str:
         # the current schema's pattern was evaluated in the previous recursion, and input_raw is its "content"
@@ -59,7 +55,7 @@ class GenericEditor(EditorInterface):
             # check if an embedded schema has been specified, the editor used will be changed to the one related
             # to the embedded schema
             if child_schema.embedded_schema is not None:
-                next_editor: EditorInterface = (
+                next_editor: ContentEditorInterface = (
                     self.editor_factory.get_content_editor_by_schema_id(
                         child_schema.embedded_schema
                     )
@@ -68,7 +64,7 @@ class GenericEditor(EditorInterface):
                     child_schema.embedded_schema
                 )
             else:
-                next_editor: EditorInterface = self
+                next_editor: ContentEditorInterface = self
                 next_schema = child_schema
 
             for match in match_list:
@@ -109,45 +105,17 @@ class GenericEditor(EditorInterface):
                         + input_raw[content_end:]
                     )
 
-                """# check whether it is an element with offending content or not. If so, it will be edited
-                # Otherwise, take content and pass it to the next recursive iteration
-                if (
-                    ContentTag.ELEMENT in child_schema.tags
-                    and self.content_analyzer.analyze(
-                        self.extract_content(input_raw, child_schema)
-                    )
-                ):
-                    input_raw = self.edit_content(
-                        input_value=input_raw, match=match, schema=child_schema
-                    )
-                else:
-                    content_start: int = (
-                        match.start()
-                        + regex.search(match.group("content"), match.group()).start()
-                    )
-                    content_end: int = (
-                        match.start()
-                        + regex.search(match.group("content"), match.group()).end()
-                    )
-
-                    input_raw = (
-                        input_raw[:content_start]
-                        + self.edit(match.group("content"), child_schema)
-                        + input_raw[content_end:]
-                    )"""
-
         return input_raw
 
     # Extracts all content from a certain subsegment
     def extract_content(self, input_value, schema: GenericSchema) -> str:
         # input_value is the content extracted using the schema's pattern.
         # schema either contains ContentTag.Element, or is child of an element
-
         if schema.embedded_schema is not None:
             return self.editor_factory.get_content_editor_by_schema_id(
-                schema.embedded_schema
+                schema_id=schema.embedded_schema
             ).extract_content(
-                input_value,
+                input_value=input_value,
                 schema=self.schema_factory.get_schema_by_id(schema.embedded_schema),
             )
 
@@ -165,10 +133,12 @@ class GenericEditor(EditorInterface):
             for match in matches_iter:
                 if match.group("content") is not None:
                     result += self.extract_content(match.group("content"), child_schema)
+
+                    if child_schema.children is None or child_schema.children == []:
+                        result += " "
                 else:
                     # No content could be identified
                     raise EditException(f"No closer found for match: {match.group()}")
-
         return result
 
     # Gets passed content, and for each identified child element applies the action specified for it
@@ -199,7 +169,7 @@ class GenericEditor(EditorInterface):
                     result += cat + " "
                 return result[0:-1]
 
-        # there was no tag, so we iterate through the child schema
+        # there was no leaf tag, so we iterate through the child schemas
         for child_schema in schema.children:
             matches_iter = regex.finditer(child_schema.pattern, input_value)
             match_list: list[Match] = []

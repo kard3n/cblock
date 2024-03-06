@@ -1,7 +1,8 @@
 from content_analyzer.ContentAnalyzerInterface import ContentAnalyzerInterface
 from content_factory.ContentFactory import ContentFactory
 from db.DBManagerInterface import DBManagerInterface
-from editor.EditorInterface import EditorInterface
+from editor.ContentEditorInterface import ContentEditorInterface
+from schema.SchemaFactory import SchemaFactory
 from utils.Singleton import Singleton
 
 
@@ -16,28 +17,35 @@ class ContentEditorFactory(metaclass=Singleton):
         self.content_analyzer = content_analyzer
         self.content_factory = content_factory
         self.db_manager = db_manager
+        self.editor_factory: ContentEditorFactory = ContentEditorFactory(
+            content_analyzer=self.content_analyzer,
+            content_factory=self.content_factory,
+            db_manager=self.db_manager,
+        )
+        self.schema_factory: SchemaFactory = SchemaFactory(db_manager=self.db_manager)
 
-    def get_content_editor(self, schema_type: str) -> EditorInterface:
+    def get_content_editor(self, schema_type: str) -> ContentEditorInterface:
         # Imports are needed due to circular imports. Editors are singletons, so there's no major performance impact
         if schema_type == "json":
 
-            from editor.editors.json_editor.JSONEditor import JSONEditor
+            from editor.editors.json_editor.JSONEditor import JSONContentEditor
 
-            return JSONEditor(
+            return JSONContentEditor(
                 content_analyzer=self.content_analyzer,
                 content_factory=self.content_factory,
                 db_manager=self.db_manager,
             )
         if schema_type == "generic":
-            from editor.editors.generic_editor.GenericEditor import GenericEditor
+            from editor.editors.generic_editor.GenericEditor import GenericContentEditor
 
-            return GenericEditor(
+            return GenericContentEditor(
                 content_analyzer=self.content_analyzer,
                 content_factory=self.content_factory,
-                db_manager=self.db_manager,
+                editor_factory=self.editor_factory,
+                schema_factory=self.schema_factory,
             )
 
-    def get_content_editor_by_schema_id(self, schema_id: str) -> EditorInterface:
+    def get_content_editor_by_schema_id(self, schema_id: str) -> ContentEditorInterface:
         schema_type: str = self.db_manager.get_schema(schema_id).schema_type
 
         return self.get_content_editor(schema_type=schema_type)

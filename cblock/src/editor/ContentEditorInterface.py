@@ -5,7 +5,7 @@ from content_factory.Content import Content
 from content_factory.ContentFactory import ContentFactory
 
 
-class EditorInterface(ABC):
+class ContentEditorInterface(ABC):
 
     @abstractmethod
     def __init__(

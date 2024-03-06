@@ -6,13 +6,13 @@ from content_factory.Content import Content
 from content_factory.ContentFactory import ContentFactory
 from db.DBManagerInterface import DBManagerInterface
 from editor.ContentEditorFactory import ContentEditorFactory
-from editor.EditorInterface import EditorInterface
+from editor.ContentEditorInterface import ContentEditorInterface
 from schema.ContentTag import ContentTag
 from schema.SchemaFactory import SchemaFactory
 from schema.json_schema.JSONSchema import JSONSchema, ValueType
 
 
-class JSONEditor(EditorInterface):
+class JSONContentEditor(ContentEditorInterface):
     content_analyzer: ContentAnalyzerInterface
     content_factory: ContentFactory
 
@@ -165,7 +165,7 @@ class JSONEditor(EditorInterface):
 
         return input_value
 
-    def __get_editor_by_schema_id(self, schema_id) -> EditorInterface:
+    def __get_editor_by_schema_id(self, schema_id) -> ContentEditorInterface:
         return self.editor_factory.get_content_editor_by_schema_id(schema_id=schema_id)
 
     def __get_schema_by_id(self, schema_id) -> any:

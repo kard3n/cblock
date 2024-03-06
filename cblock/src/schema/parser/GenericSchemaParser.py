@@ -1,3 +1,5 @@
+import logging
+
 import regex
 
 from schema.ContentTag import ContentTag
@@ -111,66 +113,3 @@ class GenericSchemaParser(SchemaParserInterface):
     @classmethod
     def parse_file(cls, filename: str):
         pass
-
-
-"""    # expects a string, the first line must not have indentation (will be the current element)
-    # The next lines must have an indentation of at least 4, to mark them as child elements
-    @classmethod
-    def parse_element_multi(cls, element: str) -> GenericSchemaElement:
-        line_list = element.split("\n")
-
-        if count_continuous(line_list[0], " ", 0) != 0:
-            raise SchemaParsingException(
-                f"Element has wrong indentation: {line_list[0]}"
-            )
-
-        result: GenericSchemaElement = cls.parse_element_single(line_list[0])
-
-        if len(line_list) > 1:
-            list_position: int = 1
-            current_child_element: GenericSchemaElement
-            while list_position < len(line_list):
-                if count_continuous(line_list[list_position], " ", 0) == 4:
-                    pass  # current_child_element = cls.parse_element_single(line_list[])"""
-
-
-"""@classmethod
-    def parse_string(cls, input: str) -> GenericSchema:
-        result: GenericSchema = GenericSchema()
-        position: int = 0
-
-        current_element: GenericSchemaElement = GenericSchemaElement()
-        for line in input.split("\n"):
-            if count_continuous(string=line, symbol=" ", pos=0) == 0:
-                for item in line.split(","):
-                    # remove whitespaces
-                    item = item[jump_whitespaces(item, 0)]
-                    if item.startswith("open:"):
-                        current_element.open = re.compile(
-                            extract_from_inbetween_symbol(item[5:], '"')
-                        )
-                    if item.startswith("close:"):
-                        current_element.close = re.compile(
-                            extract_from_inbetween_symbol(item[5:], '"')
-                        )
-                    if item.startswith("action:"):
-                        pass
-                    if item.startswith("editor_id"):
-                        id_pos: int = jump_whitespaces(item, 9)
-                        num: str = ""
-                        while item[id_pos].isnumeric():
-                            num += item[id_pos]
-                            id_pos += 1
-
-                        if num != "":
-                            current_element.editor_id = int(num)
-                        else:
-                            raise SchemaParsingException(
-                                '"editor_id" tag must be followed by an ID.'
-                            )
-                    else:
-                        raise SchemaParsingException(f'"{item} is not a valid field"')
-            else:  # different indentation, needs recursion
-                pass
-
-        return current_element"""
