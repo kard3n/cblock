@@ -51,6 +51,39 @@ class JsonEditorUnitTest(unittest.TestCase):
             input_value={"name": random_content}, schema=schema
         ) == ContentExtractionResult(text=random_content + " ", pictures=[])
 
+    def test_extract_content_dict_invalid_keys(self):
+        schema: JSONSchema = JSONSchema(
+            tags=[],
+            embedded_schema=None,
+            value_type=ValueType.DICT,
+            value={
+                test_utils.random_string(10): JSONSchema(
+                    tags=[ContentTag.ANALYZE, ContentTag.TITLE],
+                    embedded_schema=None,
+                    value_type=ValueType.LEAF,
+                    value="Something",
+                ),
+                "name": JSONSchema(
+                    tags=[ContentTag.ANALYZE, ContentTag.TITLE],
+                    embedded_schema=None,
+                    value_type=ValueType.LEAF,
+                    value="Something",
+                ),
+                test_utils.random_string(10): JSONSchema(
+                    tags=[ContentTag.ANALYZE, ContentTag.TITLE],
+                    embedded_schema=None,
+                    value_type=ValueType.LEAF,
+                    value="Something",
+                ),
+            },
+        )
+
+        random_content: str = test_utils.random_string(10)
+
+        assert self.editor.extract_content(
+            input_value={"name": random_content}, schema=schema
+        ) == ContentExtractionResult(text=random_content + " ", pictures=[])
+
     def test_extract_content_list(self):
         schema: JSONSchema = JSONSchema(
             tags=[],
@@ -266,6 +299,42 @@ class JsonEditorUnitTest(unittest.TestCase):
             schema=schema,
             content=generated_content,
         ) == {"name": generated_content.title, "class": generated_content.summary}
+
+    def test_apply_action_dict_invalid_keys(self):
+        generated_content: Content = test_utils.generate_content()
+        self.content_factory.get_content.return_value = generated_content
+
+        schema: JSONSchema = JSONSchema(
+            tags=[],
+            embedded_schema=None,
+            value_type=ValueType.DICT,
+            value={
+                test_utils.random_string(10): JSONSchema(
+                    tags=[ContentTag.ANALYZE, ContentTag.TITLE],
+                    embedded_schema=None,
+                    value_type=ValueType.LEAF,
+                    value="Something",
+                ),
+                "name": JSONSchema(
+                    tags=[ContentTag.ANALYZE, ContentTag.TITLE],
+                    embedded_schema=None,
+                    value_type=ValueType.LEAF,
+                    value="Something",
+                ),
+                test_utils.random_string(10): JSONSchema(
+                    tags=[ContentTag.ANALYZE, ContentTag.TITLE],
+                    embedded_schema=None,
+                    value_type=ValueType.LEAF,
+                    value="Something",
+                ),
+            },
+        )
+
+        assert self.editor.apply_action(
+            input_value={"name": test_utils.random_string(10)},
+            schema=schema,
+            content=generated_content,
+        ) == {"name": generated_content.title}
 
     def test_apply_action_with_embedded_schema(self):
         generated_content: Content = test_utils.generate_content()

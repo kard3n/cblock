@@ -68,9 +68,15 @@ class JSONContentEditor(ContentEditorInterface):
         else:
             if schema.value_type == ValueType.DICT:
                 for key in schema.value:
-                    input_parsed[key] = self.edit_parsed(
-                        input_parsed[key], schema.value[key]
-                    )
+                    try:
+                        input_parsed[key] = self.edit_parsed(
+                            input_parsed[key], schema.value[key]
+                        )
+                    except KeyError:
+                        logging.info(
+                            f"Key {key} of schema {schema.value} could not be found. Maybe the schema has changed?"
+                        )
+
             elif schema.value_type == ValueType.LIST:
                 for item in input_parsed:
                     input_parsed[input_parsed.index(item)] = self.edit_parsed(
@@ -115,12 +121,20 @@ class JSONContentEditor(ContentEditorInterface):
             )
 
         if schema.value_type == ValueType.DICT:
+            next_input = None
             for key in schema.value:
-                self.extract_content(
-                    input_value=input_value[key],
-                    schema=schema.value[key],
-                    result_container=result_container,
-                )
+                try:
+                    next_input = input_value[key]
+                except KeyError:
+                    logging.info(
+                        f"Key {key} of schema {schema.value} could not be found. Maybe the schema has changed?"
+                    )
+                else:
+                    self.extract_content(
+                        input_value=next_input,
+                        schema=schema.value[key],
+                        result_container=result_container,
+                    )
         elif schema.value_type == ValueType.LIST:
             for elem in input_value:
                 # This is correct, in the case of lists, the value is directly a JSONSchema
@@ -164,11 +178,16 @@ class JSONContentEditor(ContentEditorInterface):
         else:  # No embedded schema has been specified
             if schema.value_type == ValueType.DICT:
                 for key in schema.value:
-                    input_value[key] = self.apply_action(
-                        input_value=input_value[key],
-                        schema=schema.value[key],
-                        content=content,
-                    )
+                    try:
+                        input_value[key]
+                    except KeyError:
+                        pass
+                    else:
+                        input_value[key] = self.apply_action(
+                            input_value=input_value[key],
+                            schema=schema.value[key],
+                            content=content,
+                        )
             elif schema.value_type == ValueType.LIST:
                 for elem in input_value:
                     # This is correct, in the case of lists, the value is directly a JSONSchema
