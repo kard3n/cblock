@@ -6,6 +6,7 @@ from content_factory.Content import Content
 from content_factory.ContentFactory import ContentFactory
 from editor.ContentEditorFactory import ContentEditorFactory
 from editor.ContentEditorInterface import ContentEditorInterface
+from editor.ContentExtractionResult import ContentExtractionResult
 from schema.ContentTag import ContentTag
 from schema.SchemaFactory import SchemaFactory
 from schema.json_schema.JSONSchema import JSONSchema, ValueType
@@ -94,32 +95,57 @@ class JSONContentEditor(ContentEditorInterface):
 
         return input_parsed
 
-    def extract_content(self, input_value, schema: JSONSchema) -> str:
-        result: str = ""
+    def extract_content(
+        self,
+        input_value,
+        schema: JSONSchema,
+        result_container: ContentExtractionResult | None = None,
+    ) -> ContentExtractionResult:
+        if result_container is None:
+            result_container = ContentExtractionResult()
 
         # If an embedded schema is specified, it gets applied instead
         if schema.embedded_schema is not None:
-            return (
-                self.__get_editor_by_schema_id(schema.embedded_schema).extract_content(
-                    input_value=input_value,
-                    schema=self.__get_schema_by_id(schema.embedded_schema),
-                )
-                + " "
+            return self.__get_editor_by_schema_id(
+                schema.embedded_schema
+            ).extract_content(
+                input_value=input_value,
+                schema=self.__get_schema_by_id(schema.embedded_schema),
+                result_container=result_container,
             )
 
         if schema.value_type == ValueType.DICT:
             for key in schema.value:
-                result += self.extract_content(input_value[key], schema.value[key])
+                self.extract_content(
+                    input_value=input_value[key],
+                    schema=schema.value[key],
+                    result_container=result_container,
+                )
         elif schema.value_type == ValueType.LIST:
             for elem in input_value:
                 # This is correct, in the case of lists, the value is directly a JSONSchema
-                result += self.extract_content(elem, schema.value)
+                self.extract_content(
+                    elem, schema.value, result_container=result_container
+                )
 
         elif schema.value_type == ValueType.LEAF:
             if ContentTag.ANALYZE in schema.tags:
-                result += input_value + " "
+                if (
+                    len(
+                        {
+                            ContentTag.SUMMARY,
+                            ContentTag.TITLE,
+                            ContentTag.FULL_CONTENT,
+                        }
+                        & set(schema.tags)
+                    )
+                    > 0
+                ):
+                    result_container.text += input_value + " "
+                elif ContentTag.PICTURE in schema.tags:
+                    result_container.pictures.append(input_value)
 
-        return result
+        return result_container
 
     def apply_action(self, input_value, schema: JSONSchema, content: Content) -> any:
         # If an embedded schema is specified, input_value must be a leaf (str, int, ...)

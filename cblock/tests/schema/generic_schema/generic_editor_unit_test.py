@@ -11,6 +11,7 @@ from content_factory.ContentFactory import ContentFactory
 from db.DBManagerInterface import DBManagerInterface
 from editor.ContentEditorFactory import ContentEditorFactory
 from editor.ContentEditorInterface import ContentEditorInterface
+from editor.ContentExtractionResult import ContentExtractionResult
 from editor.editors.generic_editor.GenericContentEditor import GenericContentEditor
 from schema.ContentTag import ContentTag
 from schema.SchemaFactory import SchemaFactory
@@ -53,19 +54,17 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
             ],
         )
 
-        assert (
-            self.editor.extract_content(input_value="bbholabb", schema=schema)
-            == "hola "
-        )
+        assert self.editor.extract_content(
+            input_value="bbholabb", schema=schema
+        ) == ContentExtractionResult(text="hola ", pictures=[])
 
-        assert (
-            self.editor.extract_content(input_value="bbholabb_bbholabb", schema=schema)
-            == "hola hola "
-        )
+        assert self.editor.extract_content(
+            input_value="bbholabb_bbholabb", schema=schema
+        ) == ContentExtractionResult(text="hola hola ", pictures=[])
 
-        assert (
-            self.editor.extract_content(input_value="bb_hola_bb", schema=schema) == ""
-        )
+        assert self.editor.extract_content(
+            input_value="bb_hola_bb", schema=schema
+        ) == ContentExtractionResult(text="", pictures=[])
 
     def test_extract_content_with_schema_depth_two(self):
         schema: GenericSchema = GenericSchema(
@@ -89,25 +88,22 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
             ],
         )
 
-        assert (
-            self.editor.extract_content(
-                input_value="_<p>abc</p><p>def</p><p>ghi</p>_", schema=schema
-            )
-            == "abc def ghi "
-        )
+        assert self.editor.extract_content(
+            input_value="_<p>abc</p><p>def</p><p>ghi</p>_", schema=schema
+        ) == ContentExtractionResult(text="abc def ghi ", pictures=[])
 
-        assert (
-            self.editor.extract_content(
-                input_value="_<p>abc</p><p>def</p>_", schema=schema
-            )
-            == "abc def "
-        )
+        assert self.editor.extract_content(
+            input_value="_<p>abc</p><p>def</p>_", schema=schema
+        ) == ContentExtractionResult(text="abc def ", pictures=[])
 
     def test_extract_content_with_embedded_schema(self):
         embedded_editor = Mock(ContentEditorInterface)
 
         editor_return_value: str = test_utils.random_string(10)
-        embedded_editor.extract_content.return_value = editor_return_value
+
+        embedded_editor.extract_content.return_value = ContentExtractionResult(
+            text=editor_return_value, pictures=[]
+        )
         embedded_schema_id: str = test_utils.random_string(10)
 
         self.editor_factory.get_content_editor_by_schema_id.return_value = (
@@ -131,19 +127,19 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
             ],
         )
 
-        assert (
-            self.editor.extract_content(
-                input_value="_" + editor_return_value + "_", schema=schema
-            )
-            == editor_return_value + " "
-        )
+        # The return value is a simple space, since the mocked function doesn't edit the ContentExtractionResul object
+        assert self.editor.extract_content(
+            input_value="_" + editor_return_value + "_", schema=schema
+        ) == ContentExtractionResult(text=" ", pictures=[])
 
         self.editor_factory.get_content_editor_by_schema_id.assert_called_once_with(
             schema_id=embedded_schema_id
         )
 
         embedded_editor.extract_content.assert_called_once_with(
-            input_value=editor_return_value, schema=get_schema_return_value
+            input_value=editor_return_value,
+            schema=get_schema_return_value,
+            result_container=ContentExtractionResult(text=" ", pictures=[]),
         )
 
     def test_apply_action_with_schema_depth_one(self):
@@ -254,4 +250,6 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
             == f"__A{generated_content.title}A__"
         )
 
-        self.content_analyzer.analyze.assert_called_once_with(f"{random_content} ")
+        self.content_analyzer.analyze.assert_called_once_with(
+            ContentExtractionResult(text=f"{random_content} ", pictures=[])
+        )

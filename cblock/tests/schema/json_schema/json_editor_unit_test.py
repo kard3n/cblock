@@ -8,6 +8,7 @@ from content_factory.ContentFactory import ContentFactory
 from db.DBManagerInterface import DBManagerInterface
 from editor.ContentEditorFactory import ContentEditorFactory
 from editor.ContentEditorInterface import ContentEditorInterface
+from editor.ContentExtractionResult import ContentExtractionResult
 from editor.editors.json_editor.JSONContentEditor import JSONContentEditor
 from schema.ContentTag import ContentTag
 from schema.SchemaFactory import SchemaFactory
@@ -36,7 +37,7 @@ class JsonEditorUnitTest(unittest.TestCase):
             value_type=ValueType.DICT,
             value={
                 "name": JSONSchema(
-                    tags=[ContentTag.ANALYZE],
+                    tags=[ContentTag.ANALYZE, ContentTag.TITLE],
                     embedded_schema=None,
                     value_type=ValueType.LEAF,
                     value="Something",
@@ -46,12 +47,9 @@ class JsonEditorUnitTest(unittest.TestCase):
 
         random_content: str = test_utils.random_string(10)
 
-        assert (
-            self.editor.extract_content(
-                input_value={"name": random_content}, schema=schema
-            )
-            == random_content + " "
-        )
+        assert self.editor.extract_content(
+            input_value={"name": random_content}, schema=schema
+        ) == ContentExtractionResult(text=random_content + " ", pictures=[])
 
     def test_extract_content_list(self):
         schema: JSONSchema = JSONSchema(
@@ -59,7 +57,7 @@ class JsonEditorUnitTest(unittest.TestCase):
             embedded_schema=None,
             value_type=ValueType.LIST,
             value=JSONSchema(
-                tags=[ContentTag.ANALYZE],
+                tags=[ContentTag.ANALYZE, ContentTag.SUMMARY],
                 embedded_schema=None,
                 value_type=ValueType.LEAF,
                 value="Something",
@@ -69,16 +67,14 @@ class JsonEditorUnitTest(unittest.TestCase):
         random_content_one: str = test_utils.random_string(10)
         random_content_two: str = test_utils.random_string(10)
 
-        assert (
-            self.editor.extract_content(input_value=[random_content_one], schema=schema)
-            == random_content_one + " "
-        )
+        assert self.editor.extract_content(
+            input_value=[random_content_one], schema=schema
+        ) == ContentExtractionResult(text=random_content_one + " ", pictures=[])
 
-        assert (
-            self.editor.extract_content(
-                input_value=[random_content_one, random_content_two], schema=schema
-            )
-            == random_content_one + " " + random_content_two + " "
+        assert self.editor.extract_content(
+            input_value=[random_content_one, random_content_two], schema=schema
+        ) == ContentExtractionResult(
+            text=random_content_one + " " + random_content_two + " ", pictures=[]
         )
 
     def test_extract_content_list_2d(self):
@@ -91,7 +87,7 @@ class JsonEditorUnitTest(unittest.TestCase):
                 embedded_schema=None,
                 value_type=ValueType.LIST,
                 value=JSONSchema(
-                    tags=[ContentTag.ANALYZE],
+                    tags=[ContentTag.ANALYZE, ContentTag.SUMMARY],
                     embedded_schema=None,
                     value_type=ValueType.LEAF,
                     value="Something",
@@ -102,23 +98,19 @@ class JsonEditorUnitTest(unittest.TestCase):
         random_content_one: str = test_utils.random_string(10)
         random_content_two: str = test_utils.random_string(10)
 
-        assert (
-            self.editor.extract_content(
-                input_value=[[random_content_one]], schema=schema
-            )
-            == random_content_one + " "
-        )
+        assert self.editor.extract_content(
+            input_value=[[random_content_one]], schema=schema
+        ) == ContentExtractionResult(text=random_content_one + " ", pictures=[])
 
-        assert (
-            self.editor.extract_content(
-                input_value=[[random_content_one, random_content_two]], schema=schema
-            )
-            == random_content_one + " " + random_content_two + " "
+        assert self.editor.extract_content(
+            input_value=[[random_content_one, random_content_two]], schema=schema
+        ) == ContentExtractionResult(
+            text=random_content_one + " " + random_content_two + " ", pictures=[]
         )
 
     def test_extract_content_leaf(self):
         schema: JSONSchema = JSONSchema(
-            tags=[ContentTag.ANALYZE],
+            tags=[ContentTag.ANALYZE, ContentTag.FULL_CONTENT],
             embedded_schema=None,
             value_type=ValueType.LEAF,
             value="Something",
@@ -126,15 +118,16 @@ class JsonEditorUnitTest(unittest.TestCase):
 
         random_content: str = test_utils.random_string(10)
 
-        assert (
-            self.editor.extract_content(input_value=random_content, schema=schema)
-            == random_content + " "
-        )
+        assert self.editor.extract_content(
+            input_value=random_content, schema=schema
+        ) == ContentExtractionResult(text=random_content + " ", pictures=[])
 
     def test_extract_content_with_embedded_schema(self):
         embedded_editor = Mock(ContentEditorInterface)
 
-        embedded_editor_return_value: str = test_utils.random_string(10)
+        embedded_editor_return_value: ContentExtractionResult = ContentExtractionResult(
+            text=test_utils.random_string(10), pictures=[]
+        )
         embedded_editor.extract_content.return_value = embedded_editor_return_value
         embedded_schema_id: str = test_utils.random_string(10)
 
@@ -161,11 +154,16 @@ class JsonEditorUnitTest(unittest.TestCase):
             },
         )
 
-        assert (
-            self.editor.extract_content(
-                input_value={"name": random_content}, schema=schema
-            )
-            == embedded_editor_return_value + " "
+        # The embedded editor is a mock and doesn't edit the object that it gets passed.
+        # Therefor the call has no effect
+        assert self.editor.extract_content(
+            input_value={"name": random_content}, schema=schema
+        ) == ContentExtractionResult(text="", pictures=[])
+
+        embedded_editor.extract_content.assert_called_once_with(
+            input_value=random_content,
+            schema=get_schema_return_value,
+            result_container=ContentExtractionResult(text="", pictures=[]),
         )
 
     def test_apply_action_leaf(self):

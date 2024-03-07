@@ -7,6 +7,7 @@ from content_factory.Content import Content
 from content_factory.ContentFactory import ContentFactory
 from editor.ContentEditorFactory import ContentEditorFactory
 from editor.ContentEditorInterface import ContentEditorInterface
+from editor.ContentExtractionResult import ContentExtractionResult
 from exceptions.EditException import EditException
 from schema.ContentTag import ContentTag
 from schema.SchemaFactory import SchemaFactory
@@ -108,38 +109,52 @@ class GenericContentEditor(ContentEditorInterface):
         return input_raw
 
     # Extracts all content from a certain subsegment
-    def extract_content(self, input_value, schema: GenericSchema) -> str:
+    def extract_content(
+        self,
+        input_value,
+        schema: GenericSchema,
+        result_container: ContentExtractionResult | None = None,
+    ) -> ContentExtractionResult:
         # input_value is the content extracted using the schema's pattern.
         # schema either contains ContentTag.Element, or is child of an element
+
+        if result_container is None:
+            result_container = ContentExtractionResult()
+
         if schema.embedded_schema is not None:
             return self.editor_factory.get_content_editor_by_schema_id(
                 schema_id=schema.embedded_schema
             ).extract_content(
                 input_value=input_value,
                 schema=self.schema_factory.get_schema_by_id(schema.embedded_schema),
+                result_container=result_container,
             )
 
         # if schema has the "analyze" tag, the value gets returned
         if ContentTag.ANALYZE in schema.tags:
-            return input_value
+            result_container.text += input_value
+            return result_container
 
         # schema did not mark this as a leaf element, therefore it should have children whose content
         # needs to be extracted
-        result: str = ""  # saves the result
 
         for child_schema in schema.children:
             matches_iter = regex.finditer(child_schema.pattern, input_value)
 
             for match in matches_iter:
                 if match.group("content") is not None:
-                    result += self.extract_content(match.group("content"), child_schema)
+                    self.extract_content(
+                        match.group("content"),
+                        child_schema,
+                        result_container=result_container,
+                    )
 
                     if child_schema.children is None or child_schema.children == []:
-                        result += " "
+                        result_container.text += " "
                 else:
                     # No content could be identified
                     raise EditException(f"No closer found for match: {match.group()}")
-        return result
+        return result_container
 
     # Gets passed content, and for each identified child element applies the action specified for it
     # If a leaf tag is set, the value is edited and the child elements will be ignored
