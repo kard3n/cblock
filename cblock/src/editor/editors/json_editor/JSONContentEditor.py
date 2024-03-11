@@ -192,6 +192,9 @@ class JSONContentEditor(ContentEditorInterface):
                             content=content,
                         )
             elif schema.value_type == ValueType.LIST:
+                if ContentTag.DELETE in schema.tags:
+                    input_value = []
+
                 for elem in input_value:
                     # This is correct, in the case of lists, the value is directly a JSONSchema
                     input_value[input_value.index(elem)] = self.apply_action(
