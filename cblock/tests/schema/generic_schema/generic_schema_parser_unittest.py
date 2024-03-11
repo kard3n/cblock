@@ -16,48 +16,65 @@ class TestGenericSchemaParser(unittest.TestCase):
 
     def test_parse_string_one(self):
         schema: str = r'pattern:"bb(?P<content>hola)bb", tags:"a"'
-        assert (
-            self.parser.parse_string(schema).__str__()
-            == GenericSchema(
-                pattern=None,
-                tags=[],
-                embedded_schema=None,
-                children=[
-                    GenericSchema(
-                        pattern=regex.Regex("bb(?P<content>hola)bb"),
-                        tags=[ContentTag.ANALYZE],
-                        embedded_schema=None,
-                        children=None,
-                    )
-                ],
-            ).__str__()
+        assert self.parser.parse_string(schema) == GenericSchema(
+            pattern=None,
+            tags=[],
+            embedded_schema=None,
+            children=[
+                GenericSchema(
+                    pattern=regex.Regex("bb(?P<content>hola)bb"),
+                    tags=[ContentTag.ANALYZE],
+                    embedded_schema=None,
+                    children=None,
+                )
+            ],
         )
 
     def test_parse_string_two(self):
         schema: str = r'''pattern:"bb(?P<content>xxholaxx)bb", tags:"e"
     pattern:"xx(?P<content>hola)xx", tags:"at"'''
-        assert (
-            self.parser.parse_string(schema).__str__()
-            == GenericSchema(
-                pattern=None,
-                tags=[],
-                embedded_schema=None,
-                children=[
-                    GenericSchema(
-                        pattern=regex.Regex("bb(?P<content>xxholaxx)bb"),
-                        tags=[ContentTag.ELEMENT],
-                        embedded_schema=None,
-                        children=[
-                            GenericSchema(
-                                pattern=regex.Regex("xx(?P<content>hola)xx"),
-                                tags=[ContentTag.ANALYZE, ContentTag.TITLE],
-                                embedded_schema=None,
-                                children=None,
-                            )
-                        ],
-                    )
-                ],
-            ).__str__()
+        assert self.parser.parse_string(schema) == GenericSchema(
+            pattern=None,
+            tags=[],
+            embedded_schema=None,
+            children=[
+                GenericSchema(
+                    pattern=regex.Regex("bb(?P<content>xxholaxx)bb"),
+                    tags=[ContentTag.ELEMENT],
+                    embedded_schema=None,
+                    children=[
+                        GenericSchema(
+                            pattern=regex.Regex("xx(?P<content>hola)xx"),
+                            tags=[ContentTag.ANALYZE, ContentTag.TITLE],
+                            embedded_schema=None,
+                            children=None,
+                        )
+                    ],
+                )
+            ],
+        )
+
+    def test_parse_string_multi_root(self):
+        schema: str = r'''pattern:"__(?P<content>hola)__", tags:"e"
+pattern:"xx(?P<content>hola)xx", tags:"e"'''
+        assert self.parser.parse_string(schema) == GenericSchema(
+            pattern=None,
+            tags=[],
+            embedded_schema=None,
+            children=[
+                GenericSchema(
+                    pattern=regex.Regex("__(?P<content>hola)__"),
+                    tags=[ContentTag.ELEMENT],
+                    embedded_schema=None,
+                    children=None,
+                ),
+                GenericSchema(
+                    pattern=regex.Regex("xx(?P<content>hola)xx"),
+                    tags=[ContentTag.ELEMENT],
+                    embedded_schema=None,
+                    children=None,
+                ),
+            ],
         )
 
     def test_parse_string_conflict_tags_and_embedded(self):
