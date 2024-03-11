@@ -36,9 +36,9 @@ class JSONContentEditor(ContentEditorInterface):
         except json.decoder.JSONDecodeError as e:
             logging.warning(f"DecodeError at position: {e.pos}")
 
-    # Only returns a string if the passed element is a leaf, and an embedded schema was specified
+    # Only returns a string if the passed element is a leaf or an embedded schema was specified
     def edit_parsed(self, input_parsed: any, schema: JSONSchema) -> dict | str:
-        if ContentTag.ELEMENT in schema.tags:  # we got an element, so we analyze it
+        if ContentTag.CONTAINER in schema.tags:  # we got an element, so we analyze it
             if schema.value_type == ValueType.DICT:
                 if self.content_analyzer.analyze(
                     self.extract_content(input_parsed, schema)
@@ -69,9 +69,12 @@ class JSONContentEditor(ContentEditorInterface):
             if schema.value_type == ValueType.DICT:
                 for key in schema.value:
                     try:
-                        input_parsed[key] = self.edit_parsed(
-                            input_parsed[key], schema.value[key]
-                        )
+                        if ContentTag.DELETE_UNCONDITIONAL in schema.value[key].tags:
+                            input_parsed.pop(key)
+                        else:
+                            input_parsed[key] = self.edit_parsed(
+                                input_parsed[key], schema.value[key]
+                            )
                     except KeyError:
                         logging.info(
                             f"Key {key} of schema {schema.value} could not be found. Maybe the schema has changed?"
@@ -205,6 +208,10 @@ class JSONContentEditor(ContentEditorInterface):
                     input_value = content.picture
                 elif ContentTag.SUMMARY in schema.tags:
                     input_value = content.summary
+                elif (
+                    ContentTag.DELETE in schema.tags
+                ):  # The field isn't deleted, just its content
+                    input_value = ""
 
         return input_value
 

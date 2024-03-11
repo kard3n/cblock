@@ -2,25 +2,21 @@ from enum import Enum
 
 
 class ContentTag(Enum):
-    ELEMENT = "e"  # Marks element as container/segment, whose children should be analyzed together
-    DELETE = "d"  # Element should be deleted.
-    DELETE_LEAVE_ONE = "o"  # Child elements should be deleted, but at least one must remain (for lists).
-    DELETE_UNCONDITIONAL = "u"  # element should be deleted unconditionally
-    TITLE = (
-        "t"  # A leaf element that contains a title as value. The action will be REPLACE
-    )
-    SUMMARY = "s"  # A leaf element that contains a summary as value. The action will be REPLACE
-    FULL_CONTENT = (
-        "f"  # A leaf element whose value is a larger text. The action will be REPLACE
-    )
-    PICTURE = "p"  # A leaf element that has a picture as its value. The action will be REPLACE
-    VIDEO = (
-        "v"  # A leaf element that has a videos as its value. The action will be REPLACE
-    )
-    CATEGORIES = (
-        "c"  # A leaf element that contains one or more tags/categories for the content
-    )
+    # Marks element as container/segment whose children should be analyzed and edited together
+    CONTAINER = "e"
+    # Element should be deleted unconditionally.
+    # Has no effect if the element is the descendent of a CONTAINER element
+    DELETE_UNCONDITIONAL = "u"
+    # The following may only be used for leaf elements of the schema that are descendents of a CONTAINER element
     ANALYZE = "a"  # Needs to be set for every item that should be analyzed
+    DELETE = "d"  # Element should be deleted.
+    # When sensitive content is detected, the content of elements with the following tags will be replaced:
+    TITLE = "t"
+    SUMMARY = "s"
+    FULL_CONTENT = "f"
+    PICTURE = "p"
+    VIDEO = "v"
+    CATEGORIES = "c"
 
     @classmethod
     def get_leaf_tags(cls) -> list:
@@ -31,4 +27,5 @@ class ContentTag(Enum):
             cls.VIDEO,
             cls.CATEGORIES,
             cls.ANALYZE,
+            cls.DELETE,
         ]

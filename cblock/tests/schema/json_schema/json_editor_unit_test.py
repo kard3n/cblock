@@ -388,4 +388,47 @@ class JsonEditorUnitTest(unittest.TestCase):
             schema=get_schema_return_value,
         )
 
+    def test_edit_delete_unconditional(self):
+        schema: JSONSchema = JSONSchema(
+            tags=[],
+            embedded_schema=None,
+            value_type=ValueType.DICT,
+            value={
+                "name": JSONSchema(
+                    tags=[ContentTag.DELETE_UNCONDITIONAL],
+                    embedded_schema=None,
+                    value_type=None,
+                    value="",
+                )
+            },
+        )
+
+        assert (
+            self.editor.edit_parsed(
+                input_parsed={"name": test_utils.random_string(10)}, schema=schema
+            )
+            == {}
+        )
+
+    def test_edit_delete(self):
+        self.content_analyzer.analyze.return_value = True
+
+        schema: JSONSchema = JSONSchema(
+            tags=[ContentTag.CONTAINER],
+            embedded_schema=None,
+            value_type=ValueType.DICT,
+            value={
+                "name": JSONSchema(
+                    tags=[ContentTag.DELETE, ContentTag.ANALYZE],
+                    embedded_schema=None,
+                    value_type=ValueType.LEAF,
+                    value="",
+                )
+            },
+        )
+
+        assert self.editor.edit_parsed(
+            input_parsed={"name": test_utils.random_string(10)}, schema=schema
+        ) == {"name": ""}
+
     # TODO tests for edit and tests for apply_action with more complex schemas

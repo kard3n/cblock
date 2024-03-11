@@ -40,7 +40,7 @@ class TestGenericSchemaParser(unittest.TestCase):
             children=[
                 GenericSchema(
                     pattern=regex.Regex("bb(?P<content>xxholaxx)bb"),
-                    tags=[ContentTag.ELEMENT],
+                    tags=[ContentTag.CONTAINER],
                     embedded_schema=None,
                     children=[
                         GenericSchema(
@@ -64,13 +64,13 @@ pattern:"xx(?P<content>hola)xx", tags:"e"'''
             children=[
                 GenericSchema(
                     pattern=regex.Regex("__(?P<content>hola)__"),
-                    tags=[ContentTag.ELEMENT],
+                    tags=[ContentTag.CONTAINER],
                     embedded_schema=None,
                     children=None,
                 ),
                 GenericSchema(
                     pattern=regex.Regex("xx(?P<content>hola)xx"),
-                    tags=[ContentTag.ELEMENT],
+                    tags=[ContentTag.CONTAINER],
                     embedded_schema=None,
                     children=None,
                 ),

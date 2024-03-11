@@ -74,7 +74,7 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
             children=[
                 GenericSchema(
                     pattern=regex.Regex("_(?P<content>(<p>.*</p>)+)_"),
-                    tags=[ContentTag.ELEMENT],
+                    tags=[ContentTag.CONTAINER],
                     embedded_schema=None,
                     children=[
                         GenericSchema(
@@ -217,7 +217,7 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
             == f"_{generated_content.title}_"
         )
 
-    def test_edit(self):
+    def test_edit_simple(self):
         generated_content: Content = test_utils.generate_content()
         self.content_factory.get_content.return_value = generated_content
 
@@ -230,7 +230,7 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
             children=[
                 GenericSchema(
                     pattern=regex.Regex(r"__(?P<content>A\w{10}A)+__"),
-                    tags=[ContentTag.ELEMENT],
+                    tags=[ContentTag.CONTAINER],
                     embedded_schema=None,
                     children=[
                         GenericSchema(
@@ -252,4 +252,84 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
 
         self.content_analyzer.analyze.assert_called_once_with(
             ContentExtractionResult(text=f"{random_content} ", pictures=[])
+        )
+
+    def test_edit_multiple_children(self):
+        generated_content: Content = test_utils.generate_content()
+        self.content_factory.get_content.return_value = generated_content
+
+        self.content_analyzer.analyze.return_value = True
+
+        schema: GenericSchema = GenericSchema(
+            pattern=None,
+            tags=[],
+            embedded_schema=None,
+            children=[
+                GenericSchema(
+                    pattern=regex.Regex(r"__(?P<content>A\w{10}A)__"),
+                    tags=[ContentTag.CONTAINER],
+                    embedded_schema=None,
+                    children=[
+                        GenericSchema(
+                            pattern=regex.Regex(r"A(?P<content>\w{10})A"),
+                            tags=[ContentTag.TITLE, ContentTag.ANALYZE],
+                            embedded_schema=None,
+                            children=[],
+                        )
+                    ],
+                ),
+                GenericSchema(
+                    pattern=regex.Regex(r"--(?P<content>A\w{10}A)--"),
+                    tags=[ContentTag.CONTAINER],
+                    embedded_schema=None,
+                    children=[
+                        GenericSchema(
+                            pattern=regex.Regex(r"A(?P<content>\w{10})A"),
+                            tags=[ContentTag.SUMMARY, ContentTag.ANALYZE],
+                            embedded_schema=None,
+                            children=[],
+                        )
+                    ],
+                ),
+            ],
+        )
+
+        random_content_one = test_utils.random_string(10)
+        random_content_two = test_utils.random_string(10)
+
+        assert (
+            self.editor.edit(
+                input_raw=f"__A{random_content_one}A__--A{random_content_two}A--",
+                schema=schema,
+            )
+            == f"__A{generated_content.title}A__--A{generated_content.summary}A--"
+        )
+
+        self.content_analyzer.analyze.assert_called_with(
+            ContentExtractionResult(text=f"{random_content_one} ", pictures=[])
+        )
+
+        self.content_analyzer.analyze.assert_called_with(
+            ContentExtractionResult(text=f"{random_content_two} ", pictures=[])
+        )
+
+    def test_delete_unconditionally(self):
+        schema: GenericSchema = GenericSchema(
+            pattern=None,
+            tags=[],
+            embedded_schema=None,
+            children=[
+                GenericSchema(
+                    pattern=regex.Regex(r"__(?P<content>A\w{10}A)__"),
+                    tags=[ContentTag.DELETE_UNCONDITIONAL],
+                    embedded_schema=None,
+                    children=[],
+                )
+            ],
+        )
+
+        random_content = test_utils.random_string(10)
+        assert (
+            self.editor.edit(input_raw=f"__A{random_content}A__", schema=schema)
+            == "__AA__"
         )

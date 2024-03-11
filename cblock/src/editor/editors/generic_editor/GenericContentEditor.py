@@ -81,7 +81,7 @@ class GenericContentEditor(ContentEditorInterface):
                 # check whether it is an element with offending content or not. If so, it will be edited
                 # Otherwise, take content and pass it to the next recursive iteration
                 if (
-                    ContentTag.ELEMENT in child_schema.tags
+                    ContentTag.CONTAINER in child_schema.tags
                     and self.content_analyzer.analyze(
                         next_editor.extract_content(match.group("content"), next_schema)
                     )
@@ -95,6 +95,9 @@ class GenericContentEditor(ContentEditorInterface):
                         )
                         + input_raw[content_end:]
                     )
+                elif ContentTag.DELETE_UNCONDITIONAL in child_schema.tags:
+                    # remove matched content
+                    input_raw = input_raw[:content_start] + input_raw[content_end:]
                 else:
 
                     input_raw = (
@@ -183,6 +186,8 @@ class GenericContentEditor(ContentEditorInterface):
                 for cat in content.tags:
                     result += cat + " "
                 return result[0:-1]
+            if tag == ContentTag.DELETE:
+                return ""
 
         # there was no leaf tag, so we iterate through the child schemas
         for child_schema in schema.children:

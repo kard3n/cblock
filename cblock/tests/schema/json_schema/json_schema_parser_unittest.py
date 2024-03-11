@@ -26,7 +26,7 @@ class TestJsonSchemaParser(unittest.TestCase):
                     value="John",
                 ),
                 "second_name": JSONSchema(
-                    tags=[ContentTag.ELEMENT],
+                    tags=[ContentTag.CONTAINER],
                     embedded_schema=None,
                     value_type=ValueType.DICT,
                     value={
@@ -49,7 +49,7 @@ class TestJsonSchemaParser(unittest.TestCase):
             value_type=ValueType.DICT,
             value={
                 "contained_list": JSONSchema(
-                    tags=[ContentTag.ELEMENT],
+                    tags=[ContentTag.CONTAINER],
                     embedded_schema=None,
                     value_type=ValueType.LIST,
                     value=JSONSchema(
