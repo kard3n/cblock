@@ -161,6 +161,8 @@ class JSONContentEditor(ContentEditorInterface):
                     result_container.text += input_value + " "
                 elif ContentTag.PICTURE in schema.tags:
                     result_container.pictures.append(input_value)
+                elif ContentTag.CATEGORIES in schema.tags:
+                    result_container.categories += input_value + " "
 
         return result_container
 

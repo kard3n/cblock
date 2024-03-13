@@ -133,8 +133,11 @@ class GenericContentEditor(ContentEditorInterface):
                 result_container=result_container,
             )
 
+        if ContentTag.CATEGORIES in schema.tags and ContentTag.ANALYZE in schema.tags:
+            result_container.categories += input_value + " "
+            return result_container
         # if schema has the "analyze" tag, the value gets returned
-        if ContentTag.ANALYZE in schema.tags:
+        elif ContentTag.ANALYZE in schema.tags:
             result_container.text += input_value
             return result_container
 
