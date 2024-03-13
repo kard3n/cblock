@@ -13,7 +13,8 @@ dataset = clean_dataset("../MN-DS-news-classification.csv")
 dataset_X = dataset["content"]
 dataset_y = dataset["topic"]
 
-count_vectorizer = CountVectorizer()
+# TODO maybe use TF-IDF to remove words of low interest
+count_vectorizer = CountVectorizer(stop_words="english")
 print("Vectorizing dataset...")
 bow = count_vectorizer.fit_transform(dataset_X)
 bow = np.array(bow.todense())
@@ -25,7 +26,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 print("Building Classifier")
 # Build a Gaussian Classifier
-model = GaussianNB(verbose=1)
+model = MultinomialNB()
 
 # Model training
 print("Starting training...")
