@@ -1,6 +1,6 @@
 import nltk
 import numpy as np
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB, MultinomialNB, ComplementNB
@@ -15,7 +15,7 @@ nltk.download("punkt")
 stemmer = nltk.SnowballStemmer("english", ignore_stopwords=False)
 
 
-def stem_string(string: str):
+def stem_tokenize_string(string: str):
     result: str = ""
     tokenized = nltk.word_tokenize(string)
     for word in tokenized:
@@ -24,14 +24,18 @@ def stem_string(string: str):
 
 
 print("Creating dataset...")
-dataset = clean_dataset("../MN-DS-news-classification.csv")
+dataset = clean_dataset("../MN-DS-news-classification.csv", True)
 
 # stem values of content column
-"""for i, row in dataset.iterrows():
-    dataset.at[i, "content"] = stem_string(row["content"])"""
+for i, row in dataset.iterrows():
+    dataset.at[i, "content"] = stem_tokenize_string(row["content"])
+
 
 dataset_X = dataset["content"]
 dataset_y = dataset["topic"]
+
+# remove punctuation
+dataset_X = dataset_X.str.replace("[^\w\s]", "")
 
 
 # TODO maybe use TF-IDF to remove words of low interest
@@ -50,9 +54,13 @@ print("Vectorizing dataset...")
 bow = count_vectorizer.fit_transform(dataset_X)
 bow = np.array(bow.todense())
 
+# if tf-idf should be applied. accelerates the prediction considerably, but lowers accuracy slightly
+tfidf_transformer = TfidfTransformer().fit(bow)
+bow = tfidf_transformer.transform(bow)
+
 
 X_train, X_test, y_train, y_test = train_test_split(
-    bow, dataset_y, test_size=0.3, random_state=100, stratify=dataset_y
+    bow, dataset_y, test_size=0.3, random_state=50, stratify=dataset_y
 )
 
 print("Building Classifier")

@@ -17,7 +17,7 @@ nltk.download("punkt")
 
 
 print("Creating dataset...")
-df = clean_dataset("../MN-DS-news-classification.csv")
+df = clean_dataset("../MN-DS-news-classification.csv", True)
 
 # convert to lower case
 df["content"] = df.content.map(lambda x: x.lower())
@@ -48,7 +48,7 @@ transformer = TfidfTransformer().fit(counts)
 counts = transformer.transform(counts)
 
 X_train, X_test, y_train, y_test = train_test_split(
-    counts, df["topic"], test_size=0.1, random_state=69
+    counts, df["topic"], test_size=0.3, random_state=69
 )
 
 

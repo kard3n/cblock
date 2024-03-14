@@ -20,7 +20,7 @@ for index, row in df.iterrows():
 # print(f"Topic set: {topic_set}.\nLength: {len(topic_set)}")
 
 
-def clean_dataset(ds_location: str) -> DataFrame:
+def clean_dataset(ds_location: str, only_title: bool = False) -> DataFrame:
     df = pandas.read_csv(ds_location)
     topic_conversion_dict: dict = {
         "weather": "none",
@@ -43,10 +43,16 @@ def clean_dataset(ds_location: str) -> DataFrame:
     }
 
     data = {"content": [], "topic": []}
-    for index, row in df.iterrows():
-        data["content"].append(row["title"] + " " + row["content"])
-        data["topic"].append(topic_conversion_dict[row["category_level_1"]])
-        # topic_set.add(row["category_level_1"])
+    if only_title:
+        for index, row in df.iterrows():
+            data["content"].append(row["title"])
+            data["topic"].append(topic_conversion_dict[row["category_level_1"]])
+            # topic_set.add(row["category_level_1"])
+    else:
+        for index, row in df.iterrows():
+            data["content"].append(row["title"] + " " + row["content"])
+            data["topic"].append(topic_conversion_dict[row["category_level_1"]])
+            # topic_set.add(row["category_level_1"])
 
     result: DataFrame = DataFrame(data)
 
