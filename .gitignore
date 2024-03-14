@@ -3,3 +3,4 @@ mitmproxy/*
 .git
 __pycache__
 .db
+venv/*
