@@ -18,8 +18,12 @@ def extract_from_inbetween_symbol(string: str, symbol: str) -> str:
     result: str = ""
     if string[pos] == symbol:
         pos += 1
+
         while not (string[pos] == symbol and string[pos - 1] != "\\"):
-            result += string[pos]
+            if string[pos - 1] == "\\":
+                result = result[:-1] + string[pos]
+            else:
+                result += string[pos]
             pos += 1
 
     return result
