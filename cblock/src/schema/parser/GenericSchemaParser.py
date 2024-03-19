@@ -39,10 +39,10 @@ class GenericSchemaParser(SchemaParserInterface):
             item = item[jump_whitespaces(item, 0) :]
             if item.startswith("pattern:"):
                 result.pattern = regex.compile(
-                    extract_from_inbetween_symbol(item[8:], '"')
+                    extract_from_inbetween_symbol(item[8:], "'")
                 )
             elif item.startswith("tags:"):
-                for letter in extract_from_inbetween_symbol(item[5:], '"'):
+                for letter in extract_from_inbetween_symbol(item[5:], "'"):
                     if ContentTag(letter) in ContentTag:
                         result.tags.append(ContentTag[ContentTag(letter).name])
 
