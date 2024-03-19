@@ -1,4 +1,3 @@
-import logging
 import sqlite3
 
 from db.DBManagerInterface import DBManagerInterface
@@ -81,31 +80,36 @@ class SQLiteManager(DBManagerInterface):
 
         return res[:-1]
 
+    def make_query_parameter_question_marks(self, num_params: int) -> str:
+        question_marks = "?"
+        for i in range(num_params - 1):
+            question_marks += ",?"
+        return question_marks
+
     def insert(self, values: list[any]):
         self.cursor.execute(
-            f"INSERT INTO {self.table_name} VALUES ({self.__list_to_comma_separated(values)}"
+            f"INSERT INTO {self.table_name} VALUES ({self.make_query_parameter_question_marks(num_params=len(values))})"
         )
         self.connection.commit()
 
     def insert_multiple(self, values: list[list[any]]):
+
         for value in values:
+
+            query = f"INSERT INTO {self.table_name} VALUES ({self.make_query_parameter_question_marks(num_params=len(value))})"
             self.cursor.execute(
-                f"INSERT INTO {self.table_name} VALUES ({self.__list_to_comma_separated(value)})"
+                query,
+                tuple(
+                    value,
+                ),
             )
 
         self.connection.commit()
 
-    def __list_to_comma_separated(self, items: list[str]):
-        res: str = ""
-        for item in items:
-            res += "'" + item + "',"
-
-        return res[:-1]
-
     def check_url_has_schema(self, url: str) -> bool:
         if (
             self.cursor.execute(
-                f"SELECT url FROM {self.table_name} WHERE url = '{url}'"
+                f"SELECT url FROM {self.table_name} WHERE url = ?", (url,)
             ).fetchone()
             is not None
         ):
@@ -115,7 +119,8 @@ class SQLiteManager(DBManagerInterface):
     def get_schema(self, schema_id: str) -> SchemaSearchResult:
 
         result = self.cursor.execute(
-            f"SELECT schema_type, schema FROM {self.table_name} WHERE schema_id = '{schema_id}'"
+            f"SELECT schema_type, schema FROM {self.table_name} WHERE schema_id = ?",
+            (schema_id,),
         ).fetchone()
 
         return SchemaSearchResult(schema_type=result[0], schema=result[1])
@@ -123,7 +128,7 @@ class SQLiteManager(DBManagerInterface):
     def get_paths_for_url(self, url: str) -> list[PathSearchResult]:
         result: list[PathSearchResult] = list()
         for item in self.cursor.execute(
-            f"SELECT schema_id, path FROM {self.table_name} WHERE url = '{url}'"
+            f"SELECT schema_id, path FROM {self.table_name} WHERE url = ?", (url,)
         ).fetchall():
             result.append(PathSearchResult(id=item[0], path=item[1]))
 
