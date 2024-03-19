@@ -1,12 +1,9 @@
-import logging
-
 import regex
 
 from schema.ContentTag import ContentTag
 from schema.parser.SchemaParserInterface import SchemaParserInterface
 from schema.generic_schema.GenericSchema import GenericSchema
 from exceptions.SchemaParsingException import SchemaParsingException
-from utils.Singleton import Singleton
 from utils.string_utils import (
     jump_whitespaces,
     extract_from_inbetween_symbol,
