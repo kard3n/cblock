@@ -1,11 +1,7 @@
 """
 Entry point for CBlock
 
-Run as follows:
-cd mitmproxy
-pip install -e .[dev]
-cd ..
-mitmproxy -m regular -s src/cblock.py
+mitmproxy -m regular -s cblock/src/cblock.py
 
 
 Enable utf-8 support (needs to be done only once per environment):
@@ -16,7 +12,7 @@ import logging
 
 import regex
 
-from content_analyzer.ContentAnalyzerFactory import ContentAnalyzerFactory
+from content_classifier.ContentClassifierFactory import ContentAnalyzerFactory
 from content_factory.ContentFactory import ContentFactory
 from db.PathSearchResult import PathSearchResult
 from db.SQLiteManager import SQLiteManager
@@ -32,8 +28,6 @@ from schema.parser.SchemaReader import SchemaReader
 
 
 class Main:
-    # source_filter_factory: SourceFilterFactory
-    # content_analyzer_factory: ContentAnalyzerFactory
 
     def __init__(self):
         logging.info("Starting CBlock")
@@ -56,17 +50,21 @@ class Main:
 
             try:
                 schema_reader: SchemaReader = SchemaReader(
-                    db_manager=self.db_manager, schema_location="schema_definitions/"
+                    db_manager=self.db_manager,
+                    schema_location="cblock/src/schema_definitions/",
                 )
                 schema_reader.run()
             except Exception as e:
-                print(e.__traceback__)
+                logging.error(f"Error while initializing database: {e.__traceback__}")
 
     async def response(self, flow: http.HTTPFlow):
-        # logging.info(f"URI: {flow.request.pretty_host + flow.request.path}")
+        # logging.warning(f"URI: {flow.request.pretty_host + flow.request.path}")
+        # logging.warning(f"Pretty host: {flow.request.pretty_host}")
         paths: list[PathSearchResult] = self.db_manager.get_paths_for_url(
             url=flow.request.pretty_host
         )
+
+        logging.warning(f"Paths: {paths}")
 
         for search_result in paths:
             if regex.compile(search_result.path).match(flow.request.path) is not None:
@@ -78,32 +76,28 @@ class Main:
     async def __edit(self, schema_id: str, content: str) -> str:
 
         # logging.warning(self.db_manager.get_schema(url=url))
-        schema_type, schema = self.db_manager.get_schema(schema_id=schema_id)
-
-        logging.info(
-            f"Parsed: {self.schema_parser_factory.getParser(parser_type=schema_type).parse_string(schema)}"
-        )
+        schema_search_result = self.db_manager.get_schema(schema_id=schema_id)
 
         logging.info(
             f"""Result: {self.content_editor_factory.get_content_editor(
-                schema_type=schema_type
+                schema_type=schema_search_result.schema_type
             ).edit(
                 input_raw=content,
                 schema=self.schema_parser_factory.getParser(
-                    parser_type=schema_type
-                ).parse_string(schema),
+                    parser_type=schema_search_result.schema_type
+                ).parse_string(schema_search_result.schema),
             )[
                 0:100
             ]}"""
         )
 
         return self.content_editor_factory.get_content_editor(
-            schema_type=schema_type
+            schema_type=schema_search_result.schema_type
         ).edit(
             input_raw=content,
             schema=self.schema_parser_factory.getParser(
-                parser_type=schema_type
-            ).parse_string(schema),
+                parser_type=schema_search_result.schema_type
+            ).parse_string(schema_search_result.schema),
         )
 
 

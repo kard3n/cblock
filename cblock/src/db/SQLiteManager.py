@@ -1,3 +1,4 @@
+import logging
 import sqlite3
 
 from db.DBManagerInterface import DBManagerInterface
@@ -112,8 +113,9 @@ class SQLiteManager(DBManagerInterface):
         return False
 
     def get_schema(self, schema_id: str) -> SchemaSearchResult:
+
         result = self.cursor.execute(
-            f"SELECT schema_type, schema FROM {self.table_name} WHERE id = '{id}'"
+            f"SELECT schema_type, schema FROM {self.table_name} WHERE schema_id = '{schema_id}'"
         ).fetchone()
 
         return SchemaSearchResult(schema_type=result[0], schema=result[1])

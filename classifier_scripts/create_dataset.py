@@ -2,25 +2,7 @@ import pandas
 from pandas import DataFrame
 
 
-"""
-print(df.columns)
-print(f"Shape of dataset: {df.shape}")
-
-print(df["category_level_2"])
-
-topic_set = set()
-
-# for value in df["category_level_1"]:
-#    topic_set.add(value)
-
-# iterate over all rows
-for index, row in df.iterrows():
-    topic_set.add(row["category_level_1"])"""
-
-# print(f"Topic set: {topic_set}.\nLength: {len(topic_set)}")
-
-
-def clean_dataset(ds_location: str, only_title: bool = False) -> DataFrame:
+def create_dataset(ds_location: str, only_title: bool = False) -> DataFrame:
     df = pandas.read_csv(ds_location)
     topic_conversion_dict: dict = {
         "weather": "none",
@@ -57,10 +39,3 @@ def clean_dataset(ds_location: str, only_title: bool = False) -> DataFrame:
     result: DataFrame = DataFrame(data)
 
     return result
-
-
-"""cleaning_result: DataFrame = clean_dataset()
-cleaning_result.to_csv("data.csv")
-print(set(cleaning_result["topic"]))"""
-
-# print(df.columns["category_level_1"])

@@ -2,7 +2,7 @@ import logging
 
 from regex import Match, regex
 
-from content_analyzer.ContentAnalyzerInterface import ContentAnalyzerInterface
+from content_classifier.ContentClassifierInterface import ContentClassifierInterface
 from content_factory.Content import Content
 from content_factory.ContentFactory import ContentFactory
 from editor.ContentEditorFactory import ContentEditorFactory
@@ -15,12 +15,12 @@ from schema.generic_schema.GenericSchema import GenericSchema
 
 
 class GenericContentEditor(ContentEditorInterface):
-    content_analyzer: ContentAnalyzerInterface
+    content_analyzer: ContentClassifierInterface
     content_factory: ContentFactory
 
     def __init__(
         self,
-        content_analyzer: ContentAnalyzerInterface,
+        content_analyzer: ContentClassifierInterface,
         content_factory: ContentFactory,
         schema_factory: SchemaFactory,
         editor_factory: ContentEditorFactory,
@@ -82,7 +82,7 @@ class GenericContentEditor(ContentEditorInterface):
                 # Otherwise, take content and pass it to the next recursive iteration
                 if (
                     ContentTag.CONTAINER in child_schema.tags
-                    and self.content_analyzer.analyze(
+                    and self.content_analyzer.classify(
                         next_editor.extract_content(match.group("content"), next_schema)
                     )
                 ):

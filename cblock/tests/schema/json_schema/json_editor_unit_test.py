@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import Mock
 
 import test_utils
-from content_analyzer.ContentAnalyzerInterface import ContentAnalyzerInterface
+from content_classifier.ContentClassifierInterface import ContentClassifierInterface
 from content_factory.Content import Content
 from content_factory.ContentFactory import ContentFactory
 from db.DBManagerInterface import DBManagerInterface
@@ -19,7 +19,7 @@ class JsonEditorUnitTest(unittest.TestCase):
     def setUp(self):
         self.db_manager: DBManagerInterface = Mock(DBManagerInterface)
         self.content_factory = Mock(ContentFactory)
-        self.content_analyzer = Mock(ContentAnalyzerInterface)
+        self.content_analyzer = Mock(ContentClassifierInterface)
         self.schema_factory = Mock(SchemaFactory)
         self.editor_factory = Mock(ContentEditorFactory)
 

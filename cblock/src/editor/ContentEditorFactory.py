@@ -1,4 +1,4 @@
-from content_analyzer.ContentAnalyzerInterface import ContentAnalyzerInterface
+from content_classifier.ContentClassifierInterface import ContentClassifierInterface
 from content_factory.ContentFactory import ContentFactory
 from db.DBManagerInterface import DBManagerInterface
 from editor.ContentEditorInterface import ContentEditorInterface
@@ -10,18 +10,13 @@ class ContentEditorFactory(metaclass=Singleton):
 
     def __init__(
         self,
-        content_analyzer: ContentAnalyzerInterface,
+        content_analyzer: ContentClassifierInterface,
         content_factory: ContentFactory,
         db_manager: DBManagerInterface,
     ):
         self.content_analyzer = content_analyzer
         self.content_factory = content_factory
         self.db_manager = db_manager
-        self.editor_factory: ContentEditorFactory = ContentEditorFactory(
-            content_analyzer=self.content_analyzer,
-            content_factory=self.content_factory,
-            db_manager=self.db_manager,
-        )
         self.schema_factory: SchemaFactory = SchemaFactory(db_manager=self.db_manager)
 
     def get_content_editor(self, schema_type: str) -> ContentEditorInterface:
@@ -33,7 +28,7 @@ class ContentEditorFactory(metaclass=Singleton):
             return JSONContentEditor(
                 content_analyzer=self.content_analyzer,
                 content_factory=self.content_factory,
-                editor_factory=self.editor_factory,
+                editor_factory=self,
                 schema_factory=self.schema_factory,
             )
         if schema_type == "generic":
@@ -44,7 +39,7 @@ class ContentEditorFactory(metaclass=Singleton):
             return GenericContentEditor(
                 content_analyzer=self.content_analyzer,
                 content_factory=self.content_factory,
-                editor_factory=self.editor_factory,
+                editor_factory=self,
                 schema_factory=self.schema_factory,
             )
 

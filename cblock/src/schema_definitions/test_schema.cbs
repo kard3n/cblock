@@ -2,4 +2,4 @@ url: basic_web.com
 path: /data
 type: json
 schema:
-{"contained_list"e: [{"picture"p(testName):"pic.jpg",}]}
+{"contained_list"e: [{"picture"p:"pic.jpg",}]}

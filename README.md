@@ -32,6 +32,18 @@ $ venv\Scripts\pip install -r cblock/requirements_dev.txt
 $ venv/bin/pip install -r "cblock/requirements_dev.txt"
 ````
 
+Enable UTF-8 support:
+
+> The virtual environment needs to be activated first, as explained in [Execution](#execution)
+
+````shell
+# Windows
+$ set PYTHONUTF8=1
+
+# Linux
+$ export PYTHONUTF8=1
+````
+
 ## Execution
 Activate virtual environment:
 ````shell

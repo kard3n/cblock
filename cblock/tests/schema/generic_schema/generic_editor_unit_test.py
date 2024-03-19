@@ -5,7 +5,7 @@ from unittest.mock import Mock
 from regex import regex
 
 import test_utils
-from content_analyzer.ContentAnalyzerInterface import ContentAnalyzerInterface
+from content_classifier.ContentClassifierInterface import ContentClassifierInterface
 from content_factory.Content import Content
 from content_factory.ContentFactory import ContentFactory
 from db.DBManagerInterface import DBManagerInterface
@@ -20,7 +20,7 @@ from schema.generic_schema.GenericSchema import GenericSchema
 
 class GenericSchemaEditorUnitTest(unittest.TestCase):
     content_factory: ContentFactory
-    content_analyzer: ContentAnalyzerInterface
+    content_analyzer: ContentClassifierInterface
     schema_factory: SchemaFactory
     editor_factory: ContentEditorFactory
     editor: GenericContentEditor
@@ -28,7 +28,7 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
     def setUp(self):
         self.db_manager: DBManagerInterface = Mock(DBManagerInterface)
         self.content_factory = Mock(ContentFactory)
-        self.content_analyzer = Mock(ContentAnalyzerInterface)
+        self.content_analyzer = Mock(ContentClassifierInterface)
         self.schema_factory = Mock(SchemaFactory)
         self.editor_factory = Mock(ContentEditorFactory)
 
@@ -221,7 +221,7 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
         generated_content: Content = test_utils.generate_content()
         self.content_factory.get_content.return_value = generated_content
 
-        self.content_analyzer.analyze.return_value = True
+        self.content_analyzer.classify.return_value = True
 
         schema: GenericSchema = GenericSchema(
             pattern=None,
@@ -250,7 +250,7 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
             == f"__A{generated_content.title}A__"
         )
 
-        self.content_analyzer.analyze.assert_called_once_with(
+        self.content_analyzer.classify.assert_called_once_with(
             ContentExtractionResult(text=f"{random_content} ", pictures=[])
         )
 
@@ -258,7 +258,7 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
         generated_content: Content = test_utils.generate_content()
         self.content_factory.get_content.return_value = generated_content
 
-        self.content_analyzer.analyze.return_value = True
+        self.content_analyzer.classify.return_value = True
 
         schema: GenericSchema = GenericSchema(
             pattern=None,
@@ -305,11 +305,11 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
             == f"__A{generated_content.title}A__--A{generated_content.summary}A--"
         )
 
-        self.content_analyzer.analyze.assert_called_with(
+        self.content_analyzer.classify.assert_called_with(
             ContentExtractionResult(text=f"{random_content_one} ", pictures=[])
         )
 
-        self.content_analyzer.analyze.assert_called_with(
+        self.content_analyzer.classify.assert_called_with(
             ContentExtractionResult(text=f"{random_content_two} ", pictures=[])
         )
 

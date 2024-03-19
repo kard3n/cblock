@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from content_analyzer.ContentAnalyzerInterface import ContentAnalyzerInterface
+from content_classifier.ContentClassifierInterface import ContentClassifierInterface
 from content_factory.Content import Content
 from content_factory.ContentFactory import ContentFactory
 from editor.ContentExtractionResult import ContentExtractionResult
@@ -11,7 +11,7 @@ class ContentEditorInterface(ABC):
     @abstractmethod
     def __init__(
         self,
-        content_analyzer: ContentAnalyzerInterface,
+        content_analyzer: ContentClassifierInterface,
         content_factory: ContentFactory,
     ) -> None:
         raise NotImplementedError("Not implemented")
