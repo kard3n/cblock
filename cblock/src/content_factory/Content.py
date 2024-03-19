@@ -10,4 +10,6 @@ class Content:
     picture: str = "picture.png"
     video: str = "video.mp4"
     audio: str = "audio.mp3"
+    link: str = "example.com"
+    origin: str = "ContentBlock"
     tags: list[str] = list

@@ -189,18 +189,22 @@ class GenericContentEditor(ContentEditorInterface):
         for tag in schema.tags:
             if tag == ContentTag.TITLE:
                 return content.title
-            if tag == ContentTag.SUMMARY:
+            elif tag == ContentTag.SUMMARY:
                 return content.summary
-            if tag == ContentTag.FULL_CONTENT:
+            elif tag == ContentTag.FULL_CONTENT:
                 return content.full
-            if tag == ContentTag.PICTURE:
+            elif tag == ContentTag.PICTURE:
                 return content.video
-            if tag == ContentTag.CATEGORIES:
+            elif tag == ContentTag.LINK:
+                return content.link
+            elif tag == ContentTag.ORIGIN:
+                return content.origin
+            elif tag == ContentTag.CATEGORIES:
                 result = ""
                 for cat in content.tags:
                     result += cat + " "
                 return result[0:-1]
-            if tag == ContentTag.DELETE:
+            elif tag == ContentTag.DELETE:
                 return ""
 
         # there was no leaf tag, so we iterate through the child schemas

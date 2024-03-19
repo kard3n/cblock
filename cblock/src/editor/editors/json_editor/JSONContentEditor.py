@@ -214,6 +214,10 @@ class JSONContentEditor(ContentEditorInterface):
                     input_value = content.picture
                 elif ContentTag.SUMMARY in schema.tags:
                     input_value = content.summary
+                elif ContentTag.LINK in schema.tags:
+                    input_value = content.link
+                elif ContentTag.ORIGIN in schema.tags:
+                    input_value = content.origin
                 elif (
                     ContentTag.DELETE in schema.tags
                 ):  # The field isn't deleted, just its content
