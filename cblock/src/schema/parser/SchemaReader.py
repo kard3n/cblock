@@ -26,7 +26,7 @@ class SchemaReader:
 
         data_to_insert = []
         for filename in filename_list:
-            result: any
+            result: any = None
             if filename.endswith(".cbs"):
                 try:
                     result = self.read_schema(
@@ -50,6 +50,8 @@ class SchemaReader:
         url: str | None = None
         path: str | None = None
         factory: SchemaParserFactory = SchemaParserFactory()
+        if directory.endswith("/"):
+            directory = directory[:-1]
         with open(directory + "/" + filename) as file:
             file_content = file.read()
 
