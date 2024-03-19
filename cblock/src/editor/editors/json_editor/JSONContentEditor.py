@@ -151,7 +151,6 @@ class JSONContentEditor(ContentEditorInterface):
                     len(
                         {
                             ContentTag.SUMMARY,
-                            ContentTag.TITLE,
                             ContentTag.FULL_CONTENT,
                         }
                         & set(schema.tags)
@@ -159,6 +158,8 @@ class JSONContentEditor(ContentEditorInterface):
                     > 0
                 ):
                     result_container.text += input_value + " "
+                elif ContentTag.TITLE in schema.tags:
+                    result_container.title += input_value + " "
                 elif ContentTag.PICTURE in schema.tags:
                     result_container.pictures.append(input_value)
                 elif ContentTag.CATEGORIES in schema.tags:

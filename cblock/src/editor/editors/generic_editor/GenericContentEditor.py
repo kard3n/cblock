@@ -133,13 +133,17 @@ class GenericContentEditor(ContentEditorInterface):
                 result_container=result_container,
             )
 
-        if ContentTag.CATEGORIES in schema.tags and ContentTag.ANALYZE in schema.tags:
-            result_container.categories += input_value + " "
-            return result_container
-        # if schema has the "analyze" tag, the value gets returned
-        elif ContentTag.ANALYZE in schema.tags:
-            result_container.text += input_value
-            return result_container
+        if ContentTag.ANALYZE in schema.tags:
+            if ContentTag.CATEGORIES in schema.tags:
+                result_container.categories += input_value + " "
+                return result_container
+            elif ContentTag.TITLE in schema.tags:
+                result_container.title += input_value
+                return result_container
+            # if schema has the "analyze" tag, the value gets returned
+            else:
+                result_container.text += input_value
+                return result_container
 
         # schema did not mark this as a leaf element, therefore it should have children whose content
         # needs to be extracted
