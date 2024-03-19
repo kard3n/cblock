@@ -31,7 +31,7 @@ class JSONContentEditor(ContentEditorInterface):
     def edit(self, input_raw: str, schema: JSONSchema) -> str:
         try:
             input_decoded: dict = json.loads(input_raw)
-            return self.edit_parsed(input_decoded, schema).__str__()
+            return json.dumps(self.edit_parsed(input_decoded, schema))
 
         except json.decoder.JSONDecodeError as e:
             logging.warning(f"DecodeError at position: {e.pos}")
@@ -83,7 +83,7 @@ class JSONContentEditor(ContentEditorInterface):
             elif schema.value_type == ValueType.LIST:
                 for item in input_parsed:
                     input_parsed[input_parsed.index(item)] = self.edit_parsed(
-                        item, schema.value[0]
+                        item, schema.value
                     )
             elif schema.value_type == ValueType.LEAF:
                 # If it's a leaf, we just need to check if an embedded editor has been specified and, if so, edit
