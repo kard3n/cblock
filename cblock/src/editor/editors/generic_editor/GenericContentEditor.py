@@ -41,14 +41,21 @@ class GenericContentEditor(ContentEditorInterface):
 
             for match in matches_iter:
 
-                if match.group("content") is not None:
-                    # found a substring that matches, so we have to check for tags and do something
-                    # extract start and end position of "content" group
-                    match_list.append(match)
+                try:
+                    if match.group("content") is not None:
+                        # found a substring that matches, so we have to check for tags and do something
+                        # extract start and end position of "content" group
+                        match_list.append(match)
 
-                else:
-                    # there's no closer for the opened match, return Exception
-                    raise EditException(f"No closer found for match: {match.group()}")
+                    else:
+                        # there's no closer for the opened match, return Exception
+                        raise EditException(
+                            f"No closer found for match: {match.group()}"
+                        )
+                except Exception:
+                    logging.warning(
+                        f"Could not find content group in match: {match.group()}"
+                    )
 
             # we start editing from left to right. This is to avoid problems due to differing content length
             match_list.reverse()
