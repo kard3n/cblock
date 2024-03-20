@@ -60,7 +60,7 @@ class GenericContentEditor(ContentEditorInterface):
             # we start editing from left to right. This is to avoid problems due to differing content length
             match_list.reverse()
 
-            # check if an embedded schema has been specified, the editor used will be changed to the one related
+            # check if an embedded schema has been specified, if so the editor used will be the one related
             # to the embedded schema
             if child_schema.embedded_schema is not None:
                 next_editor: ContentEditorInterface = (
@@ -76,13 +76,14 @@ class GenericContentEditor(ContentEditorInterface):
                 next_schema = child_schema
 
             for match in match_list:
+                logging.warning(f"Match content: {match.group("content")}\nMatch group: {match.group()}")
                 content_start: int = (
                     match.start()
-                    + regex.search(match.group("content"), match.group()).start()
+                    + match.group().find(match.group("content"))
                 )
                 content_end: int = (
                     match.start()
-                    + regex.search(match.group("content"), match.group()).end()
+                    + match.group().find(match.group("content")) + len(match.group("content"))
                 )
 
                 # check whether it is an element with offending content or not. If so, it will be edited
@@ -234,10 +235,12 @@ class GenericContentEditor(ContentEditorInterface):
     def edit_content(self, input_raw: str, match: Match, schema: GenericSchema) -> str:
 
         content_start: int = (
-            match.start() + regex.search(match.group("content"), match.group()).start()
+                match.start()
+                + match.group().find(match.group("content"))
         )
         content_end: int = (
-            match.start() + regex.search(match.group("content"), match.group()).end()
+                match.start()
+                + match.group().find(match.group("content")) + len(match.group("content"))
         )
 
         input_raw = (
