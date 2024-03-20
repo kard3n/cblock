@@ -71,3 +71,4 @@ Example: Schema that contains the following fields:
 ### generic -> GenericSchema
 All leaves must be children of an element with the ELEMENT tag, or have one themselves.
 Always use non-greedy quantifiers when possible. For example, `.*` should be `.*?`, as `.*` would match as much as possible while `.*?` tries to find the shortest match possible (which is what we usually want)
+Any comma that is part of a value must be escaped.
