@@ -251,7 +251,7 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
         )
 
         self.content_analyzer.classify.assert_called_once_with(
-            ContentExtractionResult(text=f"{random_content} ", pictures=[])
+            ContentExtractionResult(title=f"{random_content} ", text=" ", pictures=[])
         )
 
     def test_edit_multiple_children(self):
@@ -306,11 +306,27 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
         )
 
         self.content_analyzer.classify.assert_called_with(
-            ContentExtractionResult(text=f"{random_content_one} ", pictures=[])
+            ContentExtractionResult(
+                title=f"",
+                text=f"{random_content_two} ",
+                pictures=[],
+            )
+        )
+
+        assert (
+            self.editor.edit(
+                input_raw=f"__A{random_content_one}A__",
+                schema=schema,
+            )
+            == f"__A{generated_content.title}A__"
         )
 
         self.content_analyzer.classify.assert_called_with(
-            ContentExtractionResult(text=f"{random_content_two} ", pictures=[])
+            ContentExtractionResult(
+                title=f"{random_content_one} ",
+                text=" ",
+                pictures=[],
+            )
         )
 
     def test_delete_unconditionally(self):
@@ -331,5 +347,5 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
         random_content = test_utils.random_string(10)
         assert (
             self.editor.edit(input_raw=f"__A{random_content}A__", schema=schema)
-            == "__AA__"
+            == "____"
         )
