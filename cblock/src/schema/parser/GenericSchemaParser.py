@@ -20,7 +20,7 @@ class GenericSchemaParser(SchemaParserInterface):
         cleaned_list: list[str] = []
 
         for line in schema.split("\n"):
-            if not line.isspace() or len(line) == 0:
+            if not len(line.strip()) == 0:
                 cleaned_list.append(line)
 
         if len(cleaned_list) > 0:
