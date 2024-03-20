@@ -22,7 +22,10 @@ class ContentEditorInterface(ABC):
 
     @abstractmethod
     def extract_content(
-        self, input_value, schema, result_container: ContentExtractionResult | None
+        self,
+        input_value,
+        schema,
+        result_container: ContentExtractionResult | None = None,
     ) -> ContentExtractionResult:
         raise NotImplementedError("Not implemented")
 
