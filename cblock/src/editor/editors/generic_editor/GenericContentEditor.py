@@ -76,14 +76,13 @@ class GenericContentEditor(ContentEditorInterface):
                 next_schema = child_schema
 
             for match in match_list:
-                logging.warning(f"Match content: {match.group("content")}\nMatch group: {match.group()}")
-                content_start: int = (
-                    match.start()
-                    + match.group().find(match.group("content"))
+                content_start: int = match.start() + match.group().find(
+                    match.group("content")
                 )
                 content_end: int = (
                     match.start()
-                    + match.group().find(match.group("content")) + len(match.group("content"))
+                    + match.group().find(match.group("content"))
+                    + len(match.group("content"))
                 )
 
                 # check whether it is an element with offending content or not. If so, it will be edited
@@ -234,13 +233,11 @@ class GenericContentEditor(ContentEditorInterface):
 
     def edit_content(self, input_raw: str, match: Match, schema: GenericSchema) -> str:
 
-        content_start: int = (
-                match.start()
-                + match.group().find(match.group("content"))
-        )
+        content_start: int = match.start() + match.group().find(match.group("content"))
         content_end: int = (
-                match.start()
-                + match.group().find(match.group("content")) + len(match.group("content"))
+            match.start()
+            + match.group().find(match.group("content"))
+            + len(match.group("content"))
         )
 
         input_raw = (
