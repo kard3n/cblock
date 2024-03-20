@@ -152,25 +152,26 @@ class GenericContentEditor(ContentEditorInterface):
                 result_container.text += input_value
                 return result_container
 
-        # schema did not mark this as a leaf element, therefore it should have children whose content
-        # needs to be extracted
+        # in case the schema has children, their content should be extracted too
+        if schema.children is not None:
+            for child_schema in schema.children:
+                matches_iter = regex.finditer(child_schema.pattern, input_value)
 
-        for child_schema in schema.children:
-            matches_iter = regex.finditer(child_schema.pattern, input_value)
+                for match in matches_iter:
+                    if match.group("content") is not None:
+                        self.extract_content(
+                            match.group("content"),
+                            child_schema,
+                            result_container=result_container,
+                        )
 
-            for match in matches_iter:
-                if match.group("content") is not None:
-                    self.extract_content(
-                        match.group("content"),
-                        child_schema,
-                        result_container=result_container,
-                    )
-
-                    if child_schema.children is None or child_schema.children == []:
-                        result_container.text += " "
-                else:
-                    # No content could be identified
-                    raise EditException(f"No closer found for match: {match.group()}")
+                        if child_schema.children is None or child_schema.children == []:
+                            result_container.text += " "
+                    else:
+                        # No content could be identified
+                        raise EditException(
+                            f"No closer found for match: {match.group()}"
+                        )
         return result_container
 
     # Gets passed content, and for each identified child element applies the action specified for it
