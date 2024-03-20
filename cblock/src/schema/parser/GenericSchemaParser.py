@@ -1,3 +1,5 @@
+import logging
+
 import regex
 
 from schema.ContentTag import ContentTag
@@ -8,6 +10,7 @@ from utils.string_utils import (
     jump_whitespaces,
     extract_from_inbetween_symbol,
     count_continuous,
+    split_safe,
 )
 
 
@@ -34,7 +37,7 @@ class GenericSchemaParser(SchemaParserInterface):
     @classmethod
     def parse_element_single(cls, element: str) -> GenericSchema:
         result = GenericSchema()
-        for item in element.split(","):
+        for item in split_safe(element, ","):
             # remove whitespaces
             item = item[jump_whitespaces(item, 0) :]
             if item.startswith("pattern:"):
@@ -61,6 +64,9 @@ class GenericSchemaParser(SchemaParserInterface):
                         '"editor_id" tag must be followed by an ID.'
                     )
             else:
+                logging.error(
+                    f'"{item}" is not a valid field. Are all commas escaped correctly?'
+                )
                 raise SchemaParsingException(f'"{item} is not a valid field"')
 
         if result.embedded_schema is not None and result.tags != []:
