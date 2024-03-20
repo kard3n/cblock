@@ -30,4 +30,6 @@ class ContentTag(Enum):
             cls.CATEGORIES,
             cls.ANALYZE,
             cls.DELETE,
+            cls.TITLE,
+            cls.LINK,
         ]
