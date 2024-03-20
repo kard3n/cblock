@@ -37,16 +37,18 @@ General Tags:
 
 Tags used for children of a CONTAINER element
 
-| Name | Symbol | Description |
-|--------------|-----------|------------|
-| ANALYZE | a | Needs to be set for every item that should be analyzed |
-| DELETE | d | Element should be deleted. |
-| TITLE | t | A leaf that contains a title as value. Its value will be replaced with another |
-| SUMMARY | s | A leaf that contains a summary as value. Its value will be replaced with another |
-| FULL_CONTENT | f | A leaf whose value is a larger text. Its value will be replaced with another |
-| PICTURE | p | A leaf that has a picture as its value. Its value will be replaced with another |
-| VIDEO | v | A leaf that has a videos as its value. Its value will be replaced with another |
-| CATEGORIES | c | A leaf element that contains one or more tags/categories for the content |
+| Name         | Symbol | Description                                                                      |
+|--------------|--------|----------------------------------------------------------------------------------|
+| ANALYZE      | a      | Needs to be set for every item that should be analyzed                           |
+| DELETE       | d      | Element should be deleted.                                                       |
+| TITLE        | t      | A leaf that contains a title as value. Its value will be replaced with another   |
+| SUMMARY      | s      | A leaf that contains a summary as value. Its value will be replaced with another |
+| FULL_CONTENT | f      | A leaf whose value is a larger text. Its value will be replaced with another     |
+| PICTURE      | p      | A leaf that has a picture as its value. Its value will be replaced with another  |
+| VIDEO        | v      | A leaf that has a videos as its value. Its value will be replaced with another   |
+| CATEGORIES   | c      | A leaf element that contains one or more tags/categories for the content         |
+| ORIGIN       | o      | A leaf element that contains the origin of the content (author, website, ...)    |
+| LINK         | l      | A leaf element that contains a link to another page                              |
 
 ## Schema options:
 ### json -> JSONSchema
