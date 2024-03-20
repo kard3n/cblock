@@ -36,15 +36,16 @@ def split_safe(string: str, symbol: str = ",") -> list[str]:
 def extract_from_inbetween_symbol(string: str, symbol: str) -> str:
     pos: int = jump_whitespaces_linebreaks(string, 0)
     result: str = ""
+
     if string[pos] == symbol:
         pos += 1
 
-        while not (string[pos] == symbol and string[pos - 1] != "\\"):
-            if string[pos - 1] == "\\":
-                result = result[:-1] + string[pos]
-            else:
-                result += string[pos]
-            pos += 1
+    while pos < len(string):
+        if string[pos] == symbol and string[pos - 1] != "\\":
+            break
+        else:
+            result += string[pos]
+        pos += 1
 
     return result
 
