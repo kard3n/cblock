@@ -10,7 +10,7 @@ from content_classifier.classifiers.simple.SimpleContentClassifier import (
 class ContentAnalyzerFactory:
     def get_content_analyzer(self) -> ContentClassifierInterface:
         # TODO depending on configuration, use one or another
-        # return SimpleContentClassifier()
+        return SimpleContentClassifier()
         return NaiveBayesClassifier(
             forbidden_topics=[
                 "finance",

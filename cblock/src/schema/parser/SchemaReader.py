@@ -41,7 +41,9 @@ class SchemaReader:
                         )
                     )
                 else:
-                    raise SchemaParsingException(result)
+                    raise SchemaParsingException(
+                        f"The file {filename} could not be parsed: {result}"
+                    )
         self.db_manager.insert_multiple(values=data_to_insert)
 
     # Returns a list, with the following content (order): schema name, url, schema type, underlying schema (as string)
