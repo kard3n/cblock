@@ -12,4 +12,5 @@ class ContentFactory:
             video="video.mp4",
             audio="audio.wav",
             tags=["default"],
+            link="https://www.example.com/",
         )
