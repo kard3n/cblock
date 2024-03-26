@@ -31,7 +31,7 @@ class JSONSchemaParser(SchemaParserInterface):
         # if inherited_tags is not None:
         #    element_container.tags = deepcopy(inherited_tags)
 
-        pos: int = 0
+        pos: int = jump_whitespaces_linebreaks(element, 0)
 
         # check if the passed element has tags, if it does adds them
         if element[pos].isalpha() or element[pos] == ":" or element[pos] == "(":
