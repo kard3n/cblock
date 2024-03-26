@@ -19,12 +19,12 @@ class JsonEditorUnitTest(unittest.TestCase):
     def setUp(self):
         self.db_manager: DBManagerInterface = Mock(DBManagerInterface)
         self.content_factory = Mock(ContentFactory)
-        self.content_analyzer = Mock(ContentClassifierInterface)
+        self.content_classifier = Mock(ContentClassifierInterface)
         self.schema_factory = Mock(SchemaFactory)
         self.editor_factory = Mock(ContentEditorFactory)
 
         self.editor: JSONContentEditor = JSONContentEditor(
-            content_analyzer=self.content_analyzer,
+            content_analyzer=self.content_classifier,
             content_factory=self.content_factory,
             editor_factory=self.editor_factory,
             schema_factory=self.schema_factory,
@@ -49,7 +49,9 @@ class JsonEditorUnitTest(unittest.TestCase):
 
         assert self.editor.extract_content(
             input_value={"name": random_content}, schema=schema
-        ) == ContentExtractionResult(text=random_content + " ", pictures=[])
+        ) == ContentExtractionResult(
+            title=f"{random_content} ", text="", pictures=[], categories=""
+        )
 
     def test_extract_content_dict_invalid_keys(self):
         schema: JSONSchema = JSONSchema(
@@ -82,7 +84,9 @@ class JsonEditorUnitTest(unittest.TestCase):
 
         assert self.editor.extract_content(
             input_value={"name": random_content}, schema=schema
-        ) == ContentExtractionResult(text=random_content + " ", pictures=[])
+        ) == ContentExtractionResult(
+            title=random_content + " ", text="", pictures=[], categories=""
+        )
 
     def test_extract_content_list(self):
         schema: JSONSchema = JSONSchema(
@@ -411,7 +415,7 @@ class JsonEditorUnitTest(unittest.TestCase):
         )
 
     def test_edit_delete(self):
-        self.content_analyzer.analyze.return_value = True
+        self.content_classifier.classify.return_value = True
 
         schema: JSONSchema = JSONSchema(
             tags=[ContentTag.CONTAINER],
