@@ -65,7 +65,7 @@ class JSONContentEditor(ContentEditorInterface):
                         schema,
                         self.content_factory.get_content(),
                     )
-        else:
+        else:  # Not an element
             if schema.value_type == ValueType.DICT:
                 for key in schema.value:
                     try:
@@ -78,6 +78,10 @@ class JSONContentEditor(ContentEditorInterface):
                     except KeyError:
                         logging.info(
                             f"Key {key} of schema {schema.value} could not be found. Maybe the schema has changed?"
+                        )
+                    except TypeError as e:
+                        logging.warning(
+                            f"Could not access {key} of schema {schema.value} on attribute {input_parsed}: {e}?"
                         )
 
             elif schema.value_type == ValueType.LIST:
