@@ -5,7 +5,7 @@ schema:
 {
   "subCards": [
     e:{
-      "title"ta: "Title",
+      "title"ta: "",
       "abstract"sa: "",
       "url"l: "",
       "source"o: ""
