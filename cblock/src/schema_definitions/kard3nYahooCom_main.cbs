@@ -1,0 +1,13 @@
+url: yahoo.com
+path: /$
+type: generic
+schema:
+pattern:'<li class="ntk-item(?P<content>.*?)<\/li>', tags:'e'
+    pattern:'<h3.*?>(?P<content>.*?)<\/h3>', tags:'ta'
+    pattern:'href="(?P<content>.*?)"', tags:'l'
+pattern:'<li.*?>(?P<content>.*?)><\/li>', tags:'e'
+    pattern:'<a class.*?>(?P<content>.*?)<\/u><\/a>', tags:'ta'
+    pattern:'<p class.*?>(?P<content>.*?)<\/p>', tags:'sa'
+pattern:'class="C\(--batcave\).*?>(?P<content>.*?)<\/a>', tags:'e'
+    pattern:'<h3.*?>(?P<content>.*?)<\/h3>', tags:'ta'
+    pattern:'<p class=".*?>(?P<content>.*?)<\/p>', tags:'d'
