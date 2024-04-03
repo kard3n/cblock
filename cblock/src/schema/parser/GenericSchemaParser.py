@@ -7,7 +7,7 @@ from schema.parser.SchemaParserInterface import SchemaParserInterface
 from schema.generic_schema.GenericSchema import GenericSchema
 from exceptions.SchemaParsingException import SchemaParsingException
 from utils.string_utils import (
-    jump_whitespaces,
+    count_whitespaces,
     extract_from_inbetween_symbol,
     count_continuous,
     split_safe,
@@ -39,7 +39,7 @@ class GenericSchemaParser(SchemaParserInterface):
         result = GenericSchema()
         for item in split_safe(element, ","):
             # remove whitespaces
-            item = item[jump_whitespaces(item, 0) :]
+            item = item.lstrip()
             if item.startswith("pattern:"):
                 result.pattern = regex.compile(
                     extract_from_inbetween_symbol(item[8:], "'")
@@ -50,7 +50,7 @@ class GenericSchemaParser(SchemaParserInterface):
                         result.tags.append(ContentTag[ContentTag(letter).name])
 
             elif item.startswith("schema_id:"):
-                id_pos: int = jump_whitespaces(item, 10)
+                id_pos: int = count_whitespaces(item, 10)
 
                 num: str = ""
                 while id_pos < len(item) and item[id_pos].isalnum():

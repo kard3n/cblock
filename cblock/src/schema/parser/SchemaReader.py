@@ -59,19 +59,19 @@ class SchemaReader:
 
         pos: int = 0
         while pos < len(file_content):
-            pos = string_utils.jump_whitespaces(string=file_content, pos=pos)
+            pos = string_utils.count_whitespaces(string=file_content, pos=pos)
             if file_content[pos:].startswith("url:"):
-                pos = string_utils.jump_whitespaces(string=file_content, pos=pos + 4)
+                pos = string_utils.count_whitespaces(string=file_content, pos=pos + 4)
                 url = string_utils.extract_until_symbols(
                     string=file_content, symbols=["\n"], start_pos=pos, end_pos=None
                 )
             if file_content[pos:].startswith("path:"):
-                pos = string_utils.jump_whitespaces(string=file_content, pos=pos + 5)
+                pos = string_utils.count_whitespaces(string=file_content, pos=pos + 5)
                 path = string_utils.extract_until_symbols(
                     string=file_content, symbols=["\n"], start_pos=pos, end_pos=None
                 )
             if file_content[pos:].startswith("type:"):
-                pos = string_utils.jump_whitespaces(string=file_content, pos=pos + 5)
+                pos = string_utils.count_whitespaces(string=file_content, pos=pos + 5)
                 schema_type = string_utils.extract_until_symbols(
                     string=file_content, symbols=["\n"], start_pos=pos, end_pos=None
                 )
