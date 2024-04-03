@@ -6,7 +6,7 @@ def jump_whitespaces_linebreaks(string: str, pos: int) -> int:
     return pos
 
 
-def jump_whitespaces(string: str, pos: int) -> int:
+def count_whitespaces(string: str, pos: int) -> int:
     while string[pos] == " ":
         pos += 1
 
