@@ -23,7 +23,7 @@ class GenericSchemaParser(SchemaParserInterface):
         cleaned_list: list[str] = []
 
         for line in schema.split("\n"):
-            if not len(line.strip()) == 0:
+            if not (len(line.strip()) == 0 or line.lstrip().startswith("#")):
                 cleaned_list.append(line)
 
         if len(cleaned_list) > 0:
@@ -63,6 +63,8 @@ class GenericSchemaParser(SchemaParserInterface):
                     raise SchemaParsingException(
                         '"editor_id" tag must be followed by an ID.'
                     )
+            elif item.startswith("desc"):  # comments are skipped
+                pass
             else:
                 logging.error(
                     f'"{item}" is not a valid field. Are all commas escaped correctly?'

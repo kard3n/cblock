@@ -72,3 +72,7 @@ Example: Schema that contains the following fields:
 All leaves must be children of an element with the ELEMENT tag, or have one themselves.
 Always use non-greedy quantifiers when possible. For example, `.*` should be `.*?`, as `.*` would match as much as possible while `.*?` tries to find the shortest match possible (which is what we usually want)
 Any comma that is part of a value must be escaped.
+
+Comments:
+* To add info to a pattern, another parameter whose name starts with "desc" can be added to it.
+* To add a comment, add a line whose first non-whitespace character is a "#"
