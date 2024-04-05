@@ -6,11 +6,11 @@ from schema.ContentTag import ContentTag
 from schema.parser.SchemaParserInterface import SchemaParserInterface
 from schema.generic_schema.GenericSchema import GenericSchema
 from exceptions.SchemaParsingException import SchemaParsingException
-from utils.Singleton import Singleton
 from utils.string_utils import (
-    jump_whitespaces,
+    count_whitespaces,
     extract_from_inbetween_symbol,
     count_continuous,
+    split_safe,
 )
 
 
@@ -23,7 +23,7 @@ class GenericSchemaParser(SchemaParserInterface):
         cleaned_list: list[str] = []
 
         for line in schema.split("\n"):
-            if not line.isspace() or len(line) == 0:
+            if not (len(line.strip()) == 0 or line.lstrip().startswith("#")):
                 cleaned_list.append(line)
 
         if len(cleaned_list) > 0:
@@ -37,20 +37,20 @@ class GenericSchemaParser(SchemaParserInterface):
     @classmethod
     def parse_element_single(cls, element: str) -> GenericSchema:
         result = GenericSchema()
-        for item in element.split(","):
+        for item in split_safe(element, ","):
             # remove whitespaces
-            item = item[jump_whitespaces(item, 0) :]
+            item = item.lstrip()
             if item.startswith("pattern:"):
                 result.pattern = regex.compile(
-                    extract_from_inbetween_symbol(item[8:], '"')
+                    extract_from_inbetween_symbol(item[8:], "'")
                 )
             elif item.startswith("tags:"):
-                for letter in extract_from_inbetween_symbol(item[5:], '"'):
+                for letter in extract_from_inbetween_symbol(item[5:], "'"):
                     if ContentTag(letter) in ContentTag:
                         result.tags.append(ContentTag[ContentTag(letter).name])
 
             elif item.startswith("schema_id:"):
-                id_pos: int = jump_whitespaces(item, 10)
+                id_pos: int = count_whitespaces(item, 10)
 
                 num: str = ""
                 while id_pos < len(item) and item[id_pos].isalnum():
@@ -63,7 +63,12 @@ class GenericSchemaParser(SchemaParserInterface):
                     raise SchemaParsingException(
                         '"editor_id" tag must be followed by an ID.'
                     )
+            elif item.startswith("desc"):  # comments are skipped
+                pass
             else:
+                logging.error(
+                    f'"{item}" is not a valid field. Are all commas escaped correctly?'
+                )
                 raise SchemaParsingException(f'"{item} is not a valid field"')
 
         if result.embedded_schema is not None and result.tags != []:

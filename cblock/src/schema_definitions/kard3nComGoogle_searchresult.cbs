@@ -1,0 +1,9 @@
+url: google.com
+path: \/search\?q=.*?
+type: generic
+schema:
+pattern:'<div class="ULSxyf">(?P<content>.*?<\/a>)<\/div><\/div><\/div><\/div><\/div><\/div>', tags:'e'
+    pattern:'<h3 class=".*?">(?P<content>.*?)<\/h3>', tags:'ta'
+    pattern:'style="-webkit-line-clamp:2">(?P<content>.*?)</div>', tags:'sa'
+    pattern:'href="(?P<content>.*?)".*?><br>', tags:'l'
+    pattern:'(?P<content><a href=".*?">.*?</a>)', tags:'d'

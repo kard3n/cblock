@@ -6,21 +6,46 @@ def jump_whitespaces_linebreaks(string: str, pos: int) -> int:
     return pos
 
 
-def jump_whitespaces(string: str, pos: int) -> int:
+def count_whitespaces(string: str, pos: int) -> int:
     while string[pos] == " ":
         pos += 1
 
     return pos
 
 
+def split_safe(string: str, symbol: str = ",") -> list[str]:
+    result: list[str] = []
+    temp: str = ""
+    pos: int = 0
+    while pos < len(string):
+        if string[pos] == symbol and string[pos - 1] != "\\":
+            result.append(temp.__str__().strip(" ").rstrip(" "))
+            temp = ""
+        else:
+            if string[pos] == symbol and string[pos - 1] == "\\":
+                temp = temp[:-1] + string[pos]
+            else:
+                temp += string[pos]
+        pos += 1
+
+    result.append(temp.__str__().strip(" ").rstrip(" "))
+
+    return result
+
+
 def extract_from_inbetween_symbol(string: str, symbol: str) -> str:
     pos: int = jump_whitespaces_linebreaks(string, 0)
     result: str = ""
+
     if string[pos] == symbol:
         pos += 1
-        while not (string[pos] == symbol and string[pos - 1] != "\\"):
+
+    while pos < len(string):
+        if string[pos] == symbol and string[pos - 1] != "\\":
+            break
+        else:
             result += string[pos]
-            pos += 1
+        pos += 1
 
     return result
 

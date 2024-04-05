@@ -17,6 +17,8 @@ class ContentTag(Enum):
     PICTURE = "p"
     VIDEO = "v"
     CATEGORIES = "c"
+    LINK = "l"
+    ORIGIN = "o"
 
     @classmethod
     def get_leaf_tags(cls) -> list:
@@ -28,4 +30,6 @@ class ContentTag(Enum):
             cls.CATEGORIES,
             cls.ANALYZE,
             cls.DELETE,
+            cls.TITLE,
+            cls.LINK,
         ]

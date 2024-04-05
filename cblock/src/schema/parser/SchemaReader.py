@@ -26,7 +26,7 @@ class SchemaReader:
 
         data_to_insert = []
         for filename in filename_list:
-            result: any
+            result: any = None
             if filename.endswith(".cbs"):
                 try:
                     result = self.read_schema(
@@ -41,7 +41,9 @@ class SchemaReader:
                         )
                     )
                 else:
-                    raise SchemaParsingException(result)
+                    raise SchemaParsingException(
+                        f"The file {filename} could not be parsed: {result}"
+                    )
         self.db_manager.insert_multiple(values=data_to_insert)
 
     # Returns a list, with the following content (order): schema name, url, schema type, underlying schema (as string)
@@ -50,24 +52,26 @@ class SchemaReader:
         url: str | None = None
         path: str | None = None
         factory: SchemaParserFactory = SchemaParserFactory()
+        if directory.endswith("/"):
+            directory = directory[:-1]
         with open(directory + "/" + filename) as file:
             file_content = file.read()
 
         pos: int = 0
         while pos < len(file_content):
-            pos = string_utils.jump_whitespaces(string=file_content, pos=pos)
+            pos = string_utils.count_whitespaces(string=file_content, pos=pos)
             if file_content[pos:].startswith("url:"):
-                pos = string_utils.jump_whitespaces(string=file_content, pos=pos + 4)
+                pos = string_utils.count_whitespaces(string=file_content, pos=pos + 4)
                 url = string_utils.extract_until_symbols(
                     string=file_content, symbols=["\n"], start_pos=pos, end_pos=None
                 )
             if file_content[pos:].startswith("path:"):
-                pos = string_utils.jump_whitespaces(string=file_content, pos=pos + 5)
+                pos = string_utils.count_whitespaces(string=file_content, pos=pos + 5)
                 path = string_utils.extract_until_symbols(
                     string=file_content, symbols=["\n"], start_pos=pos, end_pos=None
                 )
             if file_content[pos:].startswith("type:"):
-                pos = string_utils.jump_whitespaces(string=file_content, pos=pos + 5)
+                pos = string_utils.count_whitespaces(string=file_content, pos=pos + 5)
                 schema_type = string_utils.extract_until_symbols(
                     string=file_content, symbols=["\n"], start_pos=pos, end_pos=None
                 )

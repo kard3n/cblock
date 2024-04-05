@@ -15,7 +15,7 @@ class TestGenericSchemaParser(unittest.TestCase):
         cls.parser: GenericSchemaParser = GenericSchemaParser()
 
     def test_parse_string_one(self):
-        schema: str = r'pattern:"bb(?P<content>hola)bb", tags:"a"'
+        schema: str = r"pattern:'bb(?P<content>hola)bb', tags:'a'"
         assert self.parser.parse_string(schema) == GenericSchema(
             pattern=None,
             tags=[],
@@ -31,8 +31,8 @@ class TestGenericSchemaParser(unittest.TestCase):
         )
 
     def test_parse_string_two(self):
-        schema: str = r'''pattern:"bb(?P<content>xxholaxx)bb", tags:"e"
-    pattern:"xx(?P<content>hola)xx", tags:"at"'''
+        schema: str = r"""pattern:'bb(?P<content>xxholaxx)bb', tags:'e'
+    pattern:'xx(?P<content>hola)xx', tags:'at'"""
         assert self.parser.parse_string(schema) == GenericSchema(
             pattern=None,
             tags=[],
@@ -55,8 +55,8 @@ class TestGenericSchemaParser(unittest.TestCase):
         )
 
     def test_parse_string_multi_root(self):
-        schema: str = r'''pattern:"__(?P<content>hola)__", tags:"e"
-pattern:"xx(?P<content>hola)xx", tags:"e"'''
+        schema: str = r"""pattern:'__(?P<content>hola)__', tags:'e'
+pattern:'xx(?P<content>hola)xx', tags:'e'"""
         assert self.parser.parse_string(schema) == GenericSchema(
             pattern=None,
             tags=[],
@@ -78,7 +78,7 @@ pattern:"xx(?P<content>hola)xx", tags:"e"'''
         )
 
     def test_parse_string_conflict_tags_and_embedded(self):
-        schema: str = r'pattern:"bb(?P<content>hola)bb", tags:"a", schema_id=20'
+        schema: str = r"pattern:'bb(?P<content>hola)bb', tags:'a', schema_id=20"
 
         with raises(SchemaParsingException):
             self.parser.parse_string(schema)

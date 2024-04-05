@@ -1,7 +1,7 @@
 import json
 import logging
 
-from content_analyzer.ContentAnalyzerInterface import ContentAnalyzerInterface
+from content_classifier.ContentClassifierInterface import ContentClassifierInterface
 from content_factory.Content import Content
 from content_factory.ContentFactory import ContentFactory
 from editor.ContentEditorFactory import ContentEditorFactory
@@ -13,12 +13,12 @@ from schema.json_schema.JSONSchema import JSONSchema, ValueType
 
 
 class JSONContentEditor(ContentEditorInterface):
-    content_analyzer: ContentAnalyzerInterface
+    content_analyzer: ContentClassifierInterface
     content_factory: ContentFactory
 
     def __init__(
         self,
-        content_analyzer: ContentAnalyzerInterface,
+        content_analyzer: ContentClassifierInterface,
         content_factory: ContentFactory,
         schema_factory: SchemaFactory,
         editor_factory: ContentEditorFactory,
@@ -31,7 +31,7 @@ class JSONContentEditor(ContentEditorInterface):
     def edit(self, input_raw: str, schema: JSONSchema) -> str:
         try:
             input_decoded: dict = json.loads(input_raw)
-            return self.edit_parsed(input_decoded, schema).__str__()
+            return json.dumps(self.edit_parsed(input_decoded, schema))
 
         except json.decoder.JSONDecodeError as e:
             logging.warning(f"DecodeError at position: {e.pos}")
@@ -40,7 +40,7 @@ class JSONContentEditor(ContentEditorInterface):
     def edit_parsed(self, input_parsed: any, schema: JSONSchema) -> dict | str:
         if ContentTag.CONTAINER in schema.tags:  # we got an element, so we analyze it
             if schema.value_type == ValueType.DICT:
-                if self.content_analyzer.analyze(
+                if self.content_analyzer.classify(
                     self.extract_content(input_parsed, schema)
                 ):
                     # The analyzer returned true, so the content gets replaced. Last argument is the content that should be inserted
@@ -50,7 +50,7 @@ class JSONContentEditor(ContentEditorInterface):
 
             elif schema.value_type == ValueType.LIST:
                 for item in input_parsed:
-                    if self.content_analyzer.analyze(
+                    if self.content_analyzer.classify(
                         self.extract_content(item, schema.value[0])
                     ):  # The analyzer returned true, so the content gets replaced. Last argument is the content that should be inserted
                         input_parsed[input_parsed.index(item)] = self.apply_action(
@@ -59,13 +59,13 @@ class JSONContentEditor(ContentEditorInterface):
                             self.content_factory.get_content(),
                         )
             elif schema.value_type == ValueType.LEAF:
-                if self.content_analyzer.analyze(input_parsed):
+                if self.content_analyzer.classify(input_parsed):
                     input_parsed = self.apply_action(
                         input_parsed,
                         schema,
                         self.content_factory.get_content(),
                     )
-        else:
+        else:  # Not an element
             if schema.value_type == ValueType.DICT:
                 for key in schema.value:
                     try:
@@ -79,11 +79,15 @@ class JSONContentEditor(ContentEditorInterface):
                         logging.info(
                             f"Key {key} of schema {schema.value} could not be found. Maybe the schema has changed?"
                         )
+                    except TypeError as e:
+                        logging.warning(
+                            f"Could not access {key} of schema {schema.value} on attribute {input_parsed}: {e}?"
+                        )
 
             elif schema.value_type == ValueType.LIST:
                 for item in input_parsed:
                     input_parsed[input_parsed.index(item)] = self.edit_parsed(
-                        item, schema.value[0]
+                        item, schema.value
                     )
             elif schema.value_type == ValueType.LEAF:
                 # If it's a leaf, we just need to check if an embedded editor has been specified and, if so, edit
@@ -151,7 +155,6 @@ class JSONContentEditor(ContentEditorInterface):
                     len(
                         {
                             ContentTag.SUMMARY,
-                            ContentTag.TITLE,
                             ContentTag.FULL_CONTENT,
                         }
                         & set(schema.tags)
@@ -159,6 +162,8 @@ class JSONContentEditor(ContentEditorInterface):
                     > 0
                 ):
                     result_container.text += input_value + " "
+                elif ContentTag.TITLE in schema.tags:
+                    result_container.title += input_value + " "
                 elif ContentTag.PICTURE in schema.tags:
                     result_container.pictures.append(input_value)
                 elif ContentTag.CATEGORIES in schema.tags:
@@ -213,6 +218,10 @@ class JSONContentEditor(ContentEditorInterface):
                     input_value = content.picture
                 elif ContentTag.SUMMARY in schema.tags:
                     input_value = content.summary
+                elif ContentTag.LINK in schema.tags:
+                    input_value = content.link
+                elif ContentTag.ORIGIN in schema.tags:
+                    input_value = content.origin
                 elif (
                     ContentTag.DELETE in schema.tags
                 ):  # The field isn't deleted, just its content

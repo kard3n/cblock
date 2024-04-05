@@ -1,0 +1,18 @@
+url: assets.msn.com
+path: /service/MSN/Feed/me.*?
+type: json
+schema:
+{
+  "subCards": [
+    {
+      "subCards": [
+        e:{
+          "title"ta: "",
+          "abstract"sa: "",
+          "url"l: "",
+          "source"o: ""
+        }
+      ]
+    }
+  ]
+}

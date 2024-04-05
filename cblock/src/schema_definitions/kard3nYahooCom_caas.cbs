@@ -1,0 +1,19 @@
+url: yahoo.com
+path: /caas/content/article/
+type: json
+schema:
+{
+  "items": [
+    {
+      "data": {
+        "partnerData"e: {
+          "pageTitle"ta: "Title",
+          "summary"sa: "",
+          "title"t: "",
+          "titleTag"t: "",
+          "categoryLabel"t: ""
+        }
+      }
+    }
+  ]
+}

@@ -1,5 +1,0 @@
-url: yahoo.com
-path: /caas/content/article/
-type: generic
-schema:
-pattern:"(?P<content>fuck)", tags:"ate"
