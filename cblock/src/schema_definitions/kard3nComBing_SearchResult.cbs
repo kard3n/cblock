@@ -1,0 +1,38 @@
+url: bing.com
+path: \/search\?q=.*?
+type: generic
+schema:
+# for results except the first one
+pattern:'<li class="b_algo"(?P<content>.*?)<\/li>', tags:'e'
+    pattern:'<div class="tppt">(?P<content>.*?)<\/div>', tags:'o'
+    pattern:'(?P<content><cite>.*?<\/cite>)', tags:'d'
+    pattern:'<h2.*?>(?P<content>.*?)<\/h2>', tags:''
+        pattern:'href="(?P<content>.*?)"', tags:'l'
+        pattern:'>(?P<content>.*?)<\/a>', tags:'o'
+    pattern:'<div class="b_caption.*?>.*?<\/span>(?P<content>.*?)<\/p><\/div>', tags:'t'
+        pattern:'<strong>(?P<content>.*?)<\/strong>', tags:'at'
+        pattern:'>(?P<content>.*?)<', tags:'at'
+    pattern:'<div class="pageRecoContainer.*?>(?P<content>.*)<\/div>', tags:'d'
+    pattern:'<div class="b_vlist2col.*?>(?P<content>.*?<\/ul>)<\/div>', tags:'d'
+    pattern:'<div class="b_tpcn">(?P<content>.*?)<\/a>', tags:''
+        pattern:'href="(?P<content>.*?)"', tags:'l'
+        pattern:'<div class="tptt">(?P<content>.*?)<\/div>', tags:'o'
+# for the first result with extra links
+pattern:'<li class="b_algo b_vtl_deeplinks"(?P<content>.*?<\/a>)<\/li>', tags:'e'
+    pattern:'<div class="tppt">(?P<content>.*?)<\/div>', tags:'o'
+    pattern:'(?P<content><cite>.*?<\/cite>)', tags:'d'
+    pattern:'<h2.*?>(?P<content>.*?)<\/h2>', tags:''
+        pattern:'href="(?P<content>.*?)"', tags:'l'
+        pattern:'>(?P<content>.*?)<\/a>', tags:'o'
+    pattern:'<div class="b_caption.*?>.*?<\/span>(?P<content>.*?)<\/p><\/div>', tags:'t'
+        pattern:'<strong>(?P<content>.*?)<\/strong>', tags:'at'
+        pattern:'>(?P<content>.*?)<', tags:'at'
+    pattern:'(?P<content><div class="b_vlist2col.*?>.*?$)', tags:'d', desc:'removes the list of subpages'
+    pattern:'<div class="b_tpcn">(?P<content>.*?)<\/a>', tags:''
+        pattern:'href="(?P<content>.*?)"', tags:'l'
+        pattern:'<div class="tptt">(?P<content>.*?)<\/div>', tags:'o'
+# for news results TODO: put into container, and add support for big fisrt image
+# pattern:'<div id="ans_nws.*?>(?P<content>.*?)<\/div><\/li>', tags:'de'
+pattern:'<a.*?>(?P<content>.*?)<\/a>', tags:'e'
+    pattern:'<span class="cap_title">(?P<content>.*?)<\/span>', tags:'o'
+    pattern:'<div class="na_cal_title na_t b_promtxt">(?P<content>.*?)<\/div>', tags:'ta'

@@ -1,0 +1,7 @@
+url: bing.com
+path: \/news\/NewsAnswerV2CarouselAjax.*?
+type: generic
+schema:
+pattern:'<a.*?>(?P<content>.*?)<\/a>', tags:'e'
+    pattern:'<span class="cap_title">(?P<content>.*?)<\/span>', tags:'o'
+    pattern:'<div class="na_cal_title na_t b_promtxt">(?P<content>.*?)<\/div>', tags:'ta'
