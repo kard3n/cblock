@@ -161,7 +161,7 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
         )
 
         assert (
-            self.editor.apply_action(
+            self.editor.edit_container_element(
                 input_value=f"_{test_utils.random_string(10)}_",
                 schema=schema,
                 content=generated_content,
@@ -170,7 +170,7 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
         )
 
         assert (
-            self.editor.apply_action(
+            self.editor.edit_container_element(
                 input_value=f"_{test_utils.random_string(10)}__{test_utils.random_string(10)}_",
                 schema=schema,
                 content=generated_content,
@@ -209,7 +209,7 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
         )
 
         assert (
-            self.editor.apply_action(
+            self.editor.edit_container_element(
                 input_value=f"_{test_utils.random_string(10)}_",
                 schema=schema,
                 content=generated_content,

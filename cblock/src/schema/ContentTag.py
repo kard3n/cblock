@@ -28,8 +28,8 @@ class ContentTag(Enum):
             cls.PICTURE,
             cls.VIDEO,
             cls.CATEGORIES,
-            cls.ANALYZE,
             cls.DELETE,
             cls.TITLE,
             cls.LINK,
+            cls.ORIGIN,
         ]

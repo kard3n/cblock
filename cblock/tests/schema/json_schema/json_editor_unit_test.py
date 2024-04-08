@@ -217,7 +217,7 @@ class JsonEditorUnitTest(unittest.TestCase):
         random_content: str = test_utils.random_string(10)
 
         assert (
-            self.editor.apply_action(
+            self.editor.edit_container_element(
                 input_value=random_content, schema=schema, content=generated_content
             )
             == generated_content.title
@@ -239,13 +239,13 @@ class JsonEditorUnitTest(unittest.TestCase):
             ),
         )
 
-        assert self.editor.apply_action(
+        assert self.editor.edit_container_element(
             input_value=[test_utils.random_string(10)],
             schema=schema,
             content=generated_content,
         ) == [generated_content.title]
 
-        assert self.editor.apply_action(
+        assert self.editor.edit_container_element(
             input_value=[test_utils.random_string(10), test_utils.random_string(10)],
             schema=schema,
             content=generated_content,
@@ -269,7 +269,7 @@ class JsonEditorUnitTest(unittest.TestCase):
             },
         )
 
-        assert self.editor.apply_action(
+        assert self.editor.edit_container_element(
             input_value={"name": test_utils.random_string(10)},
             schema=schema,
             content=generated_content,
@@ -295,7 +295,7 @@ class JsonEditorUnitTest(unittest.TestCase):
             },
         )
 
-        assert self.editor.apply_action(
+        assert self.editor.edit_container_element(
             input_value={
                 "name": test_utils.random_string(10),
                 "class": test_utils.random_string(10),
@@ -334,7 +334,7 @@ class JsonEditorUnitTest(unittest.TestCase):
             },
         )
 
-        assert self.editor.apply_action(
+        assert self.editor.edit_container_element(
             input_value={"name": test_utils.random_string(10)},
             schema=schema,
             content=generated_content,
@@ -372,7 +372,7 @@ class JsonEditorUnitTest(unittest.TestCase):
 
         random_string: str = test_utils.random_string(10)
 
-        assert self.editor.apply_action(
+        assert self.editor.edit_container_element(
             input_value={"name": random_string},
             schema=schema,
             content=generated_content,

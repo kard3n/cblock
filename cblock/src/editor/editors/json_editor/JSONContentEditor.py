@@ -44,7 +44,7 @@ class JSONContentEditor(ContentEditorInterface):
                     self.extract_content(input_parsed, schema)
                 ):
                     # The analyzer returned true, so the content gets replaced. Last argument is the content that should be inserted
-                    input_parsed = self.apply_action(
+                    input_parsed = self.edit_container_element(
                         input_parsed, schema, self.content_factory.get_content()
                     )
 
@@ -53,14 +53,16 @@ class JSONContentEditor(ContentEditorInterface):
                     if self.content_analyzer.classify(
                         self.extract_content(item, schema.value[0])
                     ):  # The analyzer returned true, so the content gets replaced. Last argument is the content that should be inserted
-                        input_parsed[input_parsed.index(item)] = self.apply_action(
-                            item,
-                            schema.value[0],
-                            self.content_factory.get_content(),
+                        input_parsed[input_parsed.index(item)] = (
+                            self.edit_container_element(
+                                item,
+                                schema.value[0],
+                                self.content_factory.get_content(),
+                            )
                         )
             elif schema.value_type == ValueType.LEAF:
                 if self.content_analyzer.classify(input_parsed):
-                    input_parsed = self.apply_action(
+                    input_parsed = self.edit_container_element(
                         input_parsed,
                         schema,
                         self.content_factory.get_content(),
@@ -171,12 +173,14 @@ class JSONContentEditor(ContentEditorInterface):
 
         return result_container
 
-    def apply_action(self, input_value, schema: JSONSchema, content: Content) -> any:
+    def edit_container_element(
+        self, input_value, schema: JSONSchema, content: Content
+    ) -> any:
         # If an embedded schema is specified, input_value must be a leaf (str, int, ...)
         if schema.embedded_schema is not None and type(input_value) not in [list, dict]:
             input_value = self.__get_editor_by_schema_id(
                 schema_id=schema.embedded_schema
-            ).apply_action(
+            ).edit_container_element(
                 content=content,
                 input_value=input_value,
                 schema=self.__get_schema_by_id(schema.embedded_schema),
@@ -193,7 +197,7 @@ class JSONContentEditor(ContentEditorInterface):
                     except KeyError:
                         pass
                     else:
-                        input_value[key] = self.apply_action(
+                        input_value[key] = self.edit_container_element(
                             input_value=input_value[key],
                             schema=schema.value[key],
                             content=content,
@@ -204,7 +208,7 @@ class JSONContentEditor(ContentEditorInterface):
 
                 for elem in input_value:
                     # This is correct, in the case of lists, the value is directly a JSONSchema
-                    input_value[input_value.index(elem)] = self.apply_action(
+                    input_value[input_value.index(elem)] = self.edit_container_element(
                         input_value=elem, schema=schema.value, content=content
                     )
             elif schema.value_type == ValueType.LEAF:
