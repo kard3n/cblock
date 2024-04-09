@@ -12,6 +12,7 @@ the current schema type. Elements with an embedded schema may not have any tags.
 
 An example file could look like this:
 
+### Example:
 Name:
 `basic_web_schema.cbs`
 
@@ -25,6 +26,13 @@ schema: # after the schema line, the definition of the underlying specialized sc
 {}
 ```
 
+Explanation:
+* _basic_web_schema_: the name of the schema
+* _url_: when a file from this URL is received, and _path_ matches too, the contents will be edited according to the underlying specialized schema
+* _path_: the path of the file that should be edited. This can be a regular expression
+* _type_: the type of the schema. For example _json_, _generic_ or _html_
+* _schema_: after this line until the end of the file, the definition of the underlying specialized schema is written.
+
 ## ContentTags
 Here's a list of all possible ContentTags and what they mean:
 
@@ -35,7 +43,7 @@ General Tags:
 | DELETE_UNCONDITIONAL | u | Item should be deleted unconditionally |
 | CONTAINER            | e | Marks element as container/segment, whose children should be analyzed together |
 
-Tags used for children of a CONTAINER element
+Tags used for children of a CONTAINER element (leaves)
 
 | Name         | Symbol | Description                                                                      |
 |--------------|--------|----------------------------------------------------------------------------------|
