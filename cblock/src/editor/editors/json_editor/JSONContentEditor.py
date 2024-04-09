@@ -153,23 +153,7 @@ class JSONContentEditor(ContentEditorInterface):
 
         elif schema.value_type == ValueType.LEAF:
             if ContentTag.ANALYZE in schema.tags:
-                if (
-                    len(
-                        {
-                            ContentTag.SUMMARY,
-                            ContentTag.FULL_CONTENT,
-                        }
-                        & set(schema.tags)
-                    )
-                    > 0
-                ):
-                    result_container.text += input_value + " "
-                elif ContentTag.TITLE in schema.tags:
-                    result_container.title += input_value + " "
-                elif ContentTag.PICTURE in schema.tags:
-                    result_container.pictures.append(input_value)
-                elif ContentTag.CATEGORIES in schema.tags:
-                    result_container.categories += input_value + " "
+                result_container.add_value(value=input_value, tags=schema.tags)
 
         return result_container
 

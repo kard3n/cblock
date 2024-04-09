@@ -13,7 +13,7 @@ from editor.ContentEditorFactory import ContentEditorFactory
 from editor.ContentEditorInterface import ContentEditorInterface
 from editor.ContentExtractionResult import ContentExtractionResult
 from editor.editors.generic_editor.GenericContentEditor import GenericContentEditor
-from editor.editors.http_editor.HTTPContentEditor import HTTPContentEditor
+from editor.editors.html_editor.HTMLContentEditor import HTMLContentEditor
 from schema.ContentTag import ContentTag
 from schema.SchemaFactory import SchemaFactory
 from schema.generic_schema.GenericSchema import GenericSchema
@@ -25,7 +25,7 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
     content_analyzer: ContentClassifierInterface
     schema_factory: SchemaFactory
     editor_factory: ContentEditorFactory
-    editor: HTTPContentEditor
+    editor: HTMLContentEditor
 
     def setUp(self):
         self.db_manager: DBManagerInterface = Mock(DBManagerInterface)
@@ -34,7 +34,7 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
         self.schema_factory = Mock(SchemaFactory)
         self.editor_factory = Mock(ContentEditorFactory)
 
-        self.editor: HTTPContentEditor = HTTPContentEditor(
+        self.editor: HTMLContentEditor = HTMLContentEditor(
             content_analyzer=self.content_analyzer,
             content_factory=self.content_factory,
             editor_factory=self.editor_factory,

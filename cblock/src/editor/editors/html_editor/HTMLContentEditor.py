@@ -15,7 +15,7 @@ from schema.SchemaFactory import SchemaFactory
 from schema.html_schema.HTMLSchema import HTMLSchema
 
 
-class HTTPContentEditor(ContentEditorInterface):
+class HTMLContentEditor(ContentEditorInterface):
     content_analyzer: ContentClassifierInterface
     content_factory: ContentFactory
 
@@ -92,15 +92,9 @@ class HTTPContentEditor(ContentEditorInterface):
 
         # if schema has the "analyze" tag, the value gets returned
         if ContentTag.ANALYZE in schema.content_tags:
-            if ContentTag.CATEGORIES in schema.content_tags:
-                result_container.categories += element.text + " "
-                return result_container
-            elif ContentTag.TITLE in schema.content_tags:
-                result_container.title += element.text + " "
-                return result_container
-            else:
-                result_container.text += element.text + " "
-                return result_container
+            result_container.add_value(value=element.text, tags=schema.content_tags)
+
+            return result_container
 
         # in case the "analyze" tag isn't set and the schema has children, their content should be extracted too
         if schema.children is not None:

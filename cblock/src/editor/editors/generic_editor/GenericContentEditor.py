@@ -141,17 +141,8 @@ class GenericContentEditor(ContentEditorInterface):
             )
 
         if ContentTag.ANALYZE in schema.tags:
-            if ContentTag.CATEGORIES in schema.tags:
-                result_container.categories += input_value + " "
-                return result_container
-            elif ContentTag.TITLE in schema.tags:
-                result_container.title += input_value + " "
-                logging.warning(input_value)
-                return result_container
-            # if schema has the "analyze" tag, the value gets returned
-            else:
-                result_container.text += input_value
-                return result_container
+            result_container.add_value(value=input_value, tags=schema.tags)
+            return result_container
 
         # in case the schema has children, their content should be extracted too
         if schema.children is not None:
@@ -165,9 +156,6 @@ class GenericContentEditor(ContentEditorInterface):
                             child_schema,
                             result_container=result_container,
                         )
-
-                        if child_schema.children is None or child_schema.children == []:
-                            result_container.text += " "
                     else:
                         # No content could be identified
                         raise EditException(

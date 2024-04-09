@@ -346,7 +346,9 @@ class JsonEditorUnitTest(unittest.TestCase):
         embedded_editor = Mock(ContentEditorInterface)
 
         embedded_editor_return_value: str = test_utils.random_string(10)
-        embedded_editor.apply_action.return_value = embedded_editor_return_value
+        embedded_editor.edit_container_element.return_value = (
+            embedded_editor_return_value
+        )
         embedded_schema_id: str = test_utils.random_string(10)
 
         self.editor_factory.get_content_editor_by_schema_id.return_value = (
@@ -386,7 +388,7 @@ class JsonEditorUnitTest(unittest.TestCase):
             schema_id=embedded_schema_id
         )
 
-        embedded_editor.apply_action.assert_called_once_with(
+        embedded_editor.edit_container_element.assert_called_once_with(
             content=generated_content,
             input_value=random_string,
             schema=get_schema_return_value,
