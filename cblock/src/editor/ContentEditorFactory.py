@@ -42,6 +42,15 @@ class ContentEditorFactory(metaclass=Singleton):
                 editor_factory=self,
                 schema_factory=self.schema_factory,
             )
+        if schema_type == "html":
+            from editor.editors.html_editor.HTMLContentEditor import HTMLContentEditor
+
+            return HTMLContentEditor(
+                content_analyzer=self.content_analyzer,
+                content_factory=self.content_factory,
+                editor_factory=self,
+                schema_factory=self.schema_factory,
+            )
 
     def get_content_editor_by_schema_id(self, schema_id: str) -> ContentEditorInterface:
         schema_type: str = self.db_manager.get_schema(schema_id).schema_type

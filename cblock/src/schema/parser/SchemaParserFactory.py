@@ -1,3 +1,4 @@
+from schema.parser.HTMLSchemaParser import HTMLSchemaParser
 from schema.parser.SchemaParserInterface import SchemaParserInterface
 from schema.parser.GenericSchemaParser import GenericSchemaParser
 from schema.parser.JSONSchemaParser import JSONSchemaParser
@@ -10,3 +11,5 @@ class SchemaParserFactory(metaclass=Singleton):
             return JSONSchemaParser()
         if parser_type == "generic":
             return GenericSchemaParser()
+        if parser_type == "html":
+            return HTMLSchemaParser()
