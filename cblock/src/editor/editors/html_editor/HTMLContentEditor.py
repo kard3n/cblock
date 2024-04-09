@@ -81,6 +81,16 @@ class HTMLContentEditor(ContentEditorInterface):
         if result_container is None:
             result_container = ContentExtractionResult()
 
+        for attribute in schema.attributes_to_edit:
+            if (
+                attribute in element.attrs
+                and ContentTag.ANALYZE in schema.attributes_to_edit[attribute]
+            ):
+                result_container.add_value(
+                    value=element.attrs[attribute],
+                    tags=schema.attributes_to_edit[attribute],
+                )
+
         if schema.embedded_schema is not None:
             return self.editor_factory.get_content_editor_by_schema_id(
                 schema_id=schema.embedded_schema
@@ -210,6 +220,13 @@ class HTMLContentEditor(ContentEditorInterface):
                         element=item, schema=child_schema, content=content
                     )
 
+        # Edit attributes:
+        for attribute in schema.attributes_to_edit:
+            if attribute in element.attrs:
+                if attribute in ContentTag.get_leaf_tags():
+                    element.attrs[attribute] = content.get_content_for_tags(
+                        content_tags=schema.attributes_to_edit[attribute]
+                    )
         return element
 
     def __extract_body_if_not_in_input(self, input_str: str, output_str: str) -> str:

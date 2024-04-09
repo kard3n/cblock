@@ -44,7 +44,7 @@ class HTMLSchemaParser(SchemaParserInterface):
                 result.html_tag = regex.compile(
                     extract_from_inbetween_symbol(item[9:], "'")
                 )
-            if item.startswith("recursive:"):
+            elif item.startswith("recursive:"):
                 if extract_from_inbetween_symbol(item[10:], "'").lower() == "false":
                     result.recursive = False
                 elif extract_from_inbetween_symbol(item[10:], "'").lower() != "true":
@@ -55,6 +55,21 @@ class HTMLSchemaParser(SchemaParserInterface):
                 for letter in extract_from_inbetween_symbol(item[13:], "'"):
                     if ContentTag(letter) in ContentTag:
                         result.content_tags.append(ContentTag[ContentTag(letter).name])
+            elif item.startswith("edit_attrs:"):
+                for pair in extract_from_inbetween_symbol(item[11:], "'").split():
+                    split_result = pair.split(":")
+                    if len(split_result) == 2:
+                        result.attributes_to_edit[split_result[0]] = [
+                            ContentTag[ContentTag(letter).name]
+                            for letter in split_result[1]
+                        ]
+                    else:
+                        logging.warning(
+                            f"Could not extract attribute name or ContentTags from the following item: {pair}"
+                        )
+                        raise SchemaParsingException(
+                            f"Could not extract attribute name or ContentTags from the following item: {pair}"
+                        )
 
             elif item.startswith("embedded_schema:"):
                 id_pos: int = count_whitespaces(item, 16)

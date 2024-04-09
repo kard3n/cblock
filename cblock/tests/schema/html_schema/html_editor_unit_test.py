@@ -70,6 +70,37 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
             input_value=r"""<b href="https://example.com">test</b>""", schema=schema
         ) == ContentExtractionResult(title="", text="", pictures=[])
 
+    def test_extract_content_from_attributes(self):
+        schema: HTMLSchema = HTMLSchema(
+            html_tag=None,
+            content_tags=[],
+            attributes={},
+            embedded_schema=None,
+            children=[
+                HTMLSchema(
+                    html_tag=regex.compile("a"),
+                    content_tags=[],
+                    attributes_to_edit={
+                        "analyze": [ContentTag.ANALYZE, ContentTag.TITLE],
+                        "dont_analyze": [ContentTag.DELETE],
+                    },
+                    attributes={},
+                    embedded_schema=None,
+                    children=None,
+                )
+            ],
+        )
+
+        random_string_one: str = test_utils.random_string(10)
+        random_string_two: str = test_utils.random_string(10)
+
+        assert self.editor.extract_content(
+            input_value=f"""<a analyze="{random_string_one}" dont_analyze="{random_string_two}"></a>""",
+            schema=schema,
+        ) == ContentExtractionResult(
+            title=random_string_one + " ", text="", pictures=[]
+        )
+
     def test_extract_content_parsed(self):
         schema: HTMLSchema = HTMLSchema(
             html_tag=None,

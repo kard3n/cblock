@@ -16,7 +16,12 @@ class Content:
     origin: str = "ContentBlock"
     tags: list[str] = list
 
-    def get_content_by_tag(self, content_tag: ContentTag) -> str | None:
+    def get_content_by_tag(self, content_tag: ContentTag) -> str:
+        """
+        Given a ContentTag object, returns the instance's corresponding content
+        :param content_tag:
+        :return:(str)
+        """
         if content_tag == ContentTag.TITLE:
             return self.title
         elif content_tag == ContentTag.SUMMARY:
@@ -38,3 +43,31 @@ class Content:
             return ""
 
         return "No Content for Tag: " + content_tag.name
+
+    def get_content_for_tags(self, content_tags: list[ContentTag]) -> str | None:
+        """
+        Given a list of ContentTags, returns the instance's corresponding content to one of them
+        :param content_tags: (list[ContentTag])
+        :return:(str)
+        """
+        if ContentTag.TITLE in content_tags:
+            return self.title
+        elif ContentTag.SUMMARY in content_tags:
+            return self.summary
+        elif ContentTag.FULL_CONTENT in content_tags:
+            return self.full
+        elif ContentTag.PICTURE in content_tags:
+            return self.video
+        elif ContentTag.LINK in content_tags:
+            return self.link
+        elif ContentTag.ORIGIN in content_tags:
+            return self.origin
+        elif ContentTag.CATEGORIES in content_tags:
+            result = ""
+            for cat in self.tags:
+                result += cat + " "
+            return result[0:-1]
+        elif ContentTag.DELETE in content_tags:
+            return ""
+
+        return "No Content for Tags: " + [tag.name for tag in content_tags].__str__()
