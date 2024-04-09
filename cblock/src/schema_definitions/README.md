@@ -69,10 +69,29 @@ Example: Schema that contains the following fields:
 
 
 ### generic -> GenericSchema
-All leaves must be children of an element with the ELEMENT tag, or have one themselves.
-Always use non-greedy quantifiers when possible. For example, `.*` should be `.*?`, as `.*` would match as much as possible while `.*?` tries to find the shortest match possible (which is what we usually want)
-Any comma that is part of a value must be escaped.
+This type of schema can be used in cases where none of the other types would work. It uses regular expressions to find the content that should be edited, making use of Python's named-group feature.
+For example, to delete any content that is between double underscores (__) one could use the following rule: `pattern:'__(?P<content>.*?)__', tags:'ed'`.
+* pattern: describes which content to match. The content of the `content` group is what is actually going to be edited. Anything that is not part of the _content_ will need to be matched, but is not part of the content that is edited.
+* tags: These are just content tags, just like with any other schema type
 
-Comments:
-* To add info to a pattern, another parameter whose name starts with "desc" can be added to it.
-* To add a comment, add a line whose first non-whitespace character is a "#"
+To have the matched content be edited according to another schema, it is possible to add another field:
+* embedded_schema: when set contains the name of another schema, which is used to edit the content inside the _content_ group.
+
+It is also possible to have a hierarchy of rules, for example if we now instead of deleting the whole content of the previous rule just want to delete any "a" we could do the following:
+````
+pattern:'__(?P<content>.*?)__', tags:''
+# Note: the child rule must be indented exactly 4 more spaces than the parent.
+# Also, this is how to make a comment (first non-whitespace character is a "#"
+    pattern:'(?P<content>a*)', tags:'ed'
+````
+
+Any line whose first non-whitespace symbol is a "#" is considered a comment. It is also possible to add a description to a specific rule by adding a field that starts with "desc".
+
+Good to know:
+> Try to use non-greedy quantifiers when possible. For example, `.*` should be `.*?`, as `.*` would match as much as possible while `.*?` tries to find the shortest match possible (which is usually we want).
+
+> All leaves (those rules who contain a leaf tag such as "DELETE") must be children of a container element (one that has the "CONTAINER" tag), or be one themselves.
+
+> To add info to a pattern, another parameter whose name starts with "desc" can be added to it.
+
+> To add a comment, add a line whose first non-whitespace character is a "#"
