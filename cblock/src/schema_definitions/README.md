@@ -103,3 +103,15 @@ Good to know:
 > To add info to a pattern, another parameter whose name starts with "desc" can be added to it.
 
 > To add a comment, add a line whose first non-whitespace character is a "#"
+
+
+### html -> HTMLSchema
+This type of schema is used for HTML document. It is similar to the GenericSchema, but has the following possible fields:
+* _html\_tag_: the tag of the html content. To match, for example, a <a></a> element, this would be set to "a". Allows regular expressions
+* _content\_tags_: just content tags. Example: "de" for "DELETE" and "ELEMENT"
+* _edit\_attrs_: the elements attributes that should be edited. Contains a whitespace-separated list with values in the style of `attribute_name:contentTag1ContentTag2`. Example for an _href_ and _src_ attribute: `'href:l src:p'`
+* all other fields: will be considered attribute names and a regex that must match its value. In case only elements that contain a link to `example.com`, the following could be added to the rule: `href: 'https:\/\/example\.com'`
+
+> Note: every field's value must be enclosed by double quotes
+
+To add a comment, To add a comment, add a line whose first non-whitespace character is a "#". Just like with GenericSchemas
