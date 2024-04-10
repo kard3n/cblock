@@ -95,7 +95,7 @@ class GenericContentEditor(ContentEditorInterface):
                 ):
                     input_raw = (
                         input_raw[:content_start]
-                        + next_editor.apply_action(
+                        + next_editor.edit_container_element(
                             match.group("content"),
                             next_schema,
                             content=self.content_factory.get_content(),
@@ -141,17 +141,8 @@ class GenericContentEditor(ContentEditorInterface):
             )
 
         if ContentTag.ANALYZE in schema.tags:
-            if ContentTag.CATEGORIES in schema.tags:
-                result_container.categories += input_value + " "
-                return result_container
-            elif ContentTag.TITLE in schema.tags:
-                result_container.title += input_value + " "
-                logging.warning(input_value)
-                return result_container
-            # if schema has the "analyze" tag, the value gets returned
-            else:
-                result_container.text += input_value
-                return result_container
+            result_container.add_value(value=input_value, tags=schema.tags)
+            return result_container
 
         # in case the schema has children, their content should be extracted too
         if schema.children is not None:
@@ -165,9 +156,6 @@ class GenericContentEditor(ContentEditorInterface):
                             child_schema,
                             result_container=result_container,
                         )
-
-                        if child_schema.children is None or child_schema.children == []:
-                            result_container.text += " "
                     else:
                         # No content could be identified
                         raise EditException(
@@ -177,11 +165,13 @@ class GenericContentEditor(ContentEditorInterface):
 
     # Gets passed content, and for each identified child element applies the action specified for it
     # If a leaf tag is set, the value is edited and the child elements will be ignored
-    def apply_action(self, input_value, schema: GenericSchema, content: Content) -> str:
+    def edit_container_element(
+        self, input_value, schema: GenericSchema, content: Content
+    ) -> str:
         if schema.embedded_schema is not None:
             return self.editor_factory.get_content_editor_by_schema_id(
                 schema.embedded_schema
-            ).apply_action(
+            ).edit_container_element(
                 input_value,
                 schema=self.schema_factory.get_schema_by_id(schema.embedded_schema),
                 content=content,
@@ -189,25 +179,8 @@ class GenericContentEditor(ContentEditorInterface):
 
         # No embedded schema has been identified, so the function continues as usual
         for tag in schema.tags:
-            if tag == ContentTag.TITLE:
-                return content.title
-            elif tag == ContentTag.SUMMARY:
-                return content.summary
-            elif tag == ContentTag.FULL_CONTENT:
-                return content.full
-            elif tag == ContentTag.PICTURE:
-                return content.video
-            elif tag == ContentTag.LINK:
-                return content.link
-            elif tag == ContentTag.ORIGIN:
-                return content.origin
-            elif tag == ContentTag.CATEGORIES:
-                result = ""
-                for cat in content.tags:
-                    result += cat + " "
-                return result[0:-1]
-            elif tag == ContentTag.DELETE:
-                return ""
+            if tag in ContentTag.get_leaf_tags():
+                return content.get_content_by_tag(tag)
 
         # there was no leaf tag, so we iterate through the child schemas
         for child_schema in schema.children:
@@ -244,7 +217,7 @@ class GenericContentEditor(ContentEditorInterface):
 
         input_raw = (
             input_raw[:content_start]
-            + self.apply_action(
+            + self.edit_container_element(
                 match.group("content"),
                 schema,
                 self.content_factory.get_content(),

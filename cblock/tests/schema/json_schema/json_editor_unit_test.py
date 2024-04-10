@@ -217,7 +217,7 @@ class JsonEditorUnitTest(unittest.TestCase):
         random_content: str = test_utils.random_string(10)
 
         assert (
-            self.editor.apply_action(
+            self.editor.edit_container_element(
                 input_value=random_content, schema=schema, content=generated_content
             )
             == generated_content.title
@@ -239,13 +239,13 @@ class JsonEditorUnitTest(unittest.TestCase):
             ),
         )
 
-        assert self.editor.apply_action(
+        assert self.editor.edit_container_element(
             input_value=[test_utils.random_string(10)],
             schema=schema,
             content=generated_content,
         ) == [generated_content.title]
 
-        assert self.editor.apply_action(
+        assert self.editor.edit_container_element(
             input_value=[test_utils.random_string(10), test_utils.random_string(10)],
             schema=schema,
             content=generated_content,
@@ -269,7 +269,7 @@ class JsonEditorUnitTest(unittest.TestCase):
             },
         )
 
-        assert self.editor.apply_action(
+        assert self.editor.edit_container_element(
             input_value={"name": test_utils.random_string(10)},
             schema=schema,
             content=generated_content,
@@ -295,7 +295,7 @@ class JsonEditorUnitTest(unittest.TestCase):
             },
         )
 
-        assert self.editor.apply_action(
+        assert self.editor.edit_container_element(
             input_value={
                 "name": test_utils.random_string(10),
                 "class": test_utils.random_string(10),
@@ -334,7 +334,7 @@ class JsonEditorUnitTest(unittest.TestCase):
             },
         )
 
-        assert self.editor.apply_action(
+        assert self.editor.edit_container_element(
             input_value={"name": test_utils.random_string(10)},
             schema=schema,
             content=generated_content,
@@ -346,7 +346,9 @@ class JsonEditorUnitTest(unittest.TestCase):
         embedded_editor = Mock(ContentEditorInterface)
 
         embedded_editor_return_value: str = test_utils.random_string(10)
-        embedded_editor.apply_action.return_value = embedded_editor_return_value
+        embedded_editor.edit_container_element.return_value = (
+            embedded_editor_return_value
+        )
         embedded_schema_id: str = test_utils.random_string(10)
 
         self.editor_factory.get_content_editor_by_schema_id.return_value = (
@@ -372,7 +374,7 @@ class JsonEditorUnitTest(unittest.TestCase):
 
         random_string: str = test_utils.random_string(10)
 
-        assert self.editor.apply_action(
+        assert self.editor.edit_container_element(
             input_value={"name": random_string},
             schema=schema,
             content=generated_content,
@@ -386,7 +388,7 @@ class JsonEditorUnitTest(unittest.TestCase):
             schema_id=embedded_schema_id
         )
 
-        embedded_editor.apply_action.assert_called_once_with(
+        embedded_editor.edit_container_element.assert_called_once_with(
             content=generated_content,
             input_value=random_string,
             schema=get_schema_return_value,

@@ -12,6 +12,7 @@ the current schema type. Elements with an embedded schema may not have any tags.
 
 An example file could look like this:
 
+### Example:
 Name:
 `basic_web_schema.cbs`
 
@@ -25,6 +26,13 @@ schema: # after the schema line, the definition of the underlying specialized sc
 {}
 ```
 
+Explanation:
+* _basic_web_schema_: the name of the schema
+* _url_: when a file from this URL is received, and _path_ matches too, the contents will be edited according to the underlying specialized schema
+* _path_: the path of the file that should be edited. This can be a regular expression
+* _type_: the type of the schema. For example _json_, _generic_ or _html_
+* _schema_: after this line until the end of the file, the definition of the underlying specialized schema is written.
+
 ## ContentTags
 Here's a list of all possible ContentTags and what they mean:
 
@@ -35,7 +43,7 @@ General Tags:
 | DELETE_UNCONDITIONAL | u | Item should be deleted unconditionally |
 | CONTAINER            | e | Marks element as container/segment, whose children should be analyzed together |
 
-Tags used for children of a CONTAINER element
+Tags used for children of a CONTAINER element (leaves)
 
 | Name         | Symbol | Description                                                                      |
 |--------------|--------|----------------------------------------------------------------------------------|
@@ -69,10 +77,41 @@ Example: Schema that contains the following fields:
 
 
 ### generic -> GenericSchema
-All leaves must be children of an element with the ELEMENT tag, or have one themselves.
-Always use non-greedy quantifiers when possible. For example, `.*` should be `.*?`, as `.*` would match as much as possible while `.*?` tries to find the shortest match possible (which is what we usually want)
-Any comma that is part of a value must be escaped.
+This type of schema can be used in cases where none of the other types would work. It uses regular expressions to find the content that should be edited, making use of Python's named-group feature.
+For example, to delete any content that is between double underscores (__) one could use the following rule: `pattern:'__(?P<content>.*?)__', tags:'ed'`.
+* pattern: describes which content to match. The content of the `content` group is what is actually going to be edited. Anything that is not part of the _content_ will need to be matched, but is not part of the content that is edited.
+* tags: These are just content tags, just like with any other schema type
 
-Comments:
-* To add info to a pattern, another parameter whose name starts with "desc" can be added to it.
-* To add a comment, add a line whose first non-whitespace character is a "#"
+To have the matched content be edited according to another schema, it is possible to add another field:
+* embedded_schema: when set contains the name of another schema, which is used to edit the content inside the _content_ group.
+
+It is also possible to have a hierarchy of rules, for example if we now instead of deleting the whole content of the previous rule just want to delete any "a" we could do the following:
+````
+pattern:'__(?P<content>.*?)__', tags:''
+# Note: the child rule must be indented exactly 4 more spaces than the parent.
+# Also, this is how to make a comment (first non-whitespace character is a "#"
+    pattern:'(?P<content>a*)', tags:'ed'
+````
+
+Any line whose first non-whitespace symbol is a "#" is considered a comment. It is also possible to add a description to a specific rule by adding a field that starts with "desc".
+
+Good to know:
+> Try to use non-greedy quantifiers when possible. For example, `.*` should be `.*?`, as `.*` would match as much as possible while `.*?` tries to find the shortest match possible (which is usually we want).
+
+> All leaves (those rules who contain a leaf tag such as "DELETE") must be children of a container element (one that has the "CONTAINER" tag), or be one themselves.
+
+> To add info to a pattern, another parameter whose name starts with "desc" can be added to it.
+
+> To add a comment, add a line whose first non-whitespace character is a "#"
+
+
+### html -> HTMLSchema
+This type of schema is used for HTML document. It is similar to the GenericSchema, but has the following possible fields:
+* _html\_tag_: the tag of the html content. To match, for example, a <a></a> element, this would be set to "a". Allows regular expressions
+* _content\_tags_: just content tags. Example: "de" for "DELETE" and "ELEMENT"
+* _edit\_attrs_: the elements attributes that should be edited. Contains a whitespace-separated list with values in the style of `attribute_name:contentTag1ContentTag2`. Example for an _href_ and _src_ attribute: `'href:l src:p'`
+* all other fields: will be considered attribute names and a regex that must match its value. In case only elements that contain a link to `example.com`, the following could be added to the rule: `href: 'https:\/\/example\.com'`
+
+> Note: every field's value must be enclosed by double quotes
+
+To add a comment, To add a comment, add a line whose first non-whitespace character is a "#". Just like with GenericSchemas

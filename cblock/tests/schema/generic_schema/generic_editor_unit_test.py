@@ -130,7 +130,7 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
         # The return value is a simple space, since the mocked function doesn't edit the ContentExtractionResul object
         assert self.editor.extract_content(
             input_value="_" + editor_return_value + "_", schema=schema
-        ) == ContentExtractionResult(text=" ", pictures=[])
+        ) == ContentExtractionResult(text="", pictures=[])
 
         self.editor_factory.get_content_editor_by_schema_id.assert_called_once_with(
             schema_id=embedded_schema_id
@@ -139,7 +139,7 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
         embedded_editor.extract_content.assert_called_once_with(
             input_value=editor_return_value,
             schema=get_schema_return_value,
-            result_container=ContentExtractionResult(text=" ", pictures=[]),
+            result_container=ContentExtractionResult(text="", pictures=[]),
         )
 
     def test_apply_action_with_schema_depth_one(self):
@@ -161,7 +161,7 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
         )
 
         assert (
-            self.editor.apply_action(
+            self.editor.edit_container_element(
                 input_value=f"_{test_utils.random_string(10)}_",
                 schema=schema,
                 content=generated_content,
@@ -170,7 +170,7 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
         )
 
         assert (
-            self.editor.apply_action(
+            self.editor.edit_container_element(
                 input_value=f"_{test_utils.random_string(10)}__{test_utils.random_string(10)}_",
                 schema=schema,
                 content=generated_content,
@@ -184,7 +184,7 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
         generated_content: Content = test_utils.generate_content()
         self.content_factory.get_content.return_value = generated_content
 
-        embedded_editor.apply_action.return_value = generated_content.title
+        embedded_editor.edit_container_element.return_value = generated_content.title
         embedded_schema_id: str = test_utils.random_string(10)
 
         self.editor_factory.get_content_editor_by_schema_id.return_value = (
@@ -209,7 +209,7 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
         )
 
         assert (
-            self.editor.apply_action(
+            self.editor.edit_container_element(
                 input_value=f"_{test_utils.random_string(10)}_",
                 schema=schema,
                 content=generated_content,
@@ -251,7 +251,7 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
         )
 
         self.content_analyzer.classify.assert_called_once_with(
-            ContentExtractionResult(title=f"{random_content} ", text=" ", pictures=[])
+            ContentExtractionResult(title=f"{random_content} ", text="", pictures=[])
         )
 
     def test_edit_multiple_children(self):
@@ -324,7 +324,7 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
         self.content_analyzer.classify.assert_called_with(
             ContentExtractionResult(
                 title=f"{random_content_one} ",
-                text=" ",
+                text="",
                 pictures=[],
             )
         )

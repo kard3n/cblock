@@ -29,5 +29,5 @@ class ContentEditorInterface(ABC):
     ) -> ContentExtractionResult:
         raise NotImplementedError("Not implemented")
 
-    def apply_action(self, input_value, schema: any, content: Content) -> str:
+    def edit_container_element(self, input_value, schema: any, content: Content) -> str:
         raise NotImplementedError("Not implemented")
