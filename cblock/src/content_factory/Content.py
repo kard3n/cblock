@@ -9,7 +9,7 @@ class Content:
     subtitle: str = "Subtitle removed by CBlock"
     summary: str = "Summary removed by CBlock"
     full: str = "Full Content removed by CBlock"  # Example: an article
-    picture: str = "picture.png"
+    picture: str = "https://i.imgur.com/a0Dq7Sc.png"
     video: str = "video.mp4"
     audio: str = "audio.mp3"
     link: str = "https://www.example.com/"

@@ -8,7 +8,7 @@ class ContentFactory:
             subtitle="Subtitle removed by ContentBlock",
             summary="Summary removed by ContentBlock.",
             full="Full text removed by ContentBlock.",
-            picture="picture.png",
+            picture="https://i.imgur.com/a0Dq7Sc.png",
             video="video.mp4",
             audio="audio.wav",
             tags=["default"],
