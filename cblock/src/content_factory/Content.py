@@ -57,7 +57,7 @@ class Content:
         elif ContentTag.FULL_CONTENT in content_tags:
             return self.full
         elif ContentTag.PICTURE in content_tags:
-            return self.video
+            return self.picture
         elif ContentTag.LINK in content_tags:
             return self.link
         elif ContentTag.ORIGIN in content_tags:
