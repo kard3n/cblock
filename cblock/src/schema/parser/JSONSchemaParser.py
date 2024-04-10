@@ -49,7 +49,7 @@ class JSONSchemaParser(SchemaParserInterface):
                         while (
                             element[pos] != ")"
                             and element[pos] != ":"
-                            and element[pos].isalpha()
+                            and (element[pos].isalnum() or element[pos] in ["_"])
                         ):
                             schema_id += element[pos]
                             pos += 1
