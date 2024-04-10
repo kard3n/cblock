@@ -31,4 +31,5 @@ def generate_content() -> Content:
         video=random_string(10),
         audio=random_string(10),
         tags=[random_string(10)],
+        link=random_string(10),
     )
