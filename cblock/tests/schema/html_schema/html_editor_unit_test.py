@@ -274,6 +274,49 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
             == f"<div><a>{generated_content.title}</a></div>"
         )
 
+    def test_edit_container_element_with_attributes(self):
+        generated_content: Content = test_utils.generate_content()
+
+        schema: HTMLSchema = HTMLSchema(
+            html_tag=None,
+            content_tags=[],
+            attributes={},
+            embedded_schema=None,
+            children=[
+                HTMLSchema(
+                    html_tag=regex.compile("a"),
+                    content_tags=[],
+                    search_recursive=True,
+                    attributes_to_edit={
+                        "href": [ContentTag.LINK],
+                        "text": [ContentTag.SUMMARY, ContentTag.ANALYZE],
+                    },
+                    attributes={},
+                    embedded_schema=None,
+                    children=[],
+                )
+            ],
+        )
+
+        random_string_one: str = test_utils.random_string(10)
+        random_string_two: str = test_utils.random_string(10)
+
+        assert self.editor.extract_content(
+            input_value=f'<div><a href="{random_string_one}" text="{random_string_two}">Anything</a></div>',
+            schema=schema,
+        ) == ContentExtractionResult(
+            title="", text=random_string_two + " ", pictures=[], categories=""
+        )
+
+        assert (
+            self.editor.edit_container_element(
+                input_value=f'<div><a href="{random_string_one}" text="{random_string_two}">Anything</a></div>',
+                schema=schema,
+                content=generated_content,
+            )
+            == f'<div><a href="{generated_content.link}" text="{generated_content.summary}">Anything</a></div>'
+        )
+
     def test_edit_container_is_leaf(self):
         generated_content: Content = test_utils.generate_content()
         self.content_factory.get_content.return_value = generated_content

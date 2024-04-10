@@ -169,7 +169,7 @@ class HTMLContentEditor(ContentEditorInterface):
                 element=BeautifulSoup(input_value, "lxml"),
                 schema=schema,
                 content=content,
-            ).__repr__(),
+            ).__str__(),
         )
 
     # Gets passed content, and for each identified child element applies the action specified for it
@@ -222,11 +222,13 @@ class HTMLContentEditor(ContentEditorInterface):
 
         # Edit attributes:
         for attribute in schema.attributes_to_edit:
-            if attribute in element.attrs:
-                if attribute in ContentTag.get_leaf_tags():
-                    element.attrs[attribute] = content.get_content_for_tags(
-                        content_tags=schema.attributes_to_edit[attribute]
-                    )
+            if attribute in element.attrs.keys() and len(
+                set(schema.attributes_to_edit[attribute])
+                & set(ContentTag.get_leaf_tags())
+            ):
+                element.attrs[attribute] = content.get_content_for_tags(
+                    content_tags=schema.attributes_to_edit[attribute]
+                )
         return element
 
     def __extract_body_if_not_in_input(self, input_str: str, output_str: str) -> str:
@@ -237,8 +239,7 @@ class HTMLContentEditor(ContentEditorInterface):
         :param output_str:
         :return: (str)
         """
-        print("Input string: " + input_str)
-        print("Output string: " + output_str)
+
         if regex.search(
             pattern=regex.compile(r"<body.*?>.*?<\/body.*?>"), string=input_str
         ):
