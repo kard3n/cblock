@@ -42,7 +42,6 @@ class HTMLContentEditor(ContentEditorInterface):
             )
 
         except Exception as e:
-            print(e)
             logging.warning(f"Error parsing input to HTML representation: {e}")
 
         return input_raw + "YOOOOOOO"
@@ -184,9 +183,6 @@ class HTMLContentEditor(ContentEditorInterface):
         :param content:
         :return:
         """
-
-        print("Received: " + element.__str__())
-        print("Schema: " + schema.__str__())
 
         if schema.embedded_schema is not None:
             return self.editor_factory.get_content_editor_by_schema_id(
