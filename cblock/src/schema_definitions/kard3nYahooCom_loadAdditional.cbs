@@ -1,7 +1,0 @@
-url: yahoo.com
-path: /fp_ms/_rcv/remote\?ctrl=Stream.*?
-type: generic
-schema:
-pattern:'<li.*?>(?P<content>.*?)><\/li>', tags:'e'
-    pattern:'<a class.*?>(?P<content>.*?)<\/u><\/a>', tags:'ta'
-    pattern:'<p class.*?>(?P<content>.*?)<\/p>', tags:'sa'

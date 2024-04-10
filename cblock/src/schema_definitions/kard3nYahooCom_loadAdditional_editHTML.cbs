@@ -1,0 +1,7 @@
+url: yahoo.com
+path: /fp_ms/_rcv/remote\?ctrl=Stream.*?
+type: json
+schema:
+html_tag:'li', content_tags:'e', data-uuid:'.*?'
+    html_tag:'a', content_tags:'ta', edit_attrs:'href:l', class:'.*stream-tile.*'
+    html_tag:'p', content_tags:'sa',  data-test-locator:'stream-item-summary'
