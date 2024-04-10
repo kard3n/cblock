@@ -1,9 +1,7 @@
 import unittest
 
-from pytest import raises
 from regex import regex
 
-from exceptions.SchemaParsingException import SchemaParsingException
 from schema.ContentTag import ContentTag
 from schema.html_schema.HTMLSchema import HTMLSchema
 from schema.parser.HTMLSchemaParser import HTMLSchemaParser
@@ -33,7 +31,7 @@ class TestHTTPSchemaParser(unittest.TestCase):
                     },
                     attributes={"href": regex.compile(r"https:\/\/example\.com")},
                     embedded_schema=None,
-                    children=None,
+                    children=[],
                 )
             ],
         )
@@ -63,14 +61,14 @@ class TestHTTPSchemaParser(unittest.TestCase):
                             },
                             attributes={"class": regex.compile(r"headline")},
                             embedded_schema=None,
-                            children=None,
+                            children=[],
                         ),
                         HTMLSchema(
                             html_tag=regex.compile("span"),
                             content_tags=[ContentTag.ANALYZE, ContentTag.SUMMARY],
                             attributes={"class": regex.compile(r"summary")},
                             embedded_schema=None,
-                            children=None,
+                            children=[],
                         ),
                     ],
                 )
