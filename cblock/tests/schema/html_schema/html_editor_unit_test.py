@@ -410,3 +410,58 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
             )
             == f"<div><a>{generated_content.title}</a></div>"
         )
+
+    def test_edit_with_attributes(self):
+        generated_content: Content = test_utils.generate_content()
+        self.content_factory.get_content.return_value = generated_content
+        self.content_analyzer.classify.return_value = True
+
+        schema: HTMLSchema = HTMLSchema(
+            html_tag=None,
+            content_tags=[],
+            attributes={},
+            embedded_schema=None,
+            children=[
+                HTMLSchema(
+                    html_tag=regex.compile("div"),
+                    content_tags=[ContentTag.CONTAINER],
+                    search_recursive=True,
+                    attributes={},
+                    embedded_schema=None,
+                    children=[
+                        HTMLSchema(
+                            html_tag=regex.compile("a"),
+                            content_tags=[
+                                ContentTag.ANALYZE,
+                                ContentTag.TITLE,
+                            ],
+                            attributes_to_edit={
+                                "href": [ContentTag.LINK],
+                                "src": [ContentTag.PICTURE],
+                            },
+                            search_recursive=True,
+                            attributes={},
+                            embedded_schema=None,
+                            children=[],
+                        )
+                    ],
+                )
+            ],
+        )
+
+        random_string: str = test_utils.random_string(10)
+
+        assert (
+            self.editor.edit(
+                input_raw=f"<div><a>{random_string}</a></div>", schema=schema
+            )
+            == f"<div><a>{generated_content.title}</a></div>"
+        )
+
+        assert (
+            self.editor.edit(
+                input_raw=f'<div><a href="https://www.example.com/test" src="https://www.example.com/testimage.png">{random_string}\n{random_string}<p></p></a></div>',
+                schema=schema,
+            )
+            == f'<div><a href="{generated_content.link}" src="{generated_content.picture}">{generated_content.title}</a></div>'
+        )
