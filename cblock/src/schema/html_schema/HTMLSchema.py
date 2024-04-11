@@ -28,6 +28,6 @@ class HTMLSchema:
     embedded_schema: str | None = (
         None  # Can be specified, if a different schema (and therefore editor) should be used for the matched content
     )
-    children: None | list = (
-        None  # should be set to a value other than None if the schema element has children
-    )
+    children: list = field(
+        default_factory=list
+    )  # should be set to a value other than None if the schema element has children

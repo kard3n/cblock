@@ -443,25 +443,40 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
                             attributes={},
                             embedded_schema=None,
                             children=[],
-                        )
+                        ),
+                        HTMLSchema(
+                            html_tag=regex.compile("img"),
+                            content_tags=[],
+                            attributes_to_edit={
+                                "src": [ContentTag.PICTURE],
+                            },
+                            search_recursive=True,
+                            attributes={},
+                            embedded_schema=None,
+                            children=[],
+                        ),
                     ],
                 )
             ],
         )
 
-        random_string: str = test_utils.random_string(10)
+        random_string_one: str = test_utils.random_string(10)
+        random_string_two: str = test_utils.random_string(10)
+
+        print(generated_content)
 
         assert (
             self.editor.edit(
-                input_raw=f"<div><a>{random_string}</a></div>", schema=schema
+                input_raw=f"<div><a>{random_string_one}</a><a>{random_string_two}</a><img src={random_string_two}/></div>",
+                schema=schema,
             )
-            == f"<div><a>{generated_content.title}</a></div>"
+            == f'<div><a>{generated_content.title}</a><a>{generated_content.title}</a><img src="{generated_content.picture}"/></div>'
         )
 
         assert (
             self.editor.edit(
-                input_raw=f'<div><a href="https://www.example.com/test" src="https://www.example.com/testimage.png">{random_string}\n{random_string}<p></p></a></div>',
+                input_raw=f'<div><a href="https://www.example.com/test" src="https://www.example.com/testimage.png">{random_string_one}</a><img href="https://www.example.com/test" src="https://www.example.com/testimage.png"/></div>',
                 schema=schema,
             )
-            == f'<div><a href="{generated_content.link}" src="{generated_content.picture}">{generated_content.title}</a></div>'
+            == f'<div><a href="{generated_content.link}" src="{generated_content.picture}">{generated_content.title}</a><img href="https://www.example.com/test" src="{generated_content.picture}"/></div>'
         )

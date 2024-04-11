@@ -8,6 +8,7 @@ from schema.json_schema.JSONSchema import JSONSchema
 class SchemaType(str, Enum):
     GENERIC = "generic"
     JSON = "json"
+    HTML = "html"
 
 
 @dataclass

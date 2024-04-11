@@ -44,7 +44,7 @@ class HTMLContentEditor(ContentEditorInterface):
         except Exception as e:
             logging.warning(f"Error parsing input to HTML representation: {e}")
 
-        return input_raw + "YOOOOOOO"
+        return input_raw
 
     def extract_content(
         self,
