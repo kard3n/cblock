@@ -74,3 +74,45 @@ class TestHTTPSchemaParser(unittest.TestCase):
                 )
             ],
         )
+
+    def test_parse_string_multiple_children_non_recursive(self):
+        schema: str = r"""html_tag:'a', recursive:"False", content_tags:'e', edit_attrs:'test:e', href: 'https:\/\/example\.com'
+    html_tag:'b', content_tags:'at', edit_attrs:'random:at', recursive:'True' ,class: 'headline'
+    html_tag:'span', content_tags:'as', recursive:"False", class: 'summary'"""
+        assert self.parser.parse_string(schema) == HTMLSchema(
+            html_tag=None,
+            content_tags=[],
+            attributes={},
+            embedded_schema=None,
+            children=[
+                HTMLSchema(
+                    html_tag=regex.compile("a"),
+                    content_tags=[ContentTag.CONTAINER],
+                    attributes={"href": regex.compile(r"https:\/\/example\.com")},
+                    search_recursive=False,
+                    embedded_schema=None,
+                    children=[
+                        HTMLSchema(
+                            html_tag=regex.compile("b"),
+                            content_tags=[ContentTag.CONTAINER],
+                            search_recursive=True,
+                            attributes_to_edit={
+                                "test": [ContentTag.ANALYZE, ContentTag.TITLE],
+                                "var": [ContentTag.ANALYZE],
+                            },
+                            attributes={"class": regex.compile(r"headline")},
+                            embedded_schema=None,
+                            children=[],
+                        ),
+                        HTMLSchema(
+                            html_tag=regex.compile("span"),
+                            search_recursive=False,
+                            content_tags=[ContentTag.ANALYZE, ContentTag.SUMMARY],
+                            attributes={"class": regex.compile(r"summary")},
+                            embedded_schema=None,
+                            children=[],
+                        ),
+                    ],
+                )
+            ],
+        )
