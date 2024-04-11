@@ -165,8 +165,8 @@ class HTMLContentEditor(ContentEditorInterface):
                     attrs=child_schema.attributes,
                     recursive=child_schema.search_recursive,
                 )
-                for element in matched_elements:
-                    self.__explore_parsed(element, child_schema)
+                for child_element in matched_elements:
+                    self.__explore_parsed(child_element, child_schema)
 
     def edit_container_element(
         self, input_value, schema: HTMLSchema, content: Content
