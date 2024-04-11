@@ -1,38 +1,47 @@
 url: bing.com
 path: \/search\?q=.*?
-type: generic
+type: html
 schema:
-# for results except the first one
-pattern:'<li class="b_algo"(?P<content>.*?)<\/li>', tags:'e'
-    pattern:'<div class="tppt">(?P<content>.*?)<\/div>', tags:'o'
-    pattern:'(?P<content><cite>.*?<\/cite>)', tags:'d'
-    pattern:'<h2.*?>(?P<content>.*?)<\/h2>', tags:''
-        pattern:'href="(?P<content>.*?)"', tags:'l'
-        pattern:'>(?P<content>.*?)<\/a>', tags:'o'
-    pattern:'<div class="b_caption.*?>.*?<\/span>(?P<content>.*?)<\/p><\/div>', tags:'t'
-        pattern:'<strong>(?P<content>.*?)<\/strong>', tags:'at'
-        pattern:'>(?P<content>.*?)<', tags:'at'
-    pattern:'<div class="pageRecoContainer.*?>(?P<content>.*)<\/div>', tags:'d'
-    pattern:'<div class="b_vlist2col.*?>(?P<content>.*?<\/ul>)<\/div>', tags:'d'
-    pattern:'<div class="b_tpcn">(?P<content>.*?)<\/a>', tags:''
-        pattern:'href="(?P<content>.*?)"', tags:'l'
-        pattern:'<div class="tptt">(?P<content>.*?)<\/div>', tags:'o'
-# for the first result with extra links
-pattern:'<li class="b_algo b_vtl_deeplinks"(?P<content>.*?<\/a>)<\/li>', tags:'e'
-    pattern:'<div class="tppt">(?P<content>.*?)<\/div>', tags:'o'
-    pattern:'(?P<content><cite>.*?<\/cite>)', tags:'d'
-    pattern:'<h2.*?>(?P<content>.*?)<\/h2>', tags:''
-        pattern:'href="(?P<content>.*?)"', tags:'l'
-        pattern:'>(?P<content>.*?)<\/a>', tags:'o'
-    pattern:'<div class="b_caption.*?>.*?<\/span>(?P<content>.*?)<\/p><\/div>', tags:'t'
-        pattern:'<strong>(?P<content>.*?)<\/strong>', tags:'at'
-        pattern:'>(?P<content>.*?)<', tags:'at'
-    pattern:'(?P<content><div class="b_vlist2col.*?>.*?$)', tags:'d', desc:'removes the list of subpages'
-    pattern:'<div class="b_tpcn">(?P<content>.*?)<\/a>', tags:''
-        pattern:'href="(?P<content>.*?)"', tags:'l'
-        pattern:'<div class="tptt">(?P<content>.*?)<\/div>', tags:'o'
-# for news results TODO: put into container, and add support for big fisrt image
-# pattern:'<div id="ans_nws.*?>(?P<content>.*?)<\/div><\/li>', tags:'de'
-pattern:'<a.*?>(?P<content>.*?)<\/a>', tags:'e'
-    pattern:'<span class="cap_title">(?P<content>.*?)<\/span>', tags:'o'
-    pattern:'<div class="na_cal_title na_t b_promtxt">(?P<content>.*?)<\/div>', tags:'ta'
+# for simple search results
+html_tag:'li', content_tags:'e', data-id:'^$', class:'^b_algo.*?'
+    # for link when clicking on the upper part
+    html_tag:'a', content_tags:'', class:'tilk', edit_attrs:'href:l'
+    # for URL shown
+    html_tag:'div', content_tags:'', class:'b_attribution'
+        html_tag:'cite', content_tags:'o'
+    html_tag:'div', content_tags:'', class:'tptxt'
+        html_tag:'div', content_tags:'o', recursive:'False', class:'tptt'
+        html_tag:'cite', content_tags:'l', class:'b_agsp.*?'
+    html_tag:'h2', content_tags:''
+        html_tag:'a', content_tags:'ta', edit_attrs:'href:l'
+    html_tag:'div', content_tags:'', class:'b_caption', role:'contentinfo'
+        html_tag:'p', content_tags:'sa', recursive:'False'
+    # removes extra results
+    html_tag:'div', content_tags:'d', class:'b_vlist2col b_deep'
+    # removes another extra thingy
+    html_tag:'div', content_tags:'d', role:'contentinfo'
+    # removes "explore further"
+    html_tag:'div', content_tags:'d', class:'pageRecoContainer'
+# for videos related to search
+html_tag:'li', content_tags:'', class:'b_ans b_mop b_vidAns'
+    html_tag:'div', content_tags:'e', class:'slide'
+        html_tag:'img', edit_attrs:'src:p src-hq:p alt:t'
+        html_tag:'span', content_tags:'t', edit_attrs:'title:ta', title:'.*?'
+        html_tag:'span', class:'mc_vtvc_meta_row_channel', content_tags:'o'
+# for news related to search
+html_tag:'li', content_tags:'', class:'b_ans.*?b_nwsAnsTopItem'
+    html_tag:'div', content_tags:'e', class:'na_card_wrp.*?'
+        html_tag:'img', edit_attrs:'src:p data-src-hq:p title:t'
+        html_tag:'div', content_tags:'ta', class:'na_cal_title.*?'
+        html_tag:'span', content_tags:'o', class:'cap_title'
+        # for big first image with description
+        html_tag:'div', content_tags:'ta', class:'.*?na_t_news_caption.*?'
+        html_tag:'p', content_tags:'sa', class:'itm_spt itm_spt_news_caption'
+# for images related to search
+html_tag:'li', content_tags:'', class:'b_ans.*?b_imgans.*?'
+    html_tag:'div', content_tags:'e', class:'irpu'
+        html_tag:'a', edit_attrs:'href:l aria-label:t', class:'^$'
+            html_tag:'img', edit_attrs:'src:p alt:t class:d', class:'sgt rms_img'
+        html_tag:'a', content_tags:'ta', edit_attrs:'href:l title:t', class:'imgText.*?'
+
+
