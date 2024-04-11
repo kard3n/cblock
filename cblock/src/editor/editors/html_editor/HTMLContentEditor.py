@@ -35,14 +35,21 @@ class HTMLContentEditor(ContentEditorInterface):
 
         try:
             soup = BeautifulSoup(input_raw, "lxml")
-            self.__explore_parsed(element=soup, schema=schema)
-
-            return self.__extract_body_if_not_in_input(
-                input_str=input_raw, output_str=soup.__repr__()
-            )
 
         except Exception as e:
             logging.warning(f"Error parsing input to HTML representation: {e}")
+            return input_raw
+
+        try:
+            self.__explore_parsed(element=soup, schema=schema)
+        except Exception as e:
+            logging.warning(f"Error editing input: {e}")
+            return input_raw
+
+        # seems to be redundant, removed for now
+        """return self.__extract_body_if_not_in_input(
+            input_str=input_raw, output_str=soup.__repr__()
+        )"""
 
         return input_raw
 
@@ -237,7 +244,7 @@ class HTMLContentEditor(ContentEditorInterface):
         """
 
         if regex.search(
-            pattern=regex.compile(r"<body.*?>.*?<\/body.*?>"), string=input_str
+            pattern=regex.compile(r".*?<body.*?>.*?<\/body.*?>"), string=input_str
         ):
             return output_str
         else:
