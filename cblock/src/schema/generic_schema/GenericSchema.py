@@ -16,7 +16,6 @@ class GenericSchema:
     embedded_schema: str | None = (
         None  # Can be specified, if a different schema (and therefore editor) should be used for the matched content
     )
-    children: None | list = (
-        None  # should be set to a value other than None if the schema element has children
-        # substrings matched by the child elements should never overlap
-    )
+    children: list = field(
+        default_factory=list
+    )  # substrings matched by the child elements should never overlap

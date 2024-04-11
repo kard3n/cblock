@@ -46,6 +46,8 @@ class HTMLContentEditor(ContentEditorInterface):
             logging.warning(f"Error editing input: {e}")
             return input_raw
 
+        return soup.__str__()
+
         # seems to be redundant, removed for now
         """return self.__extract_body_if_not_in_input(
             input_str=input_raw, output_str=soup.__repr__()
