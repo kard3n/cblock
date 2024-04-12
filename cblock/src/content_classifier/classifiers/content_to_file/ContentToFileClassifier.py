@@ -1,7 +1,6 @@
 import datetime
 import logging
 import os.path
-import pathlib
 
 from content_classifier.ContentClassifierInterface import ContentClassifierInterface
 from editor.ContentExtractionResult import ContentExtractionResult

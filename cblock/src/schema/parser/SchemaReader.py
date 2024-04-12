@@ -121,7 +121,7 @@ class SchemaReader:
         else:
             # parse schema and pickle the result
             try:
-                parser = factory.getParser(schema_type)
+                parser = factory.get_parser(schema_type)
                 pickled_object = pickle.dumps(parser.parse_string(file_content[pos:]))
             except Exception as e:
                 raise SchemaParsingException(

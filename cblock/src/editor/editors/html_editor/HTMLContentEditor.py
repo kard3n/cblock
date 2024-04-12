@@ -1,7 +1,7 @@
 import logging
 
-from bs4 import BeautifulSoup, Tag, PageElement
-from regex import Match, regex
+from bs4 import BeautifulSoup, Tag
+from regex import regex
 
 from content_classifier.ContentClassifierInterface import ContentClassifierInterface
 from content_factory.Content import Content
@@ -9,7 +9,6 @@ from content_factory.ContentFactory import ContentFactory
 from editor.ContentEditorFactory import ContentEditorFactory
 from editor.ContentEditorInterface import ContentEditorInterface
 from editor.ContentExtractionResult import ContentExtractionResult
-from exceptions.EditException import EditException
 from schema.ContentTag import ContentTag
 from schema.SchemaFactory import SchemaFactory
 from schema.html_schema.HTMLSchema import HTMLSchema

@@ -1,8 +1,6 @@
 import abc
 from abc import ABC
 
-from utils.Singleton import Singleton
-
 
 class SchemaParserInterface(ABC):
     # TODO make this and subclasses singleton

@@ -1,10 +1,7 @@
-import logging
-
 from schema.ContentTag import ContentTag
 from schema.parser.SchemaParserInterface import SchemaParserInterface
 from schema.json_schema.JSONSchema import JSONSchema, ValueType
 from exceptions.SchemaParsingException import SchemaParsingException
-from utils.Singleton import Singleton
 from utils.string_utils import jump_whitespaces_linebreaks
 
 
@@ -22,14 +19,8 @@ class JSONSchemaParser(SchemaParserInterface):
     # and then the content (list, dict or string)
     # if element does not start with tags followed by a ':', then comes_with_tags needs to be set to False
     @classmethod
-    def __parse_schema_element(
-        cls, element: str, inherited_tags: list[ContentTag] = None
-    ) -> JSONSchema:
+    def __parse_schema_element(cls, element: str) -> JSONSchema:
         element_container: JSONSchema = JSONSchema()
-
-        # add inherited tags to initially empty tag list. Disables dor now, maybe remove later
-        # if inherited_tags is not None:
-        #    element_container.tags = deepcopy(inherited_tags)
 
         pos: int = jump_whitespaces_linebreaks(element, 0)
 
@@ -111,7 +102,7 @@ class JSONSchemaParser(SchemaParserInterface):
 
                 current_value += element[pos]
             element_container.value = cls.__parse_schema_element(
-                current_value[0 : len(current_value) - 1], element_container.tags
+                current_value[0 : len(current_value) - 1]
             )
 
         # starts with a curly bracket, must be a dictionary
@@ -215,7 +206,7 @@ class JSONSchemaParser(SchemaParserInterface):
                         pos += 1
 
                 element_container.value[current_name] = cls.__parse_schema_element(
-                    current_value, element_container.tags
+                    current_value
                 )
                 current_value = ""
 
@@ -242,26 +233,28 @@ class JSONSchemaParser(SchemaParserInterface):
         return element_container
 
     @classmethod
-    def __get_name(cls, input: str, start_pos: int) -> int:
+    def __get_name(cls, input_str: str, start_pos: int) -> int:
         pos: int = start_pos
 
-        pos = jump_whitespaces_linebreaks(input, pos)
+        pos = jump_whitespaces_linebreaks(input_str, pos)
 
-        if input[pos] != '"':
+        if input_str[pos] != '"':
             raise SchemaParsingException(
-                f'Could not determine beginning of name "{input[start_pos:]}". No '
+                f'Could not determine beginning of name "{input_str[start_pos:]}". No '
                 + "quotation mark could be found."
             )
 
         # jump quotation mark
         pos += 1
 
-        while pos < len(input) and not (input[pos] == '"' and input[pos - 1] != "\\"):
+        while pos < len(input_str) and not (
+            input_str[pos] == '"' and input_str[pos - 1] != "\\"
+        ):
             pos += 1
 
-        if input[pos] != '"':
+        if input_str[pos] != '"':
             raise SchemaParsingException(
-                f'Could not determine ending of name "{input[start_pos:]}".'
+                f'Could not determine ending of name "{input_str[start_pos:]}".'
             )
 
         return pos
