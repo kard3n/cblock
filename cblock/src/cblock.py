@@ -44,10 +44,6 @@ class Main:
             database_name="cb_database.db", table_name="cb_schema"
         )
 
-        logging.warning(
-            type(self.content_analyzer_factory.get_content_analyzer(self.config))
-        )
-
         self.content_editor_factory = ContentEditorFactory(
             content_analyzer=self.content_analyzer_factory.get_content_analyzer(
                 configuration=self.config
