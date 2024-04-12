@@ -57,6 +57,7 @@ class Main:
                 )
                 schema_reader.run()
             except Exception as e:
+                self.db_manager.close_connection()
                 os.remove("cb_database.db")
                 logging.error(f"Error while initializing database: {e}")
 

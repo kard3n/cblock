@@ -133,3 +133,6 @@ class SQLiteManager(DBManagerInterface):
             result.append(PathSearchResult(id=item[0], path=item[1]))
 
         return result
+
+    def close_connection(self) -> None:
+        self.connection.close()

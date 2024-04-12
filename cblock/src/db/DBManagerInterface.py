@@ -34,3 +34,10 @@ class DBManagerInterface(ABC):
     @abstractmethod
     def get_paths_for_url(self, url: str) -> list[PathSearchResult]:
         raise NotImplementedError("Not yet implemented")
+
+    @abstractmethod
+    def close_connection(self) -> None:
+        """
+        Closes the connection to the database
+        """
+        raise NotImplementedError("Not yet implemented")
