@@ -9,12 +9,14 @@ Enable utf-8 support (needs to be done only once per environment):
 conda env config vars set PYTHONUTF8=1
 """
 
+import configparser
 import logging
 import os
 import traceback
 
 import regex
 
+from configuration.Configuration import Configuration
 from content_classifier.ContentClassifierFactory import ContentAnalyzerFactory
 from content_factory.ContentFactory import ContentFactory
 from db.PathSearchResult import PathSearchResult
@@ -34,6 +36,7 @@ class Main:
 
     def __init__(self):
         logging.info("Starting CBlock")
+        self.config = Configuration()
         self.content_analyzer_factory = ContentAnalyzerFactory()
 
         self.schema_parser_factory = SchemaParserFactory()
@@ -41,8 +44,14 @@ class Main:
             database_name="cb_database.db", table_name="cb_schema"
         )
 
+        logging.warning(
+            type(self.content_analyzer_factory.get_content_analyzer(self.config))
+        )
+
         self.content_editor_factory = ContentEditorFactory(
-            content_analyzer=self.content_analyzer_factory.get_content_analyzer(),
+            content_analyzer=self.content_analyzer_factory.get_content_analyzer(
+                configuration=self.config
+            ),
             content_factory=ContentFactory(),
             db_manager=self.db_manager,
         )

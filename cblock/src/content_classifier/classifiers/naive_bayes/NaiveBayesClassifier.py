@@ -10,13 +10,13 @@ from editor.ContentExtractionResult import ContentExtractionResult
 
 
 class NaiveBayesClassifier(ContentClassifierInterface):
-    def __init__(self, forbidden_topics: list[str]):
+    def __init__(self, topics_to_remove: list[str]):
         with open(
             pathlib.Path(__file__).parent.resolve().as_posix() + "/classifier.pickle",
             "rb",
         ) as pickled_classifier:
             self.model: ClassifierPipeline = pickle.load(pickled_classifier)
-        self.forbidden_topics = forbidden_topics
+        self.forbidden_topics = topics_to_remove
 
     def classify(self, content: ContentExtractionResult) -> bool:
         logging.info(f"Classifying {content}")

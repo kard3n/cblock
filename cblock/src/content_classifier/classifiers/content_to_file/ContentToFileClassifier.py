@@ -7,7 +7,7 @@ from editor.ContentExtractionResult import ContentExtractionResult
 
 
 class ContentToFileClassifier(ContentClassifierInterface):
-    def __init__(self):
+    def __init__(self, topics_to_remove: list[str]):
         if not os.path.isdir("extracted_headlines"):
             os.mkdir("extracted_headlines")
 
