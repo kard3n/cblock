@@ -1,6 +1,6 @@
 import logging
 import os
-
+import pickle
 
 from db.DBManagerInterface import DBManagerInterface
 from exceptions.SchemaParsingException import SchemaParsingException
@@ -51,6 +51,7 @@ class SchemaReader:
         schema_type: str | None = None
         url: str | None = None
         path: str | None = None
+        pickled_object: bytes | None = None
         factory: SchemaParserFactory = SchemaParserFactory()
         if directory.endswith("/"):
             directory = directory[:-1]
@@ -88,7 +89,9 @@ class SchemaReader:
 
                 # invoke a specific Schema Parser, depending on type, to check if the schema is valid
                 try:
-                    factory.getParser(schema_type).parse_string(file_content[pos:])
+                    pickled_object = pickle.dumps(
+                        factory.getParser(schema_type).parse_string(file_content[pos:])
+                    )
                 except Exception as e:
                     return f"Underlying {schema_type} schema could not be parsed: {e}"
                 break
@@ -100,12 +103,7 @@ class SchemaReader:
 
                 pos += 1
 
-        if (
-            url is None
-            or path is None
-            or schema_type is None
-            or file_content[pos:] == ""
-        ):
+        if url is None or path is None or schema_type is None or pickled_object is None:
             raise SchemaParsingException("Schema is missing fields.")
 
-        return [filename[:-4], url, path, schema_type, file_content[pos:]]
+        return [filename[:-4], url, path, schema_type, pickled_object]

@@ -13,6 +13,4 @@ class SchemaFactory(metaclass=Singleton):
     def get_schema_by_id(self, schema_id: str) -> any:
         schema_search_result: SchemaSearchResult = self.db_manager.get_schema(schema_id)
 
-        return self.parser_factory.getParser(
-            schema_search_result.schema_type
-        ).parse_string(schema_search_result.schema)
+        return schema_search_result.schema

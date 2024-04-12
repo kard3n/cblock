@@ -1,3 +1,4 @@
+import pickle
 import sqlite3
 
 from db.DBManagerInterface import DBManagerInterface
@@ -30,25 +31,13 @@ class SQLiteManager(DBManagerInterface):
         return True
 
     def create_schema_table(self) -> None:
-        self.__create_table(
-            id_column="schema_id",
-            non_id_columns=["url", "path", "schema_type", "schema"],
-            columns_to_index=["url"],
-        )
+        columns_to_index = ["url"]
 
-    # Creates a table. If it already exists, overwrites it
-    def __create_table(
-        self,
-        id_column: str | None,
-        non_id_columns: list[str],
-        columns_to_index: list[str] | None = None,
-    ):
         create_sentence: str = (
-            f"CREATE TABLE {self.table_name}({self.__columns_to_comma_separated(id_column=id_column, columns=non_id_columns)})"
+            f"CREATE TABLE {self.table_name}(schema_id NOT NULL PRIMARY KEY, url TEXT NOT NULL, path TEXT NOT NULL, schema_type TEXT NOT NULL, pickled_schema BLOB NOT NULL) WITHOUT ROWID"
         )
 
-        # Check if the 'table_name' table exists
-        # TODO maybe improve queries
+        # Check if the 'table_name' table exists, if so drops it
         if (
             self.cursor.execute(
                 f"SELECT name FROM sqlite_schema WHERE name='{self.table_name}'"
@@ -58,27 +47,16 @@ class SQLiteManager(DBManagerInterface):
             self.cursor.execute(f"DROP TABLE {self.table_name}")
 
         # Create fresh table
-        if id_column is not None:
-            self.cursor.execute(create_sentence + "WITHOUT ROWID")
-        else:
-            self.cursor.execute(create_sentence)
+        self.cursor.execute(create_sentence)
 
+        # Add indexes
         for index in columns_to_index:
             self.cursor.execute(
                 f"CREATE INDEX {index}_index ON {self.table_name}({index})"
             )
 
+        # Commit transaction
         self.connection.commit()
-
-    def __columns_to_comma_separated(self, id_column: str | None, columns: list[str]):
-        res: str = ""
-        if id_column is not None:
-            res += id_column + " NOT NULL PRIMARY KEY,"
-
-        for column in columns:
-            res += column + ","
-
-        return res[:-1]
 
     def make_query_parameter_question_marks(self, num_params: int) -> str:
         question_marks = "?"
@@ -119,11 +97,11 @@ class SQLiteManager(DBManagerInterface):
     def get_schema(self, schema_id: str) -> SchemaSearchResult:
 
         result = self.cursor.execute(
-            f"SELECT schema_type, schema FROM {self.table_name} WHERE schema_id = ?",
+            f"SELECT schema_type, pickled_schema FROM {self.table_name} WHERE schema_id = ?",
             (schema_id,),
         ).fetchone()
 
-        return SchemaSearchResult(schema_type=result[0], schema=result[1])
+        return SchemaSearchResult(schema_type=result[0], schema=pickle.loads(result[1]))
 
     def get_paths_for_url(self, url: str) -> list[PathSearchResult]:
         result: list[PathSearchResult] = list()

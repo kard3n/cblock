@@ -68,11 +68,8 @@ class Main:
             url=flow.request.pretty_host.removeprefix("www.")
         )
 
-        # logging.warning(f"Paths for {flow.request.pretty_host.removeprefix("www.")}: {paths}")
-
         for search_result in paths:
             if regex.compile(search_result.path).match(flow.request.path) is not None:
-                # logging.warning(f"Paths for {flow.request.pretty_host.removeprefix("www.")}: {paths}")
                 flow.response.text = await self.__edit(
                     schema_id=search_result.id,
                     content=flow.response.text,
@@ -80,29 +77,13 @@ class Main:
 
     async def __edit(self, schema_id: str, content: str) -> str:
 
-        # logging.warning(self.db_manager.get_schema(url=url))
         schema_search_result = self.db_manager.get_schema(schema_id=schema_id)
-
-        logging.info(
-            f"""Result: {self.content_editor_factory.get_content_editor(
-                schema_type=schema_search_result.schema_type
-            ).edit(
-                input_raw=content,
-                schema=self.schema_parser_factory.getParser(
-                    parser_type=schema_search_result.schema_type
-                ).parse_string(schema_search_result.schema),
-            )[
-                0:100
-            ]}"""
-        )
 
         return self.content_editor_factory.get_content_editor(
             schema_type=schema_search_result.schema_type
         ).edit(
             input_raw=content,
-            schema=self.schema_parser_factory.getParser(
-                parser_type=schema_search_result.schema_type
-            ).parse_string(schema_search_result.schema),
+            schema=schema_search_result.schema,
         )
 
 
