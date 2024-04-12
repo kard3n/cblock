@@ -9,7 +9,6 @@ Enable utf-8 support (needs to be done only once per environment):
 conda env config vars set PYTHONUTF8=1
 """
 
-import configparser
 import logging
 import os
 import traceback
@@ -25,9 +24,6 @@ from editor.ContentEditorFactory import ContentEditorFactory
 from mitmproxy import http
 from schema.parser.SchemaParserFactory import SchemaParserFactory
 from schema.parser.SchemaReader import SchemaReader
-
-
-# TODO class to load config
 
 # TODO configure project root
 
