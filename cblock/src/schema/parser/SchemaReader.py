@@ -32,27 +32,27 @@ class SchemaReader:
                     result = self.read_schema(
                         directory=self.schema_location, filename=filename
                     )
+
+                    data_to_insert.append(result)
+
                 except SchemaParsingException as e:
-                    logging.warning(f"Exception parsing schema '{filename}: {e}'")
-                if type(result) is not str:
-                    data_to_insert.append(
-                        self.read_schema(
-                            directory=self.schema_location, filename=filename
-                        )
+                    logging.warning(
+                        f"The schema with ID {filename} could not be parsed and was therefore not added: {e}"
                     )
-                else:
-                    raise SchemaParsingException(
-                        f"The file {filename} could not be parsed: {result}"
-                    )
+
         self.db_manager.insert_multiple(values=data_to_insert)
 
     # Returns a list, with the following content (order): schema name, url, schema type, underlying schema (as string)
     def read_schema(self, directory: str, filename: str) -> list | str:
+        factory: SchemaParserFactory = SchemaParserFactory()
+
         schema_type: str | None = None
         url: str | None = None
         path: str | None = None
         pickled_object: bytes | None = None
-        factory: SchemaParserFactory = SchemaParserFactory()
+
+        found_underlying_schema: bool = False
+
         if directory.endswith("/"):
             directory = directory[:-1]
         with open(directory + "/" + filename) as file:
@@ -79,21 +79,17 @@ class SchemaReader:
                 # Check if the schema type is valid
                 try:
                     SchemaType[SchemaType(schema_type).name]
-                except ValueError:
-                    return "Invalid schema type {}".format(schema_type)
+                except ValueError as e:
+                    raise SchemaParsingException(
+                        f"Schema type {schema_type} is not recognized: {e}"
+                    )
             if file_content[pos:].startswith("schema:"):
                 pos += 7
-                while file_content[pos] != "\n":
+                while pos < len(file_content) and file_content[pos] != "\n":
                     pos += 1
                 pos += 1
 
-                # invoke a specific Schema Parser, depending on type, to check if the schema is valid
-                try:
-                    pickled_object = pickle.dumps(
-                        factory.getParser(schema_type).parse_string(file_content[pos:])
-                    )
-                except Exception as e:
-                    return f"Underlying {schema_type} schema could not be parsed: {e}"
+                found_underlying_schema = True
                 break
 
             else:
@@ -103,7 +99,33 @@ class SchemaReader:
 
                 pos += 1
 
-        if url is None or path is None or schema_type is None or pickled_object is None:
-            raise SchemaParsingException("Schema is missing fields.")
+        if url is None or path is None or schema_type is None:
+            missing_field_list: list[str] = []
+            if url is None:
+                missing_field_list.append("url")
+            if path is None:
+                missing_field_list.append("path")
+            if schema_type is None:
+                missing_field_list.append("schema_type")
 
-        return [filename[:-4], url, path, schema_type, pickled_object]
+            raise SchemaParsingException(
+                f"Schema {filename} is missing the following fields: {missing_field_list}."
+            )
+        elif (
+            found_underlying_schema is False
+            or len(file_content[pos:].strip(" \n")) == 0
+        ):
+            raise SchemaParsingException(
+                f"Schema {filename} is missing an underlying schema."
+            )
+        else:
+            # parse schema and pickle the result
+            try:
+                parser = factory.getParser(schema_type)
+                pickled_object = pickle.dumps(parser.parse_string(file_content[pos:]))
+            except Exception as e:
+                raise SchemaParsingException(
+                    f"Underlying {schema_type} schema could not be parsed: {e}"
+                )
+
+            return [filename[:-4], url, path, schema_type, pickled_object]

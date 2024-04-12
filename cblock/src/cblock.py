@@ -11,6 +11,7 @@ conda env config vars set PYTHONUTF8=1
 
 import logging
 import os
+import traceback
 
 import regex
 
@@ -59,7 +60,9 @@ class Main:
             except Exception as e:
                 self.db_manager.close_connection()
                 os.remove("cb_database.db")
-                logging.error(f"Error while initializing database: {e}")
+                logging.error(
+                    f"Error while initializing database: {traceback.format_exc()}"
+                )
 
     async def response(self, flow: http.HTTPFlow):
         # logging.warning(f"URI: {flow.request.pretty_host + flow.request.path}")
