@@ -1,0 +1,15 @@
+url: theguardian.com
+path: /((europe)?|(uk/[a-z]+))$
+type: html
+schema:
+html_tag:'ul', content_tags:'', class:'dcr.*?'
+    html_tag:'li', content_tags:'e', recursive:'False', edit_attrs:'href:l', class:'dcr.*?'
+        # only edit if href does no start with "nav3"
+        html_tag:'a', content_tags:'', edit_attrs:'href:l aria-label:t', data-link-name:'^(?!nav3).*?'
+        html_tag:'h3', content_tags:''
+            html_tag:'div', content_tags:'ta'
+            html_tag:'span', content_tags:'ta'
+        html_tag:'img', edit_attrs:'src:p'
+        html_tag:'div', content_tags:''
+            html_tag:'span', content_tags:'o'
+            html_tag:'div', content_tags:'d', not_attrs:'class'
