@@ -121,11 +121,27 @@ class HTMLContentEditor(ContentEditorInterface):
                     attrs=child_schema.attributes,
                     recursive=child_schema.search_recursive,
                 ):
-                    self.extract_content_parsed(
-                        matched_element, child_schema, result_container
-                    )
+                    # If the matched element does not have one of the blacklisted attributes, edit it
+                    if not self.has_attribute_overlap(
+                        element=matched_element, attributes=child_schema.not_attributes
+                    ):
+                        self.extract_content_parsed(
+                            matched_element, child_schema, result_container
+                        )
 
         return result_container
+
+    def has_attribute_overlap(self, element: Tag, attributes: list[str]) -> bool:
+        """
+        Returns True if element has at least one of the attributes specified in attributes
+        :param element:
+        :param attributes:
+        :return:
+        """
+        for attribute in attributes:
+            if element.has_attr(attribute):
+                return True
+        return False
 
     def __explore_parsed(self, element: Tag, schema: HTMLSchema):
         """
@@ -165,6 +181,11 @@ class HTMLContentEditor(ContentEditorInterface):
                     recursive=child_schema.search_recursive,
                 )
                 for child_element in matched_elements:
+                    # check that the child does not have one of the black-listed attributes
+                    if self.has_attribute_overlap(
+                        element=child_element, attributes=child_schema.not_attributes
+                    ):
+                        return
                     self.__explore_parsed(child_element, child_schema)
 
     def edit_container_element(
@@ -220,9 +241,12 @@ class HTMLContentEditor(ContentEditorInterface):
                     recursive=child_schema.search_recursive,
                 )
                 for item in matched_elements:
-                    self.__edit_container_element_parsed(
-                        element=item, schema=child_schema, content=content
-                    )
+                    if not self.has_attribute_overlap(
+                        element=item, attributes=child_schema.not_attributes
+                    ):
+                        self.__edit_container_element_parsed(
+                            element=item, schema=child_schema, content=content
+                        )
 
         # Edit attributes:
         for attribute in schema.attributes_to_edit:

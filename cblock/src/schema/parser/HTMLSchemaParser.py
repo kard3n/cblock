@@ -46,11 +46,14 @@ class HTMLSchemaParser(SchemaParserInterface):
                 )
             elif item.startswith("recursive:"):
                 if extract_from_inbetween_symbol(item[10:], "'").lower() == "false":
-                    result.recursive = False
+                    result.search_recursive = False
                 elif extract_from_inbetween_symbol(item[10:], "'").lower() != "true":
                     logging.warning(
-                        f"Recursive flag was neither 'False' nor 'True', applying default: {result.recursive}.\n\tElement: {element}"
+                        f"Recursive flag was neither 'False' nor 'True', applying default: {result.search_recursive}.\n\tElement: {element}"
                     )
+            elif item.startswith("not_attrs:"):
+                for not_attr in extract_from_inbetween_symbol(item[10:], "'").split():
+                    result.not_attributes.append(not_attr)
             elif item.startswith("content_tags:"):
                 for letter in extract_from_inbetween_symbol(item[13:], "'"):
                     if ContentTag(letter) in ContentTag:

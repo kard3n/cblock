@@ -53,7 +53,7 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
                     content_tags=[ContentTag.ANALYZE, ContentTag.TITLE],
                     attributes={"href": regex.compile(r"https:\/\/example\.com")},
                     embedded_schema=None,
-                    children=None,
+                    children=[],
                 )
             ],
         )
@@ -86,7 +86,7 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
                     },
                     attributes={},
                     embedded_schema=None,
-                    children=None,
+                    children=[],
                 )
             ],
         )
@@ -113,7 +113,7 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
                     content_tags=[ContentTag.ANALYZE, ContentTag.TITLE],
                     attributes={"href": regex.compile(r"https:\/\/example\.com")},
                     embedded_schema=None,
-                    children=None,
+                    children=[],
                 )
             ],
         )
@@ -136,6 +136,40 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
             ),
             schema=schema,
         ) == ContentExtractionResult(title="", text="", pictures=[])
+
+    def test_extract_content_parsed_blacklisted_attribute(self):
+        schema: HTMLSchema = HTMLSchema(
+            html_tag=None,
+            content_tags=[],
+            attributes={},
+            embedded_schema=None,
+            children=[
+                HTMLSchema(
+                    html_tag=regex.compile("a"),
+                    content_tags=[ContentTag.ANALYZE, ContentTag.TITLE],
+                    not_attributes=["class"],
+                    attributes={"href": regex.compile(r"https:\/\/example\.com")},
+                    embedded_schema=None,
+                    children=[],
+                )
+            ],
+        )
+
+        assert self.editor.extract_content_parsed(
+            element=BeautifulSoup(
+                r"""<a class="anything" href="https://example.com">test</a>""",
+                parser="lxml",
+            ),
+            schema=schema,
+        ) == ContentExtractionResult(title="", text="", pictures=[])
+
+        assert self.editor.extract_content_parsed(
+            element=BeautifulSoup(
+                r"""<a href="https://example.com">test</a>""",
+                parser="lxml",
+            ),
+            schema=schema,
+        ) == ContentExtractionResult(title="test ", text="", pictures=[])
 
     def test_extract_content_non_recursive(self):
         schema: HTMLSchema = HTMLSchema(
@@ -205,7 +239,7 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
                     content_tags=[],
                     attributes={},
                     embedded_schema=embedded_schema_id,
-                    children=None,
+                    children=[],
                 )
             ],
         )
@@ -272,6 +306,47 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
                 content=generated_content,
             )
             == f"<div><a>{generated_content.title}</a></div>"
+        )
+
+    def test_edit_container_element_blacklisted_attribute(self):
+        generated_content: Content = test_utils.generate_content()
+
+        schema: HTMLSchema = HTMLSchema(
+            html_tag=None,
+            content_tags=[],
+            attributes={},
+            embedded_schema=None,
+            children=[
+                HTMLSchema(
+                    html_tag=regex.compile("a"),
+                    content_tags=[ContentTag.ANALYZE, ContentTag.TITLE],
+                    not_attributes=["class"],
+                    search_recursive=True,
+                    attributes={},
+                    embedded_schema=None,
+                    children=[],
+                )
+            ],
+        )
+
+        random_string: str = test_utils.random_string(10)
+
+        assert (
+            self.editor.edit_container_element(
+                input_value=f"<div><a>{random_string}</a></div>",
+                schema=schema,
+                content=generated_content,
+            )
+            == f"<div><a>{generated_content.title}</a></div>"
+        )
+
+        assert (
+            self.editor.edit_container_element(
+                input_value=f'<div><a class="">{random_string}</a></div>',
+                schema=schema,
+                content=generated_content,
+            )
+            == f'<div><a class="">{random_string}</a></div>'
         )
 
     def test_edit_container_element_with_attributes(self):
