@@ -74,7 +74,10 @@ class ClassifierPipeline:
 
     def preprocess(self, input_str: str):
 
-        result: str = stem_string(input_str)
+        if self.stem_input:
+            result: str = stem_string(input_str)
+        else:
+            result = input_str
         result = "".join(
             [
                 x[0] + " " if x[1] in ["NN", "NNP", "VBZ", "JJ"] else ""

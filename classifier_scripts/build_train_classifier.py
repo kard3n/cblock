@@ -22,7 +22,7 @@ def create_classifier(dataset_location: str | None = None):
     dataset_x = dataset["content"]
     dataset_y = dataset["topic"]
 
-    pipeline = ClassifierPipeline()
+    pipeline = ClassifierPipeline(stem_input=False, stem_tokens=False)
     pipeline.train(dataset_x, dataset_y)
 
     with open("classifier.pickle", "wb") as handle:
