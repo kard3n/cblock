@@ -1,9 +1,12 @@
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import ComplementNB
 from sklearn.pipeline import make_pipeline, Pipeline
 from timeit import default_timer as timer
+from nltk.tag import pos_tag
+from nltk.tokenize import word_tokenize
+import nltk
 
 import matplotlib.pyplot as plt
 from sklearn.metrics import ConfusionMatrixDisplay
@@ -14,8 +17,16 @@ from content_classifier.classifiers.naive_bayes.utils.utils import (
 
 
 class ClassifierPipeline:
-    def __init__(self):
+    def __init__(self, stem_input: bool = True, stem_tokens: bool = False):
+        """
+
+        :param stem_input: If True, the input is stemmed before being applied NER
+        :param stem_tokens: If True, the result is stemmed after applying NER
+        """
+        self.stem_tokens = stem_tokens
+        self.stem_input = stem_input
         self.__model: Pipeline | None = None
+        nltk.download("averaged_perceptron_tagger")
 
     def train(self, x, y):
 
@@ -25,7 +36,9 @@ class ClassifierPipeline:
         #   preprocessor=stem_string
         #   tokenizer=stem_tokenize_string
         #   analyzer='word' (default)
-        model = make_pipeline(TfidfVectorizer(preprocessor=stem_string), ComplementNB())
+        model = make_pipeline(
+            CountVectorizer(preprocessor=self.preprocess), ComplementNB()
+        )
 
         # Model training
         print("Starting training...")
@@ -58,3 +71,18 @@ class ClassifierPipeline:
 
         ConfusionMatrixDisplay.from_predictions(y_test, y_pred)
         plt.show()
+
+    def preprocess(self, input_str: str):
+
+        result: str = stem_string(input_str)
+        result = "".join(
+            [
+                x[0] + " " if x[1] in ["NN", "NNP", "VBZ", "JJ"] else ""
+                for x in pos_tag(word_tokenize(result))
+            ]
+        )
+
+        if self.stem_tokens:
+            return stem_string(result)
+        else:
+            return result
