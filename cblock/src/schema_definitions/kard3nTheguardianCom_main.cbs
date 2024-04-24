@@ -1,5 +1,5 @@
 url: theguardian.com
-path: /((europe)?|(uk/[a-z]+))$
+path: ^/[a-z]+(/[a-z\-]+)?$
 type: html
 schema:
 html_tag:'ul', content_tags:'', class:'dcr.*?'
