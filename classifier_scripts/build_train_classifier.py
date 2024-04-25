@@ -17,12 +17,12 @@ def create_classifier(dataset_location: str | None = None):
             + "/"
             + "2024_04_05_to_2024_04_17.csv"
         )
-    dataset = create_dataset(ds_location=dataset_location, only_title=True)
+    dataset = create_dataset(ds_location=dataset_location, only_title=False)
 
     dataset_x = dataset["content"]
     dataset_y = dataset["topic"]
 
-    pipeline = ClassifierPipeline(stem_input=False, stem_tokens=False)
+    pipeline = ClassifierPipeline(stem_input=True, stem_tokens=False)
     pipeline.train(dataset_x, dataset_y)
 
     with open("classifier.pickle", "wb") as handle:

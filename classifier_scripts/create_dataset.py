@@ -13,7 +13,9 @@ def create_dataset(ds_location: str, only_title: bool = False) -> DataFrame:
             # topic_set.add(row["category_level_1"])
     else:
         for index, row in df.iterrows():
-            data["content"].append(row["title"] + " " + row["text"])
+            data["content"].append(
+                row["title"] + " " + (row["text"] if type(row["text"]) is str else "")
+            )
             data["topic"].append(row["label"])
             # topic_set.add(row["category_level_1"])
 

@@ -1,5 +1,5 @@
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
-from sklearn.metrics import accuracy_score, f1_score
+from sklearn.metrics import accuracy_score, f1_score, recall_score
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import ComplementNB
 from sklearn.pipeline import make_pipeline, Pipeline
@@ -68,16 +68,22 @@ class ClassifierPipeline:
 
         print("Accuracy:", accuracy_score(y_test, y_pred))
         print("F1 score:", f1_score(y_test, y_pred, average="macro"))
+        print("Recall:", recall_score(y_test, y_pred, average="macro"))
 
         ConfusionMatrixDisplay.from_predictions(y_test, y_pred)
         plt.show()
 
     def preprocess(self, input_str: str):
+        to_remove = ["&quot;", "&amp;"]
+
+        for string in to_remove:
+            input_str = input_str.replace(string, "")
 
         if self.stem_input:
             result: str = stem_string(input_str)
         else:
             result = input_str
+
         result = "".join(
             [
                 x[0] + " " if x[1] in ["NN", "NNP", "VBZ", "JJ"] else ""
