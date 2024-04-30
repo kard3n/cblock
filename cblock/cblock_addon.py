@@ -21,7 +21,7 @@ from content_factory.ContentFactory import ContentFactory
 from db.PathSearchResult import PathSearchResult
 from db.SQLiteManager import SQLiteManager
 from editor.ContentEditorFactory import ContentEditorFactory
-from mitmproxy import http
+from mitmproxy.mitmproxy import http
 from schema.parser.SchemaParserFactory import SchemaParserFactory
 from schema.parser.SchemaReader import SchemaReader
 
@@ -55,7 +55,7 @@ class Main:
             try:
                 schema_reader: SchemaReader = SchemaReader(
                     db_manager=self.db_manager,
-                    schema_location="cblock/src/schema_definitions/",
+                    schema_location="cblock/schema_definitions/",
                 )
                 schema_reader.run()
             except Exception as e:

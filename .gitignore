@@ -4,3 +4,4 @@ mitmproxy/*
 __pycache__
 .db
 venv/*
+.pickle

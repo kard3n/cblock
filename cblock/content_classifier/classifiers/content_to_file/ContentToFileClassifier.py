@@ -21,7 +21,10 @@ class ContentToFileClassifier(ContentClassifierInterface):
                 encoding="utf-8",
             ) as file:
                 file.write(
-                    f'"", "{content.title.replace('"', r'""')}", "{content.text.replace('"', r'""')}"\n'
+                    '"", "{title}", "text"\n'.format(
+                        title=content.title.replace('"', r'""'),
+                        text=content.text.replace('"', r'""'),
+                    )
                 )
                 logging.warning(os.path.abspath(file.name))
 
