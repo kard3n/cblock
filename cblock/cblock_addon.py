@@ -28,7 +28,7 @@ from schema.parser.SchemaReader import SchemaReader
 # TODO configure project root
 
 
-class Main:
+class CBlockAddonMain:
 
     def __init__(self):
         logging.info("Starting CBlock")
@@ -89,6 +89,3 @@ class Main:
             input_raw=content,
             schema=schema_search_result.schema,
         )
-
-
-addons = [Main()]

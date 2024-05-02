@@ -3,13 +3,37 @@ import logging
 import signal
 import sys
 import threading
-from asyncio import AbstractEventLoop
 
+from cblock_addon import CBlockAddonMain
 from mitmproxy.mitmproxy import options
 from mitmproxy.mitmproxy.tools import dump
-from mitmproxy.mitmproxy.tools.main import mitmdump
 from os_tools.OSManagerFactory import get_os_manager
 from os_tools.OSManagerInterface import OSManagerInterface
+
+
+async def create_mitm_master(host, port) -> dump.DumpMaster:
+    """
+    Create a mitmproxy DumpMaster, but withour starting it
+    """
+
+    opts = options.Options(listen_host=host, listen_port=port)
+
+    master = dump.DumpMaster(
+        opts,
+        with_termlog=False,  # enable to see logs
+        with_dumper=False,
+    )
+
+    master.addons.add(CBlockAddonMain())
+
+    return master
+
+
+async def start_master(master: dump.DumpMaster):
+    """
+    Start the passed master
+    """
+    await master.run()
 
 
 class CBlock:
@@ -18,6 +42,8 @@ class CBlock:
         logging.getLogger().setLevel(logging.INFO)
 
     def run(self):
+        host = "localhost"
+        port = 8080
 
         # get OSManager, exit if the OS isn't supported
         try:
@@ -26,26 +52,37 @@ class CBlock:
             logging.error(e)
             sys.exit(0)
 
-        self.os_manager.activate_proxy(host="localhost", port=8080)
-
-        mitm_thread = threading.Thread(
-            target=mitmdump, args=[["-s", "cblock/cblock_addon.py"]], daemon=True
-        )
-        mitm_thread.start()
-        loop: AbstractEventLoop = asyncio.new_event_loop()
+        self.os_manager.activate_proxy(host=host, port=port)
 
         # catch shutdown signals
         signal.signal(signal.SIGINT, self._shutdown)
         signal.signal(signal.SIGTERM, self._shutdown)
 
-        logging.info(" ContentBlock has started\nPress Ctrl+C to exit")
+        self._start_async_event_loop()
 
-        # remove later
-        while True:
+        # done like this in order to have the master object that's needed to shut down later
+        master = self._run_in_event_loop(create_mitm_master(host, port))
+
+        # wait for master to be returned
+        while not master.done():
             pass
 
-    def _shutdown(self, signum, frame):
-        logging.info(" CBlock says goodbye :)")
+        master = master.result()
+
+        self._run_in_event_loop(start_master(master))
+
+        print("ContentBlock has started\nPress Ctrl+C to exit")
+
+        # remove later
+        value = ""
+        while value != "exit":
+            value = input("Enter command (exit): ")
+
+        master.shutdown()
+        self._shutdown()
+
+    def _shutdown(self, *_):
+        print("CBlock says goodbye :)")
         self.os_manager.deactivate_proxy()
         self._stop_async_event_loop()
         sys.exit(0)
@@ -62,49 +99,3 @@ class CBlock:
 
     def _stop_async_event_loop(self):
         self.loop.call_soon_threadsafe(self.loop.stop)
-
-
-# entrypoint of the application
-if __name__ == "__main__":
-    # cblock = CBlock()
-    # cblock.run()
-    pass
-
-
-class RequestLogger:
-    def request(self, flow):
-        print(flow.request)
-
-
-async def start_mitm(host, port) -> dump.DumpMaster:
-
-    opts = options.Options(listen_host=host, listen_port=port)
-
-    master = dump.DumpMaster(
-        opts,
-        with_termlog=True,
-        with_dumper=False,
-    )
-
-    master.addons.add(RequestLogger())
-
-    # await master.run() # should be done like this, but master needs to be returned
-    master.run()
-    return master
-
-
-if __name__ == "__main__":
-    host = "localhost"
-    port = 8080
-
-    loop = asyncio.new_event_loop()
-    threading.Thread(target=loop.run_forever).start()
-    master = asyncio.run_coroutine_threadsafe(start_mitm(host, port), loop)
-    print("Hello")
-    value = input("Enter command: ")
-    while value != "exit":
-        if value == "s":
-            print("Testing shutdown")
-            master.result().shutdown()
-        value = input("Enter command: ")
-    loop.call_soon_threadsafe(loop.stop)
