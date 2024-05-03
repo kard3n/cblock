@@ -99,3 +99,8 @@ class CBlock:
 
     def _stop_async_event_loop(self):
         self.loop.call_soon_threadsafe(self.loop.stop)
+
+
+if __name__ == "__main__":
+    cblock = CBlock()
+    cblock.run()
