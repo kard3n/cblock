@@ -20,7 +20,7 @@ class SchemaReader:
         self.schema_location = schema_location
 
     def run(self):
-        filename_list = os.listdir(f"{self.schema_location}/")
+        filename_list = os.listdir(f"{self.schema_location}")
 
         self.db_manager.create_schema_table()
 

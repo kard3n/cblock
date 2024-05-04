@@ -19,7 +19,6 @@ class NaiveBayesClassifier(ContentClassifierInterface):
         self.forbidden_topics = topics_to_remove
 
     def classify(self, content: ContentExtractionResult) -> bool:
-        logging.info(f"Classifying {content}")
         if content.title != "":
             return self.model.predict(content.title) in self.forbidden_topics
         return self.model.predict(content.text) in self.forbidden_topics

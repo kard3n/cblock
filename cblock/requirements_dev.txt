@@ -1,8 +1,0 @@
-black
-pandas
-numpy
-scikit-learn
-nltk
-matplotlib
-beautifulsoup4
-lxml
