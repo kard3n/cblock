@@ -5,26 +5,29 @@ import sys
 import threading
 
 from cblock_addon import CBlockAddonMain
+from configuration.Configuration import Configuration
 from mitmproxy.mitmproxy import options
 from mitmproxy.mitmproxy.tools import dump
 from os_tools.OSManagerFactory import get_os_manager
 from os_tools.OSManagerInterface import OSManagerInterface
 
 
-async def create_mitm_master(host, port) -> dump.DumpMaster:
+async def create_mitm_master(config) -> dump.DumpMaster:
     """
     Create a mitmproxy DumpMaster, but withour starting it
     """
 
-    opts = options.Options(listen_host=host, listen_port=port)
+    opts = options.Options(
+        listen_host=config.proxy_host, listen_port=int(config.proxy_port)
+    )
 
     master = dump.DumpMaster(
         opts,
-        with_termlog=False,  # enable to see logs
+        with_termlog=False,  # enable to see logs. Disabling it stops all logging for some reason
         with_dumper=False,
     )
 
-    master.addons.add(CBlockAddonMain())
+    master.addons.add(CBlockAddonMain(config))
 
     return master
 
@@ -37,13 +40,10 @@ async def start_master(master: dump.DumpMaster):
 
 
 class CBlock:
-    def __init__(self):
-        logging.getLogger(__name__)
-        logging.getLogger().setLevel(logging.INFO)
+    def __init__(self, config: Configuration):
+        self.config = config
 
     def run(self):
-        host = "localhost"
-        port = 8080
 
         # get OSManager, exit if the OS isn't supported
         try:
@@ -52,7 +52,10 @@ class CBlock:
             logging.error(e)
             sys.exit(0)
 
-        self.os_manager.activate_proxy(host=host, port=port)
+        self.os_manager.activate_proxy(
+            host=self.config.proxy_host,
+            port=self.config.proxy_port,
+        )
 
         # catch shutdown signals
         signal.signal(signal.SIGINT, self._shutdown)
@@ -61,7 +64,7 @@ class CBlock:
         self._start_async_event_loop()
 
         # done like this in order to have the master object that's needed to shut down later
-        master = self._run_in_event_loop(create_mitm_master(host, port))
+        master = self._run_in_event_loop(create_mitm_master(self.config))
 
         # wait for master to be returned
         while not master.done():
@@ -102,5 +105,6 @@ class CBlock:
 
 
 if __name__ == "__main__":
-    cblock = CBlock()
+    config = Configuration()
+    cblock = CBlock(config)
     cblock.run()

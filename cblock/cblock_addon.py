@@ -30,9 +30,9 @@ from schema.parser.SchemaReader import SchemaReader
 
 class CBlockAddonMain:
 
-    def __init__(self):
+    def __init__(self, config: Configuration):
         logging.info("Starting CBlock")
-        self.config = Configuration()
+        self.config = config
         self.content_analyzer_factory = ContentAnalyzerFactory()
 
         self.schema_parser_factory = SchemaParserFactory()
