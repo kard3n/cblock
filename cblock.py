@@ -3,6 +3,7 @@ import logging
 import signal
 import sys
 import threading
+import time
 
 from cblock_addon import CBlockAddonMain
 from configuration.Configuration import Configuration
@@ -82,7 +83,9 @@ class CBlock:
 
         # self.shutdown_event.wait() doesn't allow stopping via Ctrl+C as signals never get captured
         while not self.shutdown_event.is_set():
-            pass
+            time.sleep(
+                0.33
+            )  # This way it still catches the signals (CTRL-C) without using too much performance
 
         self._shutdown()
 
