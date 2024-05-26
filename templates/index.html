@@ -23,12 +23,45 @@
             </div>
         </nav>
 
+        <div id="topic_blacklist_div">
+            {% for topic in supported_topics %}
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="check_{{ topic }}" {% if topic in topic_blacklist%}checked{% endif %}>
+                    <label class="form-check-label" for="check_{{ topic }}">{{ topic }}</label>
+                </div>
+            {% endfor %}
+            <button type="button" class="btn btn-primary" onclick="post_topics()">Submit</button>
+        </div>
+
         <div class="toast-container z-2 fixed-bottom" id="toast_container">
             <!-- div for alerts -->
         </div>
     </body>
 
     <script>
+        function post_topics(){
+            let endpoint="/topic_blacklist"
+            let to_ret = []
+            for (const topic of {{ topic_blacklist}} ) {
+                if($("#check_" + topic).is(':checked')){
+                    to_ret.push(topic)
+                }
+            }
+
+            $.post({
+                url: endpoint,
+                data: JSON.stringify({"topics": to_ret}),
+                dataType:"application/json"})
+                .done(function () {
+                    make_toast("Success", "Topics edited.")
+                })
+                .fail(function () {
+                    make_toast("Error", "Error changing topics.")
+                }).always(function (){
+                    //Nothing for now
+                });
+        }
+
         function make_toast(title, text){
             // try to find available id
             let toast_name = 0

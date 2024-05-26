@@ -10,6 +10,7 @@ conda env config vars set PYTHONUTF8=1
 """
 
 import gzip
+import json
 import logging
 import os
 import threading
@@ -44,10 +45,12 @@ class CBlockAddonMain:
             database_name="cb_database.db", table_name="cb_schema"
         )
 
+        self.content_analyzer = self.content_analyzer_factory.get_content_analyzer(
+            configuration=self.config
+        )
+
         self.content_editor_factory = ContentEditorFactory(
-            content_analyzer=self.content_analyzer_factory.get_content_analyzer(
-                configuration=self.config
-            ),
+            content_analyzer=self.content_analyzer,
             content_factory=ContentFactory(),
             db_manager=self.db_manager,
         )
@@ -88,7 +91,9 @@ class CBlockAddonMain:
 
     async def request(self, flow: http.HTTPFlow) -> None:
         if flow.request.pretty_host.removeprefix("www.") == "cblock.test":
-            if flow.request.path == "/shutdown":  # Shut down ContentBlock
+            if (
+                flow.request.path == "/shutdown" and flow.request.method == "GET"
+            ):  # Shut down ContentBlock
                 self.shutdown_event.set()
                 flow.response = http.Response.make(
                     200,
@@ -97,13 +102,66 @@ class CBlockAddonMain:
                         "Content-Type": "text/html",
                     },
                 )
-            else:  # Return Home page
+            elif (
+                flow.request.path == "/supported_topics"
+                and flow.request.method == "GET"
+            ):  # Shut down ContentBlock
+                flow.response = http.Response.make(
+                    200,
+                    json.dumps(
+                        {"topics": self.content_analyzer.get_supported_topics()}
+                    ),
+                    {
+                        "Content-Type": "application/json",
+                    },
+                )
+            elif (
+                flow.request.path == "/topic_blacklist"
+                and flow.request.method == "POST"
+            ):  # Shut down ContentBlock
+                print(flow.request.text)
+                request_body = json.loads(flow.request.text)
+                if (
+                    "topics" in request_body.keys()
+                    and type(request_body["topics"]) == list
+                ):
+                    self.content_analyzer.set_topics_to_remove(request_body["topics"])
+                    flow.response = http.Response.make(
+                        201,
+                        '{"message": "Success"}',
+                        {
+                            "Content-Type": "application/json",
+                            "Access-Control-Allow-Origin": "*",
+                        },
+                    )
+                else:
+                    flow.response = http.Response.make(
+                        400,
+                        "Data invalid",
+                        {
+                            "Content-Type": "text/html",
+                        },
+                    )
+            elif (
+                flow.request.path == "/" and flow.request.method == "GET"
+            ):  # Return Home page
                 flow.response = http.Response.make(
                     200,  # (optional) status code
-                    self.home_template.render(),  # (optional) content
+                    self.home_template.render(
+                        supported_topics=self.content_analyzer.get_supported_topics(),
+                        topic_blacklist=self.config.get_topics_to_remove(),
+                    ),  # (optional) content
                     {
                         "Content-Type": "text/html",
                     },  # (optional) headers
+                )
+            else:
+                flow.response = http.Response.make(
+                    404,
+                    "Not Found",
+                    {
+                        "Content-Type": "text/html",
+                    },
                 )
 
     async def __edit(self, schema_id: str, content: str) -> str:

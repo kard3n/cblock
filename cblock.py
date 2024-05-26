@@ -80,11 +80,6 @@ class CBlock:
 
         print("ContentBlock has started\nPress Ctrl+C to exit")
 
-        # remove later
-        """value = ""
-        while value != "exit":
-            value = input("Enter command (exit): ")"""
-
         # self.shutdown_event.wait() doesn't allow stopping via Ctrl+C as signals never get captured
         while not self.shutdown_event.is_set():
             pass

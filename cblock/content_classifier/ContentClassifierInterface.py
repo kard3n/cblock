@@ -19,7 +19,7 @@ class ContentClassifierInterface(ABC):
         raise NotImplementedError("Not implemented")
 
     @abstractmethod
-    def get_allowed_topics(self) -> list[str]:
+    def get_supported_topics(self) -> list[str]:
         """
         Return a list of all the topics the classifier can identify
         :return:

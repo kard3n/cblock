@@ -26,7 +26,7 @@ class NaiveBayesClassifier(ContentClassifierInterface):
             )
         return False
 
-    def get_allowed_topics(self) -> list[str]:
+    def get_supported_topics(self) -> list[str]:
         return self.model.classes_
 
     def set_topics_to_remove(self, topics: list[str]):
