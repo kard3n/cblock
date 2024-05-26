@@ -25,8 +25,10 @@ class ContentAnalyzerFactory:
     ) -> ContentClassifierInterface:
         if configuration.classifier in self.name_to_classifier.keys():
             return self.name_to_classifier[configuration.classifier](
-                topics_to_remove=configuration.get_topics_to_remove()
+                topics_to_remove=configuration.get_topics_to_remove(),
+                aggressiveness=configuration.aggressiveness,
             )
         return SimpleContentClassifier(
-            topics_to_remove=configuration.get_topics_to_remove()
+            topics_to_remove=configuration.get_topics_to_remove(),
+            aggressiveness=configuration.aggressiveness,
         )

@@ -105,7 +105,7 @@ class CBlockAddonMain:
             elif (
                 flow.request.path == "/supported_topics"
                 and flow.request.method == "GET"
-            ):  # Shut down ContentBlock
+            ):
                 flow.response = http.Response.make(
                     200,
                     json.dumps(
@@ -118,14 +118,41 @@ class CBlockAddonMain:
             elif (
                 flow.request.path == "/topic_blacklist"
                 and flow.request.method == "POST"
-            ):  # Shut down ContentBlock
-                print(flow.request.text)
+            ):
                 request_body = json.loads(flow.request.text)
                 if (
                     "topics" in request_body.keys()
                     and type(request_body["topics"]) == list
                 ):
+                    # TODO: also set in configuration
                     self.content_analyzer.set_topics_to_remove(request_body["topics"])
+                    flow.response = http.Response.make(
+                        201,
+                        '{"message": "Success"}',
+                        {
+                            "Content-Type": "application/json",
+                            "Access-Control-Allow-Origin": "*",
+                        },
+                    )
+                else:
+                    flow.response = http.Response.make(
+                        400,
+                        "Data invalid",
+                        {
+                            "Content-Type": "text/html",
+                        },
+                    )
+            elif (
+                flow.request.path == "/aggressiveness" and flow.request.method == "POST"
+            ):
+                request_body = json.loads(flow.request.text)
+                if "aggressiveness" in request_body.keys() and regex.match(
+                    r"[0-9]+\.[0-9]+", request_body["aggressiveness"]
+                ):
+                    # TODO: also set in configuration
+                    self.content_analyzer.set_aggressiveness(
+                        float(request_body["aggressiveness"])
+                    )
                     flow.response = http.Response.make(
                         201,
                         '{"message": "Success"}',
@@ -150,6 +177,7 @@ class CBlockAddonMain:
                     self.home_template.render(
                         supported_topics=self.content_analyzer.get_supported_topics(),
                         topic_blacklist=self.config.get_topics_to_remove(),
+                        aggressiveness=self.config.aggressiveness,
                     ),  # (optional) content
                     {
                         "Content-Type": "text/html",

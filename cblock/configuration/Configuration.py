@@ -26,6 +26,8 @@ class Configuration:
     def __getattr__(self, item):
         if item == "classifier":
             return self.config["classifier"]["ClassifierToUse"]
+        if item == "aggressiveness":
+            return self.config["classifier"]["Aggressiveness"]
         if item == "proxy_host":
             return self.config["application"]["ProxyHost"]
         if item == "proxy_port":

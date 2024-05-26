@@ -33,6 +33,14 @@
             <button type="button" class="btn btn-primary" onclick="post_topics()">Submit</button>
         </div>
 
+
+        <div id="aggressiveness_div" class="form-floating mb-3">
+            <input type="number" class="form-control" id="aggressiveness_input" placeholder=1.0 value="{{ aggressiveness }}" min=1.0 step=0.05>
+            <label for="aggressiveness_input">Classifier aggressiveness</label>
+            <button type="button" class="btn btn-primary" onclick="post_aggressiveness()">Submit</button>
+        </div>
+
+
         <div class="toast-container z-2 fixed-bottom" id="toast_container">
             <!-- div for alerts -->
         </div>
@@ -51,6 +59,23 @@
             $.post({
                 url: endpoint,
                 data: JSON.stringify({"topics": to_ret}),
+                dataType:"application/json"})
+                .done(function () {
+                    make_toast("Success", "Topics edited.")
+                })
+                .fail(function () {
+                    make_toast("Error", "Error changing topics.")
+                }).always(function (){
+                    //Nothing for now
+                });
+        }
+
+        function post_aggressiveness(){
+            let endpoint="/aggressiveness"
+
+            $.post({
+                url: endpoint,
+                data: JSON.stringify({"aggressiveness": $("#aggressiveness_input").val()}),
                 dataType:"application/json"})
                 .done(function () {
                     make_toast("Success", "Topics edited.")

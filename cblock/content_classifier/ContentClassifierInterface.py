@@ -5,7 +5,7 @@ from editor.ContentExtractionResult import ContentExtractionResult
 
 class ContentClassifierInterface(ABC):
     @abstractmethod
-    def __init__(self, topics_to_remove: list[str]):
+    def __init__(self, topics_to_remove: list[str], aggressiveness: float) -> None:
         raise NotImplementedError("Not implemented")
 
     # returns true if the passed content should be filtered, false otherwise
@@ -28,4 +28,12 @@ class ContentClassifierInterface(ABC):
 
     @abstractmethod
     def set_topics_to_remove(self, topics: list[str]):
+        raise NotImplementedError("Not implemented")
+
+    @abstractmethod
+    def set_aggressiveness(self, aggressiveness: float):
+        raise NotImplementedError("Not implemented")
+
+    @abstractmethod
+    def get_aggressiveness(self) -> float:
         raise NotImplementedError("Not implemented")
