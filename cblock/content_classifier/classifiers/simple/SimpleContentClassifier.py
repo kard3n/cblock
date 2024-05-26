@@ -11,3 +11,9 @@ class SimpleContentClassifier(ContentClassifierInterface):
         content: ContentExtractionResult,
     ) -> bool:
         return True
+
+    def get_allowed_topics(self) -> list[str]:
+        return []
+
+    def set_topics_to_remove(self, topics: list[str]):
+        pass

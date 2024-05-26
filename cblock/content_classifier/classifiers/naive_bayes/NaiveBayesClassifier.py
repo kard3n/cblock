@@ -1,11 +1,7 @@
-import logging
 import pathlib
 import pickle
 
 from content_classifier.ContentClassifierInterface import ContentClassifierInterface
-from content_classifier.classifiers.naive_bayes.ClassifierPipeline import (
-    ClassifierPipeline,
-)
 from editor.ContentExtractionResult import ContentExtractionResult
 
 
@@ -15,10 +11,23 @@ class NaiveBayesClassifier(ContentClassifierInterface):
             pathlib.Path(__file__).parent.resolve().as_posix() + "/classifier.pickle",
             "rb",
         ) as pickled_classifier:
-            self.model: ClassifierPipeline = pickle.load(pickled_classifier)
+            self.model = pickle.load(pickled_classifier)
+
         self.forbidden_topics = topics_to_remove
 
     def classify(self, content: ContentExtractionResult) -> bool:
         if content.title != "":
-            return self.model.predict(content.title) in self.forbidden_topics
-        return self.model.predict(content.text) in self.forbidden_topics
+            """topic_probabilities = self.model.predict_proba(
+                content.title + " " + content.text
+            )"""
+            return (
+                self.model.predict(content.title + " " + content.text)
+                in self.forbidden_topics
+            )
+        return False
+
+    def get_allowed_topics(self) -> list[str]:
+        return self.model.classes_
+
+    def set_topics_to_remove(self, topics: list[str]):
+        self.forbidden_topics = topics

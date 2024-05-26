@@ -17,3 +17,15 @@ class ContentClassifierInterface(ABC):
         :return: (boolean) True if the content matches one of the forbidden topics, False otherwise
         """
         raise NotImplementedError("Not implemented")
+
+    @abstractmethod
+    def get_allowed_topics(self) -> list[str]:
+        """
+        Return a list of all the topics the classifier can identify
+        :return:
+        """
+        raise NotImplementedError("Not implemented")
+
+    @abstractmethod
+    def set_topics_to_remove(self, topics: list[str]):
+        raise NotImplementedError("Not implemented")

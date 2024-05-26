@@ -21,7 +21,7 @@ class ContentToFileClassifier(ContentClassifierInterface):
                 encoding="utf-8",
             ) as file:
                 file.write(
-                    '"", "{title}", "text"\n'.format(
+                    '"","{title}","{text}"\n'.format(
                         title=content.title.replace('"', r'""'),
                         text=content.text.replace('"', r'""'),
                     )
@@ -29,3 +29,9 @@ class ContentToFileClassifier(ContentClassifierInterface):
                 logging.warning(os.path.abspath(file.name))
 
         return True
+
+    def get_allowed_topics(self) -> list[str]:
+        return []
+
+    def set_topics_to_remove(self, topics: list[str]):
+        pass
