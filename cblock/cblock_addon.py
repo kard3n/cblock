@@ -9,11 +9,14 @@ Enable utf-8 support (needs to be done only once per environment):
 conda env config vars set PYTHONUTF8=1
 """
 
+import gzip
 import logging
 import os
+import threading
 import traceback
 
 import regex
+from jinja2 import Environment, FileSystemLoader
 
 from configuration.Configuration import Configuration
 from content_classifier.ContentClassifierFactory import ContentAnalyzerFactory
@@ -30,8 +33,9 @@ from schema.parser.SchemaReader import SchemaReader
 
 class CBlockAddonMain:
 
-    def __init__(self, config: Configuration):
-        logging.info("Starting CBlock")
+    def __init__(self, config: Configuration, shutdown_event: threading.Event):
+        print("Starting CBlock")
+        self.shutdown_event = shutdown_event
         self.config = config
         self.content_analyzer_factory = ContentAnalyzerFactory()
 
@@ -65,6 +69,9 @@ class CBlockAddonMain:
                     f"Error while initializing database: {traceback.format_exc()}"
                 )
 
+        self.jinja_environment = Environment(loader=FileSystemLoader("templates/"))
+        self.home_template = self.jinja_environment.get_template("index.html")
+
     async def response(self, flow: http.HTTPFlow):
         # logging.warning(f"URI: {flow.request.pretty_host + flow.request.path}")
         # logging.warning(f"Pretty host: {flow.request.pretty_host}")
@@ -77,6 +84,26 @@ class CBlockAddonMain:
                 flow.response.text = await self.__edit(
                     schema_id=search_result.id,
                     content=flow.response.text,
+                )
+
+    async def request(self, flow: http.HTTPFlow) -> None:
+        if flow.request.pretty_host.removeprefix("www.") == "cblock.test":
+            if flow.request.path == "/shutdown":  # Shut down ContentBlock
+                self.shutdown_event.set()
+                flow.response = http.Response.make(
+                    200,
+                    "Server shutting down...",
+                    {
+                        "Content-Type": "text/html",
+                    },
+                )
+            else:  # Return Home page
+                flow.response = http.Response.make(
+                    200,  # (optional) status code
+                    self.home_template.render(),  # (optional) content
+                    {
+                        "Content-Type": "text/html",
+                    },  # (optional) headers
                 )
 
     async def __edit(self, schema_id: str, content: str) -> str:

@@ -12,7 +12,7 @@ from os_tools.OSManagerFactory import get_os_manager
 from os_tools.OSManagerInterface import OSManagerInterface
 
 
-async def create_mitm_master(config) -> dump.DumpMaster:
+async def create_mitm_master(config, shutdown_event) -> dump.DumpMaster:
     """
     Create a mitmproxy DumpMaster, but withour starting it
     """
@@ -27,7 +27,7 @@ async def create_mitm_master(config) -> dump.DumpMaster:
         with_dumper=False,
     )
 
-    master.addons.add(CBlockAddonMain(config))
+    master.addons.add(CBlockAddonMain(config, shutdown_event))
 
     return master
 
@@ -57,38 +57,49 @@ class CBlock:
             port=self.config.proxy_port,
         )
 
+        self.shutdown_event = threading.Event()
+
         # catch shutdown signals
-        signal.signal(signal.SIGINT, self._shutdown)
-        signal.signal(signal.SIGTERM, self._shutdown)
+        signal.signal(signal.SIGINT, self.set_shutdown_event)
+        signal.signal(signal.SIGTERM, self.set_shutdown_event)
 
         self._start_async_event_loop()
 
         # done like this in order to have the master object that's needed to shut down later
-        master = self._run_in_event_loop(create_mitm_master(self.config))
+        master = self._run_in_event_loop(
+            create_mitm_master(self.config, self.shutdown_event)
+        )
 
         # wait for master to be returned
         while not master.done():
             pass
 
-        master = master.result()
+        self.master = master.result()
 
-        self._run_in_event_loop(start_master(master))
+        self._run_in_event_loop(start_master(self.master))
 
         print("ContentBlock has started\nPress Ctrl+C to exit")
 
         # remove later
-        value = ""
+        """value = ""
         while value != "exit":
-            value = input("Enter command (exit): ")
+            value = input("Enter command (exit): ")"""
 
-        master.shutdown()
+        # self.shutdown_event.wait() doesn't allow stopping via Ctrl+C as signals never get captured
+        while not self.shutdown_event.is_set():
+            pass
+
         self._shutdown()
 
     def _shutdown(self, *_):
         print("CBlock says goodbye :)")
+        self.master.shutdown()
         self.os_manager.deactivate_proxy()
         self._stop_async_event_loop()
         sys.exit(0)
+
+    def set_shutdown_event(self, *_):
+        self.shutdown_event.set()
 
     # functions for creating the async loop
     def _start_async_event_loop(

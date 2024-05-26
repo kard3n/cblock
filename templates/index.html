@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{% block title %}{% endblock %}</title>
+        <link rel="shortcut icon" href="/static/favicon.ico">
+        <link rel="icon" type="image/png" sizes="32x32" href="/static/icon_32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/static/icon_16.png">
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    </head>
+    <body data-bs-theme="dark">
+        <nav class="navbar navbar-expand-lg" >
+            <div class="container-fluid">
+                <a class="navbar-brand flex-grow-1 ms-3" href="/">ContentBlock</a>
+
+                <a class="btn btn-danger" type="button" id="shutdownButton" href="/shutdown">
+                    <i class="bi bi-power h4"></i>
+                </a>
+            </div>
+        </nav>
+
+        <div class="toast-container z-2 fixed-bottom" id="toast_container">
+            <!-- div for alerts -->
+        </div>
+    </body>
+
+    <script>
+        function make_toast(title, text){
+            // try to find available id
+            let toast_name = 0
+            while($("#toast_" + toast_name).length){
+                toast_name += 1
+            }
+
+            let child = '<div id="toast_'+toast_name+'" class="toast" role="alert" aria-live="assertive" aria-atomic="true">\n' +
+                '<div class="toast-header">\n<i class="bi bi-info-lg rounded me-2"></i>\n<strong class="me-auto">'+title+'</strong>\n' +
+                '<small class="text-body-secondary">message</small>\n<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>\n</div>\n' +
+                '<div class="toast-body">\n' +text+ '\n</div>\n</div>\n'
+
+            $("#toast_container").append(child)
+            var toast = new bootstrap.Toast($("#toast_" + toast_name));
+            toast.show();
+        }
+
+    </script>
+</html>
