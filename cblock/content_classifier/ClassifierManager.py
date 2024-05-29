@@ -15,6 +15,8 @@ class ClassifierManager:
 
         dir_list = os.listdir(classifier_directory)
 
+        print(f"Initializing classifiers from {self._classifier_directory}")
+
         for obj in dir_list:
             path = self._classifier_directory + "/" + obj
 
@@ -29,7 +31,7 @@ class ClassifierManager:
                         info.name in self._classifiers.keys()
                     ):  # Check that no name exists twice
                         print(
-                            f"Warning: classifier {info.name} has already been registered. Ignoring."
+                            f"\tWarning: classifier {info.name} has already been registered. Ignoring."
                         )
                     else:
 
@@ -42,11 +44,13 @@ class ClassifierManager:
 
                         self._classifier_info[info.name] = info
 
-                        print(f"Loaded classifier '{info.nickname}': classifiers.{obj}")
+                        print(
+                            f"\tLoaded classifier '{info.nickname}': classifiers.{obj}"
+                        )
 
                 except Exception as e:
                     print(
-                        f'Error importing classifier from directory "{obj}": {traceback.format_exc()}'
+                        f'\tError importing classifier from directory "{obj}": {traceback.format_exc()}'
                     )
 
     @property

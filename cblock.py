@@ -55,6 +55,22 @@ class CBlock:
             + "/classifiers"
         )
 
+        if not len(self.classifier_manager.classifier_info.keys()):
+            print("Error: no classifiers found. Aborting.")
+            sys.exit(1)
+
+        if not config.classifier in self.classifier_manager.classifier_info.keys():
+            print(
+                "Error: classifier set in configuration not found. Please choose one of the following:"
+            )
+            for key in self.classifier_manager.classifier_info.keys():
+                print(
+                    f"\t{key}: {self.classifier_manager.classifier_info[key].description}"
+                )
+
+            print("Aborting...")
+            sys.exit(1)
+
     def run(self):
 
         # get OSManager, exit if the OS isn't supported
