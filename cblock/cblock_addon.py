@@ -100,7 +100,7 @@ class CBlockAddonMain:
                 )
 
     async def request(self, flow: http.HTTPFlow) -> None:
-        if flow.request.pretty_host.removeprefix("www.") == "cblock.test":
+        if flow.request.pretty_host.removeprefix("www.") == self.config.application_url:
             if (
                 flow.request.path == "/shutdown" and flow.request.method == "GET"
             ):  # Shut down ContentBlock

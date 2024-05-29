@@ -18,6 +18,8 @@ class Configuration:
             return self.config["application"]["ProxyHost"]
         if item == "proxy_port":
             return self.config["application"]["ProxyPort"]
+        if item == "application_url":
+            return self.config["application"]["ApplicationUrl"]
 
     def get_config(self) -> configparser.ConfigParser:
         """
