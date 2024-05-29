@@ -108,7 +108,7 @@ class CBlock:
 
         self._run_in_event_loop(start_master(self.master))
 
-        print("ContentBlock has started\nPress Ctrl+C to exit")
+        print("ContentBlock has started up successfully\n\tPress Ctrl+C to exit")
 
         # self.shutdown_event.wait() doesn't allow stopping via Ctrl+C as signals never get captured
         while not self.shutdown_event.is_set():

@@ -39,7 +39,7 @@ class CBlockAddonMain:
         classifier_manager: ClassifierManager,
         shutdown_event: threading.Event,
     ):
-        print("Starting CBlock")
+        print("Initializing CBlockAddon")
         self.shutdown_event = shutdown_event
         self.config = config
         self.classifier_manager = classifier_manager
