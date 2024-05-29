@@ -11,23 +11,9 @@ class Configuration:
         else:
             self.config.read(config_file)
 
-    def get_topics_to_remove(self) -> list[str]:
-        """
-        Returns the list of topics recovered from the configuration file
-        :return: (list[str]): List of topics
-        """
-        found_topics: list = self.config.get("basic", "TopicsToRemove").split("\n")
-        for item in found_topics:
-            if not item.strip():
-                found_topics.remove(item)
-
-        return found_topics
-
     def __getattr__(self, item):
         if item == "classifier":
             return self.config["classifier"]["ClassifierToUse"]
-        if item == "aggressiveness":
-            return self.config["classifier"]["Aggressiveness"]
         if item == "proxy_host":
             return self.config["application"]["ProxyHost"]
         if item == "proxy_port":
