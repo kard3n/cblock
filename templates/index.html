@@ -55,7 +55,7 @@
         function post_topics(){
             let endpoint="/topic_blacklist"
             let to_ret = []
-            for (const topic of {{ topic_blacklist|safe }} ) {
+            for (const topic of [{% for topic in supported_topics %}"{{ topic }}", {% endfor %}] ) {
                 if($("#check_" + topic).is(':checked')){
                     to_ret.push(topic)
                 }
