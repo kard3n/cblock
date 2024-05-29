@@ -2,7 +2,7 @@ from content_classifier.ContentClassifierInterface import ContentClassifierInter
 from editor.ContentExtractionResult import ContentExtractionResult
 
 
-class SimpleContentClassifier(ContentClassifierInterface):
+class AlwaysTrueClassifier(ContentClassifierInterface):
     def __init__(self, topics_to_remove: list[str], aggressiveness: float):
         pass
 
@@ -15,7 +15,7 @@ class SimpleContentClassifier(ContentClassifierInterface):
     def get_supported_topics(self) -> list[str]:
         return []
 
-    def set_topics_to_remove(self, topics: list[str]):
+    def set_topic_blacklist(self, topics: list[str]):
         pass
 
     def set_aggressiveness(self, aggressiveness: float):
@@ -23,3 +23,6 @@ class SimpleContentClassifier(ContentClassifierInterface):
 
     def get_aggressiveness(self) -> float:
         return 1.0
+
+
+classifier = AlwaysTrueClassifier

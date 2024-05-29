@@ -9,7 +9,6 @@ Enable utf-8 support (needs to be done only once per environment):
 conda env config vars set PYTHONUTF8=1
 """
 
-import gzip
 import json
 import logging
 import os
@@ -20,7 +19,7 @@ import regex
 from jinja2 import Environment, FileSystemLoader
 
 from configuration.Configuration import Configuration
-from content_classifier.ContentClassifierFactory import ContentAnalyzerFactory
+from content_classifier.ClassifierManager import ClassifierManager
 from content_factory.ContentFactory import ContentFactory
 from db.PathSearchResult import PathSearchResult
 from db.SQLiteManager import SQLiteManager
@@ -34,20 +33,31 @@ from schema.parser.SchemaReader import SchemaReader
 
 class CBlockAddonMain:
 
-    def __init__(self, config: Configuration, shutdown_event: threading.Event):
+    def __init__(
+        self,
+        config: Configuration,
+        classifier_manager: ClassifierManager,
+        shutdown_event: threading.Event,
+    ):
         print("Starting CBlock")
         self.shutdown_event = shutdown_event
         self.config = config
-        self.content_analyzer_factory = ContentAnalyzerFactory()
+        self.classifier_manager = classifier_manager
 
         self.schema_parser_factory = SchemaParserFactory()
         self.db_manager = SQLiteManager(
             database_name="cb_database.db", table_name="cb_schema"
         )
 
-        self.content_analyzer = self.content_analyzer_factory.get_content_analyzer(
-            configuration=self.config
-        )
+        try:
+            self.content_analyzer = self.classifier_manager.get_classifier(
+                config.classifier
+            )
+            self.content_analyzer_name = config.classifier
+        except KeyError as e:
+            raise KeyError(
+                f"The content analyzer '{config.classifier}' does not exist."
+            )
 
         self.content_editor_factory = ContentEditorFactory(
             content_analyzer=self.content_analyzer,
@@ -120,12 +130,10 @@ class CBlockAddonMain:
                 and flow.request.method == "POST"
             ):
                 request_body = json.loads(flow.request.text)
-                if (
-                    "topics" in request_body.keys()
-                    and type(request_body["topics"]) == list
-                ):
-                    # TODO: also set in configuration
-                    self.content_analyzer.set_topics_to_remove(request_body["topics"])
+                try:
+                    self.classifier_manager.set_topic_blacklist(
+                        self.content_analyzer_name, request_body["topics"]
+                    )
                     flow.response = http.Response.make(
                         201,
                         '{"message": "Success"}',
@@ -134,11 +142,12 @@ class CBlockAddonMain:
                             "Access-Control-Allow-Origin": "*",
                         },
                     )
-                else:
+                except Exception as e:
+                    print(traceback.format_exc())
                     flow.response = http.Response.make(
-                        400,
-                        "Data invalid",
-                        {
+                        status_code=400,
+                        content=traceback.format_exc(),
+                        headers={
                             "Content-Type": "text/html",
                         },
                     )
@@ -149,9 +158,9 @@ class CBlockAddonMain:
                 if "aggressiveness" in request_body.keys() and regex.match(
                     r"[0-9]+\.[0-9]+", request_body["aggressiveness"]
                 ):
-                    # TODO: also set in configuration
-                    self.content_analyzer.set_aggressiveness(
-                        float(request_body["aggressiveness"])
+                    self.classifier_manager.set_aggressiveness(
+                        self.content_analyzer_name,
+                        float(request_body["aggressiveness"]),
                     )
                     flow.response = http.Response.make(
                         201,
@@ -173,15 +182,19 @@ class CBlockAddonMain:
                 flow.request.path == "/" and flow.request.method == "GET"
             ):  # Return Home page
                 flow.response = http.Response.make(
-                    200,  # (optional) status code
+                    200,
                     self.home_template.render(
                         supported_topics=self.content_analyzer.get_supported_topics(),
-                        topic_blacklist=self.config.get_topics_to_remove(),
-                        aggressiveness=self.config.aggressiveness,
-                    ),  # (optional) content
+                        topic_blacklist=self.classifier_manager.classifier_info[
+                            self.content_analyzer_name
+                        ].topic_blacklist,
+                        aggressiveness=self.classifier_manager.classifier_info[
+                            self.content_analyzer_name
+                        ].aggressiveness,
+                    ),
                     {
                         "Content-Type": "text/html",
-                    },  # (optional) headers
+                    },
                 )
             else:
                 flow.response = http.Response.make(

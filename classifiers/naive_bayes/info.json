@@ -1,0 +1,1 @@
+{"name": "NaiveBayes", "nickname": "Naive Bayes", "filename": "NaiveBayesClassifier", "description": "A Naive Bayes classifier", "topic_blacklist": ["politics"], "aggressiveness": 1.0}

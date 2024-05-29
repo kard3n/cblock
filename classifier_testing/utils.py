@@ -5,11 +5,11 @@ stemmer = nltk.SnowballStemmer("english", ignore_stopwords=False)
 
 
 def stem_tokenize_string(string: str):
-    result: str = ""
+    result: [str] = []
     tokenized = nltk.word_tokenize(string)
     for word in tokenized:
-        result += stemmer.stem(word) + " "
-    return result.split()
+        result.append(stemmer.stem(word).lower())
+    return result
 
 
 def stem_string(string: str) -> str:

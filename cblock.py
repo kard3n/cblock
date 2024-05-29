@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import pathlib
 import signal
 import sys
 import threading
@@ -7,15 +8,20 @@ import time
 
 from cblock_addon import CBlockAddonMain
 from configuration.Configuration import Configuration
+from content_classifier.ClassifierManager import ClassifierManager
 from mitmproxy.mitmproxy import options
 from mitmproxy.mitmproxy.tools import dump
 from os_tools.OSManagerFactory import get_os_manager
 from os_tools.OSManagerInterface import OSManagerInterface
 
 
-async def create_mitm_master(config, shutdown_event) -> dump.DumpMaster:
+async def create_mitm_master(
+    config: Configuration,
+    classifier_manager: ClassifierManager,
+    shutdown_event: threading.Event,
+) -> dump.DumpMaster:
     """
-    Create a mitmproxy DumpMaster, but withour starting it
+    Create a mitmproxy DumpMaster, but without starting it
     """
 
     opts = options.Options(
@@ -24,11 +30,11 @@ async def create_mitm_master(config, shutdown_event) -> dump.DumpMaster:
 
     master = dump.DumpMaster(
         opts,
-        with_termlog=False,  # enable to see logs. Disabling it stops all logging for some reason
+        with_termlog=True,  # enable to see logs. Disabling it stops all logging for some reason
         with_dumper=False,
     )
 
-    master.addons.add(CBlockAddonMain(config, shutdown_event))
+    master.addons.add(CBlockAddonMain(config, classifier_manager, shutdown_event))
 
     return master
 
@@ -43,6 +49,11 @@ async def start_master(master: dump.DumpMaster):
 class CBlock:
     def __init__(self, config: Configuration):
         self.config = config
+
+        self.classifier_manager = ClassifierManager(
+            classifier_directory=pathlib.Path(__file__).parent.resolve().as_posix()
+            + "/classifiers"
+        )
 
     def run(self):
 
@@ -68,7 +79,9 @@ class CBlock:
 
         # done like this in order to have the master object that's needed to shut down later
         master = self._run_in_event_loop(
-            create_mitm_master(self.config, self.shutdown_event)
+            create_mitm_master(
+                self.config, self.classifier_manager, self.shutdown_event
+            )
         )
 
         # wait for master to be returned

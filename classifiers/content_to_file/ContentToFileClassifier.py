@@ -33,7 +33,7 @@ class ContentToFileClassifier(ContentClassifierInterface):
     def get_supported_topics(self) -> list[str]:
         return []
 
-    def set_topics_to_remove(self, topics: list[str]):
+    def set_topic_blacklist(self, topics: list[str]):
         pass
 
     def set_aggressiveness(self, aggressiveness: float):
@@ -41,3 +41,6 @@ class ContentToFileClassifier(ContentClassifierInterface):
 
     def get_aggressiveness(self) -> float:
         return 1.0
+
+
+classifier = ContentToFileClassifier

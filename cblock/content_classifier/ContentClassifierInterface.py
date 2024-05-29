@@ -27,7 +27,7 @@ class ContentClassifierInterface(ABC):
         raise NotImplementedError("Not implemented")
 
     @abstractmethod
-    def set_topics_to_remove(self, topics: list[str]):
+    def set_topic_blacklist(self, topics: list[str]):
         raise NotImplementedError("Not implemented")
 
     @abstractmethod
