@@ -50,17 +50,17 @@ class CBlockAddonMain:
         )
 
         try:
-            self.content_analyzer = self.classifier_manager.get_classifier(
+            self.content_classifier = self.classifier_manager.get_classifier(
                 config.classifier
             )
-            self.content_analyzer_name = config.classifier
+            self.content_classifier_name = config.classifier
         except KeyError as e:
             raise KeyError(
                 f"The content analyzer '{config.classifier}' does not exist."
             )
 
         self.content_editor_factory = ContentEditorFactory(
-            content_analyzer=self.content_analyzer,
+            content_classifier=self.content_classifier,
             content_factory=ContentFactory(),
             db_manager=self.db_manager,
         )
@@ -119,7 +119,7 @@ class CBlockAddonMain:
                 flow.response = http.Response.make(
                     200,
                     json.dumps(
-                        {"topics": self.content_analyzer.get_supported_topics()}
+                        {"topics": self.content_classifier.get_supported_topics()}
                     ),
                     {
                         "Content-Type": "application/json",
@@ -132,7 +132,7 @@ class CBlockAddonMain:
                 request_body = json.loads(flow.request.text)
                 try:
                     self.classifier_manager.set_topic_blacklist(
-                        self.content_analyzer_name, request_body["topics"]
+                        self.content_classifier_name, request_body["topics"]
                     )
                     flow.response = http.Response.make(
                         201,
@@ -158,8 +158,8 @@ class CBlockAddonMain:
                 try:
                     new_aggressiveness = float(request_body["aggressiveness"])
                     self.classifier_manager.set_aggressiveness(
-                        self.content_analyzer_name,
-                        float(request_body["aggressiveness"]),
+                        self.content_classifier_name,
+                        new_aggressiveness,
                     )
                     flow.response = http.Response.make(
                         201,
@@ -180,21 +180,42 @@ class CBlockAddonMain:
             elif (
                 flow.request.path == "/" and flow.request.method == "GET"
             ):  # Return Home page
-                flow.response = http.Response.make(
-                    200,
-                    self.home_template.render(
-                        supported_topics=self.content_analyzer.get_supported_topics(),
-                        topic_blacklist=self.classifier_manager.classifier_info[
-                            self.content_analyzer_name
-                        ].topic_blacklist,
-                        aggressiveness=self.classifier_manager.classifier_info[
-                            self.content_analyzer_name
-                        ].aggressiveness,
-                    ),
-                    {
-                        "Content-Type": "text/html",
-                    },
-                )
+                flow.response = self.make_get_main_response()
+            elif flow.request.path == "/classifier" and flow.request.method == "POST":
+                request_body = json.loads(flow.request.text)
+                try:
+                    new_classifier_name = request_body["classifier"]
+                    self.content_classifier = self.classifier_manager.get_classifier(
+                        new_classifier_name
+                    )
+                    self.content_classifier_name = new_classifier_name
+
+                    # Update config
+                    self.config.set_attribute(
+                        "classifier", self.content_classifier_name
+                    )
+
+                    self.content_editor_factory.set_content_classifier(
+                        self.content_classifier
+                    )
+
+                    # recharge page
+                    flow.response = http.Response.make(
+                        201,
+                        '{"message": "Success"}',
+                        {
+                            "Content-Type": "application/json",
+                            "Access-Control-Allow-Origin": "*",
+                        },
+                    )
+                except KeyError as e:
+                    flow.response = http.Response.make(
+                        400,
+                        "Data invalid",
+                        {
+                            "Content-Type": "text/html",
+                        },
+                    )
             else:
                 flow.response = http.Response.make(
                     404,
@@ -203,6 +224,32 @@ class CBlockAddonMain:
                         "Content-Type": "text/html",
                     },
                 )
+
+    def make_get_main_response(self) -> http.Response:
+        return http.Response.make(
+            200,
+            self.home_template.render(
+                supported_topics=self.content_classifier.get_supported_topics(),
+                topic_blacklist=self.classifier_manager.classifier_info[
+                    self.content_classifier_name
+                ].topic_blacklist,
+                aggressiveness=self.classifier_manager.classifier_info[
+                    self.content_classifier_name
+                ].aggressiveness,
+                classifiers=[
+                    {
+                        "name": classifier_info.name,
+                        "nickname": classifier_info.nickname,
+                        "description": classifier_info.description,
+                    }
+                    for classifier_info in self.classifier_manager.classifier_info.values()
+                ],
+                active_classifier=self.content_classifier_name,
+            ),
+            {
+                "Content-Type": "text/html",
+            },
+        )
 
     async def __edit(self, schema_id: str, content: str) -> str:
 

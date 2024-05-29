@@ -10,11 +10,11 @@ class ContentEditorFactory(metaclass=Singleton):
 
     def __init__(
         self,
-        content_analyzer: ContentClassifierInterface,
+        content_classifier: ContentClassifierInterface,
         content_factory: ContentFactory,
         db_manager: DBManagerInterface,
     ):
-        self.content_analyzer = content_analyzer
+        self.content_classifier = content_classifier
         self.content_factory = content_factory
         self.db_manager = db_manager
         self.schema_factory: SchemaFactory = SchemaFactory(db_manager=self.db_manager)
@@ -26,7 +26,7 @@ class ContentEditorFactory(metaclass=Singleton):
             from editor.editors.json_editor.JSONContentEditor import JSONContentEditor
 
             return JSONContentEditor(
-                content_analyzer=self.content_analyzer,
+                content_analyzer=self.content_classifier,
                 content_factory=self.content_factory,
                 editor_factory=self,
                 schema_factory=self.schema_factory,
@@ -37,7 +37,7 @@ class ContentEditorFactory(metaclass=Singleton):
             )
 
             return GenericContentEditor(
-                content_analyzer=self.content_analyzer,
+                content_analyzer=self.content_classifier,
                 content_factory=self.content_factory,
                 editor_factory=self,
                 schema_factory=self.schema_factory,
@@ -46,7 +46,7 @@ class ContentEditorFactory(metaclass=Singleton):
             from editor.editors.html_editor.HTMLContentEditor import HTMLContentEditor
 
             return HTMLContentEditor(
-                content_analyzer=self.content_analyzer,
+                content_analyzer=self.content_classifier,
                 content_factory=self.content_factory,
                 editor_factory=self,
                 schema_factory=self.schema_factory,
@@ -56,3 +56,6 @@ class ContentEditorFactory(metaclass=Singleton):
         schema_type: str = self.db_manager.get_schema(schema_id).schema_type
 
         return self.get_content_editor(schema_type=schema_type)
+
+    def set_content_classifier(self, content_classifier: ContentClassifierInterface):
+        self.content_classifier = content_classifier

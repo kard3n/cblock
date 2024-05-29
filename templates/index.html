@@ -45,6 +45,10 @@
             <button type="button" class="btn btn-primary" onclick="post_aggressiveness()">Submit</button>
         </div>
 
+        {% for classifier in classifiers %}
+            <button onclick="change_classifier('{{classifier.name}}')" class="btn {% if classifier.name == active_classifier %} btn-success {% else %} btn-primary {% endif %}">{{ classifier.nickname }}</button>
+        {% endfor %}
+
 
         <div class="toast-container z-2 fixed-bottom" id="toast_container">
             <!-- div for alerts -->
@@ -89,6 +93,23 @@
                     make_toast("Error", "Error changing topics.")
                 }).always(function (){
                     //Nothing for now
+                });
+        }
+
+        function change_classifier(classifier){
+            let endpoint="/classifier"
+
+            $.post({
+                url: endpoint,
+                data: JSON.stringify({"classifier": classifier}),
+                dataType:"application/json"})
+                .done(function () {
+                    make_toast("Success", "Classifier changed.")
+                })
+                .fail(function () {
+                    make_toast("Error", "Error changing topics.")
+                }).always(function (){
+                    document.location.href = "/"
                 });
         }
 
