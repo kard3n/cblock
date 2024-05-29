@@ -155,9 +155,8 @@ class CBlockAddonMain:
                 flow.request.path == "/aggressiveness" and flow.request.method == "POST"
             ):
                 request_body = json.loads(flow.request.text)
-                if "aggressiveness" in request_body.keys() and regex.match(
-                    r"[0-9]+\.[0-9]+", request_body["aggressiveness"]
-                ):
+                try:
+                    new_aggressiveness = float(request_body["aggressiveness"])
                     self.classifier_manager.set_aggressiveness(
                         self.content_analyzer_name,
                         float(request_body["aggressiveness"]),
@@ -170,7 +169,7 @@ class CBlockAddonMain:
                             "Access-Control-Allow-Origin": "*",
                         },
                     )
-                else:
+                except ValueError as e:
                     flow.response = http.Response.make(
                         400,
                         "Data invalid",

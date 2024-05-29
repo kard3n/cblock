@@ -75,7 +75,13 @@ class ClassifierManager:
         :param topic_blacklist:
         :return:
         """
-        self._classifier_info[classifier_name].topic_blacklist = topic_blacklist
+        self._classifier_info[classifier_name].topic_blacklist = []
+        # make sure only valid topics can be added
+        for topic in topic_blacklist:
+            if topic in self._classifiers[classifier_name].get_supported_topics():
+                self._classifier_info[classifier_name].topic_blacklist.append(topic)
+            else:
+                print("Can not in-existing topic: " + topic)
         self._classifiers[classifier_name].set_topic_blacklist(topic_blacklist)
 
         self._save_settings(classifier_name=classifier_name)
