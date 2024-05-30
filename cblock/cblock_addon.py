@@ -104,118 +104,27 @@ class CBlockAddonMain:
             if (
                 flow.request.path == "/shutdown" and flow.request.method == "GET"
             ):  # Shut down ContentBlock
-                self.shutdown_event.set()
-                flow.response = http.Response.make(
-                    200,
-                    "Server shutting down...",
-                    {
-                        "Content-Type": "text/html",
-                    },
-                )
+                await self.process_shutdown_get(flow)
             elif (
                 flow.request.path == "/supported_topics"
                 and flow.request.method == "GET"
             ):
-                flow.response = http.Response.make(
-                    200,
-                    json.dumps(
-                        {"topics": self.content_classifier.get_supported_topics()}
-                    ),
-                    {
-                        "Content-Type": "application/json",
-                    },
-                )
+                await self.process_supported_topics_get(flow)
             elif (
                 flow.request.path == "/topic_blacklist"
                 and flow.request.method == "POST"
             ):
-                request_body = json.loads(flow.request.text)
-                try:
-                    self.classifier_manager.set_topic_blacklist(
-                        self.content_classifier_name, request_body["topics"]
-                    )
-                    flow.response = http.Response.make(
-                        201,
-                        '{"message": "Success"}',
-                        {
-                            "Content-Type": "application/json",
-                            "Access-Control-Allow-Origin": "*",
-                        },
-                    )
-                except Exception as e:
-                    print(traceback.format_exc())
-                    flow.response = http.Response.make(
-                        status_code=400,
-                        content=traceback.format_exc(),
-                        headers={
-                            "Content-Type": "text/html",
-                        },
-                    )
+                await self.process_blacklist_post(flow)
             elif (
                 flow.request.path == "/aggressiveness" and flow.request.method == "POST"
             ):
-                request_body = json.loads(flow.request.text)
-                try:
-                    new_aggressiveness = float(request_body["aggressiveness"])
-                    self.classifier_manager.set_aggressiveness(
-                        self.content_classifier_name,
-                        new_aggressiveness,
-                    )
-                    flow.response = http.Response.make(
-                        201,
-                        '{"message": "Success"}',
-                        {
-                            "Content-Type": "application/json",
-                            "Access-Control-Allow-Origin": "*",
-                        },
-                    )
-                except ValueError as e:
-                    flow.response = http.Response.make(
-                        400,
-                        "Data invalid",
-                        {
-                            "Content-Type": "text/html",
-                        },
-                    )
+                await self.process_aggressiveness_post(flow)
             elif (
                 flow.request.path == "/" and flow.request.method == "GET"
             ):  # Return Home page
-                flow.response = self.make_get_main_response()
+                await self.process_main_get(flow)
             elif flow.request.path == "/classifier" and flow.request.method == "POST":
-                request_body = json.loads(flow.request.text)
-                try:
-                    new_classifier_name = request_body["classifier"]
-                    self.content_classifier = self.classifier_manager.get_classifier(
-                        new_classifier_name
-                    )
-                    self.content_classifier_name = new_classifier_name
-
-                    # Update config
-                    self.config.set_attribute(
-                        "classifier", self.content_classifier_name
-                    )
-
-                    self.content_editor_factory.set_content_classifier(
-                        self.content_classifier
-                    )
-
-                    # recharge page
-                    flow.response = http.Response.make(
-                        201,
-                        '{"message": "Success"}',
-                        {
-                            "Content-Type": "application/json",
-                            "Access-Control-Allow-Origin": "*",
-                        },
-                    )
-                except KeyError as e:
-                    flow.response = http.Response.make(
-                        400,
-                        "Data invalid",
-                        {
-                            "Content-Type": "text/html",
-                        },
-                    )
+                await self.process_classifier_post(flow)
             else:
                 flow.response = http.Response.make(
                     404,
@@ -225,8 +134,138 @@ class CBlockAddonMain:
                     },
                 )
 
-    def make_get_main_response(self) -> http.Response:
-        return http.Response.make(
+    async def process_supported_topics_get(self, flow: http.HTTPFlow) -> None:
+        """
+        Processes POST requests to /topic_blacklist and edits the flow
+        :param flow:
+        :return:
+        """
+        flow.response = http.Response.make(
+            200,
+            json.dumps({"topics": self.content_classifier.get_supported_topics()}),
+            {
+                "Content-Type": "application/json",
+            },
+        )
+
+    async def process_shutdown_get(self, flow: http.HTTPFlow) -> None:
+        """
+        Processes GET requests to /shutdown and edits the flow
+        :param flow:
+        :return:
+        """
+
+        self.shutdown_event.set()
+        flow.response = http.Response.make(
+            200,
+            "Server shutting down...",
+            {
+                "Content-Type": "text/html",
+            },
+        )
+
+    async def process_blacklist_post(self, flow: http.HTTPFlow) -> None:
+        """
+        Processes POST requests to /topic_blacklist and edits the flow
+        :param flow:
+        :return:
+        """
+        request_body = json.loads(flow.request.text)
+        try:
+            self.classifier_manager.set_topic_blacklist(
+                self.content_classifier_name, request_body["topics"]
+            )
+            flow.response = http.Response.make(
+                201,
+                '{"message": "Success"}',
+                {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*",
+                },
+            )
+        except Exception as e:
+            print(traceback.format_exc())
+            flow.response = http.Response.make(
+                status_code=400,
+                content=traceback.format_exc(),
+                headers={
+                    "Content-Type": "text/html",
+                },
+            )
+
+    async def process_aggressiveness_post(self, flow: http.HTTPFlow) -> None:
+        """
+        Processes POST requests to /aggressiveness and edits the flow
+        :param flow:
+        :return:
+        """
+        request_body = json.loads(flow.request.text)
+        try:
+            new_aggressiveness = float(request_body["aggressiveness"])
+            self.classifier_manager.set_aggressiveness(
+                self.content_classifier_name,
+                new_aggressiveness,
+            )
+            flow.response = http.Response.make(
+                201,
+                '{"message": "Success"}',
+                {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*",
+                },
+            )
+        except ValueError as e:
+            flow.response = http.Response.make(
+                400,
+                "Data invalid",
+                {
+                    "Content-Type": "text/html",
+                },
+            )
+
+    async def process_classifier_post(self, flow: http.HTTPFlow) -> None:
+        """
+        Processes POST requests to /classifier and edits the flow
+        :param flow:
+        :return:
+        """
+        request_body = json.loads(flow.request.text)
+        try:
+            new_classifier_name = request_body["classifier"]
+            self.content_classifier = self.classifier_manager.get_classifier(
+                new_classifier_name
+            )
+            self.content_classifier_name = new_classifier_name
+
+            # Update config
+            self.config.set_attribute("classifier", self.content_classifier_name)
+
+            self.content_editor_factory.set_content_classifier(self.content_classifier)
+
+            # recharge page
+            flow.response = http.Response.make(
+                201,
+                '{"message": "Success"}',
+                {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*",
+                },
+            )
+        except KeyError as e:
+            flow.response = http.Response.make(
+                400,
+                "Data invalid",
+                {
+                    "Content-Type": "text/html",
+                },
+            )
+
+    async def process_main_get(self, flow) -> None:
+        """
+        Process GET requests to /
+        :return:
+        """
+        flow.response = http.Response.make(
             200,
             self.home_template.render(
                 supported_topics=self.content_classifier.get_supported_topics(),
