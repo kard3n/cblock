@@ -1,5 +1,6 @@
 import pathlib
 import pickle
+import nltk
 
 import joblib
 
@@ -9,6 +10,10 @@ from editor.ContentExtractionResult import ContentExtractionResult
 
 class NaiveBayesClassifier(ContentClassifierInterface):
     def __init__(self, topics_to_remove: list[str], aggressiveness: float):
+        try:
+            nltk.data.find('tokenizers/punkt')
+        except LookupError:
+            nltk.download('punkt')
 
         self.model = pickle.load(
             open(
