@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}CBlock Settings{% endblock %}
+
+{% block body %}
+    <button type="button" class="btn btn-primary mb-3" onclick="reload_schemata()">
+        <i class="bi bi-arrow-repeat"></i>
+        <span>Reload Schemata</span>
+    </button>
+
+    <script>
+        function reload_schemata(){
+            let endpoint="/reload_schemata"
+
+            $.post({
+                url: endpoint,
+                dataType:"application/json"})
+                .done(function () {
+                    make_toast("Success", "Schemata reloaded.")
+                })
+                .fail(function () {
+                    make_toast("Error", "Error reloading schemata.")
+                }).always(function (){
+                    //Nothing for now
+                });
+        }
+    </script>
+{% endblock %}

@@ -65,16 +65,18 @@ class CBlockAddonMain:
             db_manager=self.db_manager,
         )
 
+        self.schema_reader: SchemaReader = SchemaReader(
+            db_manager=self.db_manager,
+            schema_location="cblock/schema_definitions/",
+        )
+
         if not self.db_manager.has_database():
             logging.warning("No database was found, initializing...")
             self.db_manager.create_schema_table()
 
             try:
-                schema_reader: SchemaReader = SchemaReader(
-                    db_manager=self.db_manager,
-                    schema_location="cblock/schema_definitions/",
-                )
-                schema_reader.run()
+
+                self.schema_reader.run()
             except Exception as e:
                 self.db_manager.close_connection()
                 os.remove("cb_database.db")
@@ -84,6 +86,7 @@ class CBlockAddonMain:
 
         self.jinja_environment = Environment(loader=FileSystemLoader("templates/"))
         self.home_template = self.jinja_environment.get_template("index.html")
+        self.settings_template = self.jinja_environment.get_template("settings.html")
 
     async def response(self, flow: http.HTTPFlow):
         # logging.warning(f"URI: {flow.request.pretty_host + flow.request.path}")
@@ -125,6 +128,15 @@ class CBlockAddonMain:
                 await self.process_main_get(flow)
             elif flow.request.path == "/classifier" and flow.request.method == "POST":
                 await self.process_classifier_post(flow)
+            elif (
+                flow.request.path == "/settings" and flow.request.method == "GET"
+            ):  # Shut down ContentBlock
+                await self.process_settings_get(flow)
+            elif (
+                flow.request.path == "/reload_schemata"
+                and flow.request.method == "POST"
+            ):  # Shut down ContentBlock
+                await self.process_reload_schemata_post(flow)
             else:
                 flow.response = http.Response.make(
                     404,
@@ -285,6 +297,47 @@ class CBlockAddonMain:
                 ],
                 active_classifier=self.content_classifier_name,
             ),
+            {
+                "Content-Type": "text/html",
+            },
+        )
+
+    async def process_reload_schemata_post(self, flow: http.HTTPFlow) -> None:
+        """
+        Processes POST requests to /reload_schemata and edits the flow
+        :param flow:
+        :return:
+        """
+        try:
+            self.db_manager.create_schema_table()
+            self.schema_reader.run()
+
+            flow.response = http.Response.make(
+                201,
+                '{"message": "Schemata Reloaded Successfully"}',
+                {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*",
+                },
+            )
+        except Exception as e:
+            print(traceback.format_exc())
+            flow.response = http.Response.make(
+                status_code=400,
+                content=traceback.format_exc(),
+                headers={
+                    "Content-Type": "text/html",
+                },
+            )
+
+    async def process_settings_get(self, flow) -> None:
+        """
+        Process GET requests to /
+        :return:
+        """
+        flow.response = http.Response.make(
+            200,
+            self.settings_template.render(),
             {
                 "Content-Type": "text/html",
             },

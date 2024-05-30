@@ -31,6 +31,10 @@ class SQLiteManager(DBManagerInterface):
         return True
 
     def create_schema_table(self) -> None:
+        """
+        Creates the schema table, and resets it if it already exists
+        :return:
+        """
         columns_to_index = ["url"]
 
         create_sentence: str = (
