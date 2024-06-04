@@ -67,7 +67,7 @@ class CBlockAddonMain:
 
         self.schema_reader: SchemaReader = SchemaReader(
             db_manager=self.db_manager,
-            schema_location="cblock/schema_definitions/",
+            schema_location="schema_definitions/",
         )
 
         if not self.db_manager.has_database():
