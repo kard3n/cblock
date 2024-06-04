@@ -4,7 +4,6 @@ from unittest.mock import Mock
 from bs4 import BeautifulSoup
 from regex import regex
 
-import test_utils
 from content_classifier.ContentClassifierInterface import ContentClassifierInterface
 from content_factory.Content import Content
 from content_factory.ContentFactory import ContentFactory
@@ -12,12 +11,11 @@ from db.DBManagerInterface import DBManagerInterface
 from editor.ContentEditorFactory import ContentEditorFactory
 from editor.ContentEditorInterface import ContentEditorInterface
 from editor.ContentExtractionResult import ContentExtractionResult
-from editor.editors.generic_editor.GenericContentEditor import GenericContentEditor
 from editor.editors.html_editor.HTMLContentEditor import HTMLContentEditor
 from schema.ContentTag import ContentTag
 from schema.SchemaFactory import SchemaFactory
-from schema.generic_schema.GenericSchema import GenericSchema
 from schema.html_schema.HTMLSchema import HTMLSchema
+from test import test_utils
 
 
 class HTTPSchemaEditorUnitTest(unittest.TestCase):
@@ -45,13 +43,15 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
         schema: HTMLSchema = HTMLSchema(
             html_tag=None,
             content_tags=[],
-            attributes={},
+            attributes_regex={},
+            attributes_multival={},
             embedded_schema=None,
             children=[
                 HTMLSchema(
                     html_tag=regex.compile("a"),
                     content_tags=[ContentTag.ANALYZE, ContentTag.TITLE],
-                    attributes={"href": regex.compile(r"https:\/\/example\.com")},
+                    attributes_regex={"href": regex.compile(r"https:\/\/example\.com")},
+                    attributes_multival={},
                     embedded_schema=None,
                     children=[],
                 )
@@ -74,7 +74,8 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
         schema: HTMLSchema = HTMLSchema(
             html_tag=None,
             content_tags=[],
-            attributes={},
+            attributes_regex={},
+            attributes_multival={},
             embedded_schema=None,
             children=[
                 HTMLSchema(
@@ -84,7 +85,8 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
                         "analyze": [ContentTag.ANALYZE, ContentTag.TITLE],
                         "dont_analyze": [ContentTag.DELETE],
                     },
-                    attributes={},
+                    attributes_regex={},
+                    attributes_multival={},
                     embedded_schema=None,
                     children=[],
                 )
@@ -105,13 +107,15 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
         schema: HTMLSchema = HTMLSchema(
             html_tag=None,
             content_tags=[],
-            attributes={},
+            attributes_regex={},
+            attributes_multival={},
             embedded_schema=None,
             children=[
                 HTMLSchema(
                     html_tag=regex.compile("a"),
                     content_tags=[ContentTag.ANALYZE, ContentTag.TITLE],
-                    attributes={"href": regex.compile(r"https:\/\/example\.com")},
+                    attributes_regex={"href": regex.compile(r"https:\/\/example\.com")},
+                    attributes_multival={},
                     embedded_schema=None,
                     children=[],
                 )
@@ -141,14 +145,16 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
         schema: HTMLSchema = HTMLSchema(
             html_tag=None,
             content_tags=[],
-            attributes={},
+            attributes_regex={},
+            attributes_multival={},
             embedded_schema=None,
             children=[
                 HTMLSchema(
                     html_tag=regex.compile("a"),
                     content_tags=[ContentTag.ANALYZE, ContentTag.TITLE],
                     not_attributes=["class"],
-                    attributes={"href": regex.compile(r"https:\/\/example\.com")},
+                    attributes_regex={"href": regex.compile(r"https:\/\/example\.com")},
+                    attributes_multival={},
                     embedded_schema=None,
                     children=[],
                 )
@@ -175,21 +181,24 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
         schema: HTMLSchema = HTMLSchema(
             html_tag=None,
             content_tags=[],
-            attributes={},
+            attributes_regex={},
+            attributes_multival={},
             embedded_schema=None,
             children=[
                 HTMLSchema(
                     html_tag=regex.compile("span"),
                     content_tags=[],
                     search_recursive=True,
-                    attributes={},
+                    attributes_regex={},
+                    attributes_multival={},
                     embedded_schema=None,
                     children=[
                         HTMLSchema(
                             html_tag=regex.compile("a"),
                             content_tags=[ContentTag.ANALYZE, ContentTag.TITLE],
                             search_recursive=False,
-                            attributes={},
+                            attributes_regex={},
+                            attributes_multival={},
                             embedded_schema=None,
                             children=[],
                         )
@@ -231,13 +240,15 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
         schema: HTMLSchema = HTMLSchema(
             html_tag=None,
             content_tags=[],
-            attributes={},
+            attributes_regex={},
+            attributes_multival={},
             embedded_schema=None,
             children=[
                 HTMLSchema(
                     html_tag=regex.compile("a"),
                     content_tags=[],
-                    attributes={},
+                    attributes_regex={},
+                    attributes_multival={},
                     embedded_schema=embedded_schema_id,
                     children=[],
                 )
@@ -267,14 +278,16 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
         schema: HTMLSchema = HTMLSchema(
             html_tag=None,
             content_tags=[],
-            attributes={},
+            attributes_regex={},
+            attributes_multival={},
             embedded_schema=None,
             children=[
                 HTMLSchema(
                     html_tag=regex.compile("a"),
                     content_tags=[ContentTag.ANALYZE, ContentTag.TITLE],
                     search_recursive=True,
-                    attributes={},
+                    attributes_regex={},
+                    attributes_multival={},
                     embedded_schema=None,
                     children=[],
                 )
@@ -314,7 +327,8 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
         schema: HTMLSchema = HTMLSchema(
             html_tag=None,
             content_tags=[],
-            attributes={},
+            attributes_regex={},
+            attributes_multival={},
             embedded_schema=None,
             children=[
                 HTMLSchema(
@@ -322,7 +336,8 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
                     content_tags=[ContentTag.ANALYZE, ContentTag.TITLE],
                     not_attributes=["class"],
                     search_recursive=True,
-                    attributes={},
+                    attributes_regex={},
+                    attributes_multival={},
                     embedded_schema=None,
                     children=[],
                 )
@@ -355,7 +370,8 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
         schema: HTMLSchema = HTMLSchema(
             html_tag=None,
             content_tags=[],
-            attributes={},
+            attributes_regex={},
+            attributes_multival={},
             embedded_schema=None,
             children=[
                 HTMLSchema(
@@ -366,7 +382,8 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
                         "href": [ContentTag.LINK],
                         "text": [ContentTag.SUMMARY, ContentTag.ANALYZE],
                     },
-                    attributes={},
+                    attributes_regex={},
+                    attributes_multival={"test_attr": ["one", "two"]},
                     embedded_schema=None,
                     children=[],
                 )
@@ -377,7 +394,7 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
         random_string_two: str = test_utils.random_string(10)
 
         assert self.editor.extract_content(
-            input_value=f'<div><a href="{random_string_one}" text="{random_string_two}">Anything</a></div>',
+            input_value=f'<div><a test_attr="one two" href="{random_string_one}" text="{random_string_two}">Anything</a></div>',
             schema=schema,
         ) == ContentExtractionResult(
             title="", text=random_string_two + " ", pictures=[], categories=""
@@ -385,11 +402,20 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
 
         assert (
             self.editor.edit_container_element(
-                input_value=f'<div><a href="{random_string_one}" text="{random_string_two}">Anything</a></div>',
+                input_value=f'<div><a href="{random_string_one}" test_attr="one two" text="{random_string_two}">Anything</a></div>',
                 schema=schema,
                 content=generated_content,
             )
-            == f'<div><a href="{generated_content.link}" text="{generated_content.summary}">Anything</a></div>'
+            == f'<div><a href="{generated_content.link}" test_attr="one two" text="{generated_content.summary}">Anything</a></div>'
+        )
+
+        assert (
+            self.editor.edit_container_element(
+                input_value=f'<div><a href="{random_string_one}" test_attr="three four" text="{random_string_two}">Anything</a></div>',
+                schema=schema,
+                content=generated_content,
+            )
+            == f'<div><a href="{random_string_one}" test_attr="three four" text="{random_string_two}">Anything</a></div>'
         )
 
     def test_edit_container_is_leaf(self):
@@ -400,7 +426,8 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
         schema: HTMLSchema = HTMLSchema(
             html_tag=None,
             content_tags=[],
-            attributes={},
+            attributes_regex={},
+            attributes_multival={},
             embedded_schema=None,
             children=[
                 HTMLSchema(
@@ -411,7 +438,8 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
                         ContentTag.TITLE,
                     ],
                     search_recursive=True,
-                    attributes={},
+                    attributes_regex={},
+                    attributes_multival={},
                     embedded_schema=None,
                     children=[],
                 )
@@ -443,14 +471,16 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
         schema: HTMLSchema = HTMLSchema(
             html_tag=None,
             content_tags=[],
-            attributes={},
+            attributes_regex={},
+            attributes_multival={},
             embedded_schema=None,
             children=[
                 HTMLSchema(
                     html_tag=regex.compile("div"),
                     content_tags=[ContentTag.CONTAINER],
                     search_recursive=True,
-                    attributes={},
+                    attributes_regex={},
+                    attributes_multival={},
                     embedded_schema=None,
                     children=[
                         HTMLSchema(
@@ -460,7 +490,8 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
                                 ContentTag.TITLE,
                             ],
                             search_recursive=True,
-                            attributes={},
+                            attributes_regex={},
+                            attributes_multival={},
                             embedded_schema=None,
                             children=[],
                         )
@@ -494,14 +525,16 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
         schema: HTMLSchema = HTMLSchema(
             html_tag=None,
             content_tags=[],
-            attributes={},
+            attributes_regex={},
+            attributes_multival={},
             embedded_schema=None,
             children=[
                 HTMLSchema(
                     html_tag=regex.compile("div"),
                     content_tags=[ContentTag.CONTAINER],
                     search_recursive=True,
-                    attributes={},
+                    attributes_regex={},
+                    attributes_multival={},
                     embedded_schema=None,
                     children=[
                         HTMLSchema(
@@ -515,7 +548,8 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
                                 "src": [ContentTag.PICTURE],
                             },
                             search_recursive=True,
-                            attributes={},
+                            attributes_regex={},
+                            attributes_multival={},
                             embedded_schema=None,
                             children=[],
                         ),
@@ -526,7 +560,8 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
                                 "src": [ContentTag.PICTURE],
                             },
                             search_recursive=True,
-                            attributes={},
+                            attributes_regex={},
+                            attributes_multival={},
                             embedded_schema=None,
                             children=[],
                         ),
