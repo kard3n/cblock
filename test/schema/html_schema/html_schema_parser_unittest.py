@@ -133,7 +133,7 @@ class TestHTTPSchemaParser(unittest.TestCase):
 
     def test_parse_string_multiple_children_non_recursive(self):
         schema: str = r"""html_tag:'a', recursive:'False', content_tags:'e', href: 'https:\/\/example\.com'
-    html_tag:'b', content_tags:'at', recursive:'True' ,class: 'headline'
+    html_tag:'b', content_tags:'at', recursive:'True' ,class!: 'headline title text'
     html_tag:'span', content_tags:'as', recursive:'False', class: 'summary'"""
         assert self.parser.parse_string(schema) == HTMLSchema(
             html_tag=None,
@@ -162,8 +162,8 @@ class TestHTTPSchemaParser(unittest.TestCase):
                             attributes=[
                                 AttributeDefinition(
                                     name="class",
-                                    value=regex.compile(r"headline"),
-                                    is_not_regex=False,
+                                    value=["headline", "title", "text"],
+                                    is_not_regex=True,
                                 )
                             ],
                             embedded_schema=None,
