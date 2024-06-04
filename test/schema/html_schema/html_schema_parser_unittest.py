@@ -3,7 +3,7 @@ import unittest
 from regex import regex
 
 from schema.ContentTag import ContentTag
-from schema.html_schema.HTMLSchema import HTMLSchema, AttributeDefinition
+from schema.html_schema.HTMLSchema import HTMLSchema
 from schema.parser.HTMLSchemaParser import HTMLSchemaParser
 
 
@@ -19,7 +19,8 @@ class TestHTTPSchemaParser(unittest.TestCase):
         assert self.parser.parse_string(schema) == HTMLSchema(
             html_tag=None,
             content_tags=[],
-            attributes=[],
+            attributes_regex={},
+            attributes_multival={},
             embedded_schema=None,
             children=[
                 HTMLSchema(
@@ -29,13 +30,8 @@ class TestHTTPSchemaParser(unittest.TestCase):
                         "test": [ContentTag.ANALYZE, ContentTag.TITLE],
                         "var": [ContentTag.DELETE],
                     },
-                    attributes=[
-                        AttributeDefinition(
-                            name="href",
-                            value=regex.compile(r"https:\/\/example\.com"),
-                            is_not_regex=False,
-                        )
-                    ],
+                    attributes_regex={"href": regex.compile(r"https:\/\/example\.com")},
+                    attributes_multival={},
                     not_attributes=["bad", "attr"],
                     embedded_schema=None,
                     children=[],
@@ -50,7 +46,8 @@ class TestHTTPSchemaParser(unittest.TestCase):
         assert self.parser.parse_string(schema) == HTMLSchema(
             html_tag=None,
             content_tags=[],
-            attributes=[],
+            attributes_regex={},
+            attributes_multival={},
             embedded_schema=None,
             children=[
                 HTMLSchema(
@@ -60,13 +57,8 @@ class TestHTTPSchemaParser(unittest.TestCase):
                         "test": [ContentTag.ANALYZE, ContentTag.TITLE],
                         "var": [ContentTag.DELETE],
                     },
-                    attributes=[
-                        AttributeDefinition(
-                            name="href",
-                            value=regex.compile(r"https:\/\/example\.com"),
-                            is_not_regex=False,
-                        )
-                    ],
+                    attributes_regex={"href": regex.compile(r"https:\/\/example\.com")},
+                    attributes_multival={},
                     embedded_schema=None,
                     children=[],
                 )
@@ -80,7 +72,8 @@ class TestHTTPSchemaParser(unittest.TestCase):
         assert self.parser.parse_string(schema) == HTMLSchema(
             html_tag=None,
             content_tags=[],
-            attributes=[],
+            attributes_regex={},
+            attributes_multival={},
             attributes_to_edit={},
             embedded_schema=None,
             children=[
@@ -88,13 +81,8 @@ class TestHTTPSchemaParser(unittest.TestCase):
                     html_tag=regex.compile("a"),
                     content_tags=[ContentTag.CONTAINER],
                     attributes_to_edit={"test": [ContentTag.ORIGIN]},
-                    attributes=[
-                        AttributeDefinition(
-                            name="href",
-                            value=regex.compile(r"https:\/\/example\.com"),
-                            is_not_regex=False,
-                        )
-                    ],
+                    attributes_regex={"href": regex.compile(r"https:\/\/example\.com")},
+                    attributes_multival={},
                     embedded_schema=None,
                     children=[
                         HTMLSchema(
@@ -103,26 +91,16 @@ class TestHTTPSchemaParser(unittest.TestCase):
                             attributes_to_edit={
                                 "random": [ContentTag.ANALYZE, ContentTag.TITLE],
                             },
-                            attributes=[
-                                AttributeDefinition(
-                                    name="class",
-                                    value=regex.compile(r"headline"),
-                                    is_not_regex=False,
-                                )
-                            ],
+                            attributes_regex={"class": regex.compile(r"headline")},
+                            attributes_multival={},
                             embedded_schema=None,
                             children=[],
                         ),
                         HTMLSchema(
                             html_tag=regex.compile("span"),
                             content_tags=[ContentTag.ANALYZE, ContentTag.SUMMARY],
-                            attributes=[
-                                AttributeDefinition(
-                                    name="class",
-                                    value=regex.compile(r"summary"),
-                                    is_not_regex=False,
-                                )
-                            ],
+                            attributes_regex={"class": regex.compile(r"summary")},
+                            attributes_multival={},
                             embedded_schema=None,
                             children=[],
                         ),
@@ -138,19 +116,15 @@ class TestHTTPSchemaParser(unittest.TestCase):
         assert self.parser.parse_string(schema) == HTMLSchema(
             html_tag=None,
             content_tags=[],
-            attributes=[],
+            attributes_regex={},
+            attributes_multival={},
             embedded_schema=None,
             children=[
                 HTMLSchema(
                     html_tag=regex.compile("a"),
                     content_tags=[ContentTag.CONTAINER],
-                    attributes=[
-                        AttributeDefinition(
-                            name="href",
-                            value=regex.compile(r"https:\/\/example\.com"),
-                            is_not_regex=False,
-                        )
-                    ],
+                    attributes_regex={"href": regex.compile(r"https:\/\/example\.com")},
+                    attributes_multival={},
                     search_recursive=False,
                     embedded_schema=None,
                     children=[
@@ -159,13 +133,10 @@ class TestHTTPSchemaParser(unittest.TestCase):
                             content_tags=[ContentTag.ANALYZE, ContentTag.TITLE],
                             search_recursive=True,
                             attributes_to_edit={},
-                            attributes=[
-                                AttributeDefinition(
-                                    name="class",
-                                    value=["headline", "title", "text"],
-                                    is_not_regex=True,
-                                )
-                            ],
+                            attributes_multival={
+                                "class": ["headline", "title", "text"]
+                            },
+                            attributes_regex={},
                             embedded_schema=None,
                             children=[],
                         ),
@@ -173,13 +144,8 @@ class TestHTTPSchemaParser(unittest.TestCase):
                             html_tag=regex.compile("span"),
                             search_recursive=False,
                             content_tags=[ContentTag.ANALYZE, ContentTag.SUMMARY],
-                            attributes=[
-                                AttributeDefinition(
-                                    name="class",
-                                    value=regex.compile(r"summary"),
-                                    is_not_regex=False,
-                                )
-                            ],
+                            attributes_regex={"class": regex.compile(r"summary")},
+                            attributes_multival={},
                             embedded_schema=None,
                             children=[],
                         ),
