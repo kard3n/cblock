@@ -237,7 +237,7 @@ def clean_multival_attr_value(attrs: [str]) -> list:
     """
     result = []
     for item in attrs:
-        if regex.match(r"_.*", item) is None:
+        if regex.match(r"_.*", item) is None and len(regex.findall(r"\(", item)) == 0:
             result.append(item)
 
     return result
@@ -273,7 +273,7 @@ def item_to_line(tag: Tag, content_tags: str) -> str:
     for key in tag.attrs.keys():
         if not attr_in_blacklist(key):
             if type(tag.attrs[key]) == list:
-                to_ret += f", {key}:'{' '.join(tag.attrs[key]).replace(",", r"\,")}'"
+                to_ret += f", {key}!:'{' '.join(clean_multival_attr_value(tag.attrs[key])).replace(",", r"\,")}'"
             else:
                 to_ret += f", {key}:'{tag.attrs[key].replace(",", r"\,")}'"
     return to_ret
