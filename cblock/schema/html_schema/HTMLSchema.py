@@ -7,6 +7,13 @@ from schema.ContentTag import ContentTag
 
 
 @dataclass
+class AttributeDefinition:
+    name: str
+    value: list[str] | Pattern
+    is_not_regex: bool = False
+
+
+@dataclass
 class HTMLSchema:
     """This class represents an HTTP schema.
 
@@ -22,7 +29,7 @@ class HTMLSchema:
     """
 
     html_tag: Pattern | None = None
-    attributes: Dict[str, Pattern] = field(default_factory=dict)
+    attributes: [AttributeDefinition] = field(default_factory=list)
     not_attributes: list[str] = field(default_factory=list)
     attributes_to_edit: Dict[str, list[ContentTag]] = field(default_factory=dict)
     search_recursive: bool = True

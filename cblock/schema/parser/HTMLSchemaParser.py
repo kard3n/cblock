@@ -3,7 +3,7 @@ import logging
 import regex
 
 from schema.ContentTag import ContentTag
-from schema.html_schema.HTMLSchema import HTMLSchema
+from schema.html_schema.HTMLSchema import HTMLSchema, AttributeDefinition
 from schema.parser.SchemaParserInterface import SchemaParserInterface
 from exceptions.SchemaParsingException import SchemaParsingException
 from utils.string_utils import (
@@ -94,9 +94,29 @@ class HTMLSchemaParser(SchemaParserInterface):
 
                 if colon_pos < 0:
                     raise SchemaParsingException(f'"{item}" does not contain a value.')
-                result.attributes[item[0:colon_pos]] = regex.compile(
-                    extract_from_inbetween_symbol(item[colon_pos + 1 :], "'")
-                )
+                item_name = item[0:colon_pos]
+                if item_name.endswith("!"):
+                    result.attributes.append(
+                        AttributeDefinition(
+                            name=item_name[0:-1],
+                            value=extract_from_inbetween_symbol(
+                                item[colon_pos + 1 :], "'"
+                            ).split(),
+                            is_not_regex=True,
+                        )
+                    )
+                else:
+                    result.attributes.append(
+                        AttributeDefinition(
+                            name=item_name,
+                            value=regex.compile(
+                                extract_from_inbetween_symbol(
+                                    item[colon_pos + 1 :], "'"
+                                )
+                            ),
+                            is_not_regex=False,
+                        )
+                    )
 
         if result.embedded_schema is not None and result.content_tags != []:
             raise SchemaParsingException(
