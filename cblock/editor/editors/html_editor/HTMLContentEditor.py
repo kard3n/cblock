@@ -1,4 +1,5 @@
 import logging
+import traceback
 
 from bs4 import BeautifulSoup, Tag
 from regex import regex
@@ -42,7 +43,7 @@ class HTMLContentEditor(ContentEditorInterface):
         try:
             self.__explore_parsed(element=soup, schema=schema)
         except Exception as e:
-            logging.warning(f"Error editing input: {e}")
+            logging.warning(f"Error editing input: {traceback.format_exc()}")
             return input_raw
 
         return soup.__str__()
@@ -136,7 +137,11 @@ class HTMLContentEditor(ContentEditorInterface):
 
         for attribute in attributes.keys():
             if attribute in element.attrs.keys():
-                element_attr_values = element.attrs[attribute].split()
+                if type(element.attrs[attribute]) == str:
+                    element_attr_values = element.attrs[attribute].split()
+                else:
+                    element_attr_values = element.attrs[attribute]
+
                 for value in attributes[attribute]:
                     if value not in element_attr_values:
                         return False

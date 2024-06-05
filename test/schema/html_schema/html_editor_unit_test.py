@@ -383,7 +383,10 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
                         "text": [ContentTag.SUMMARY, ContentTag.ANALYZE],
                     },
                     attributes_regex={},
-                    attributes_multival={"test_attr": ["one", "two"]},
+                    attributes_multival={
+                        "test_attr": ["one", "two"],
+                        "class": ["four", "five"],
+                    },
                     embedded_schema=None,
                     children=[],
                 )
@@ -394,7 +397,7 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
         random_string_two: str = test_utils.random_string(10)
 
         assert self.editor.extract_content(
-            input_value=f'<div><a test_attr="one two" href="{random_string_one}" text="{random_string_two}">Anything</a></div>',
+            input_value=f'<div><a class="four five" test_attr="one two" href="{random_string_one}" text="{random_string_two}">Anything</a></div>',
             schema=schema,
         ) == ContentExtractionResult(
             title="", text=random_string_two + " ", pictures=[], categories=""
@@ -402,20 +405,31 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
 
         assert (
             self.editor.edit_container_element(
-                input_value=f'<div><a href="{random_string_one}" test_attr="one two" text="{random_string_two}">Anything</a></div>',
+                input_value=f'<div><a class="four five" href="{random_string_one}" test_attr="one two" text="{random_string_two}">Anything</a></div>',
                 schema=schema,
                 content=generated_content,
             )
-            == f'<div><a href="{generated_content.link}" test_attr="one two" text="{generated_content.summary}">Anything</a></div>'
+            == f'<div><a class="four five" href="{generated_content.link}" test_attr="one two" text="{generated_content.summary}">Anything</a></div>'
         )
 
+        # test non-multival attribute
         assert (
             self.editor.edit_container_element(
-                input_value=f'<div><a href="{random_string_one}" test_attr="three four" text="{random_string_two}">Anything</a></div>',
+                input_value=f'<div><a href="{random_string_one}" class="four five six" test_attr="three four" text="{random_string_two}">Anything</a></div>',
                 schema=schema,
                 content=generated_content,
             )
-            == f'<div><a href="{random_string_one}" test_attr="three four" text="{random_string_two}">Anything</a></div>'
+            == f'<div><a class="four five six" href="{random_string_one}" test_attr="three four" text="{random_string_two}">Anything</a></div>'
+        )
+
+        # test multival attribute
+        assert (
+            self.editor.edit_container_element(
+                input_value=f'<div><a href="{random_string_one}" class="four six" test_attr="one two" text="{random_string_two}">Anything</a></div>',
+                schema=schema,
+                content=generated_content,
+            )
+            == f'<div><a class="four six" href="{random_string_one}" test_attr="one two" text="{random_string_two}">Anything</a></div>'
         )
 
     def test_edit_container_is_leaf(self):
