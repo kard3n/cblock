@@ -137,7 +137,7 @@ class HTMLContentEditor(ContentEditorInterface):
 
         for attribute in attributes.keys():
             if attribute in element.attrs.keys():
-                if type(element.attrs[attribute]) == str:
+                if type(element.attrs[attribute]) is str:
                     element_attr_values = element.attrs[attribute].split()
                 else:
                     element_attr_values = element.attrs[attribute]
@@ -199,14 +199,15 @@ class HTMLContentEditor(ContentEditorInterface):
                     recursive=child_schema.search_recursive,
                 )
                 for child_element in matched_elements:
+                    # don't explore elements with blacklisted attributes or which don't
+                    # have the required multivalued attribute values
                     # check that the child does not have one of the black-listed attributes
-                    if self.has_attribute_overlap(
+                    if not self.has_attribute_overlap(
                         element=child_element, attributes=child_schema.not_attributes
-                    ) or not self._multival_attributes_match(
+                    ) and self._multival_attributes_match(
                         child_element, attributes=child_schema.attributes_multival
                     ):
-                        return
-                    self.__explore_parsed(child_element, child_schema)
+                        self.__explore_parsed(child_element, child_schema)
 
     def edit_container_element(
         self, input_value, schema: HTMLSchema, content: Content
