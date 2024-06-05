@@ -1,9 +1,11 @@
 import pathlib
+import time
 
+import joblib
 from cloudpickle import cloudpickle
 from nltk import pos_tag, word_tokenize, SnowballStemmer
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_selection import SelectKBest, chi2, mutual_info_classif
+from sklearn.feature_selection import SelectKBest, chi2, mutual_info_classif, f_classif
 from sklearn.metrics import accuracy_score, f1_score, recall_score
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.naive_bayes import ComplementNB
@@ -14,7 +16,7 @@ from classifier_scripts.create_dataset import create_dataset
 stemmer = SnowballStemmer("english", ignore_stopwords=False)
 
 
-def steam_tokenize_string(string: str):
+def stem_tokenize_string(string: str):
     result: [str] = []
     tokenized = word_tokenize(string)
 
@@ -51,7 +53,7 @@ def ner(input_str: str):
     return input_str
 
 
-dataset_loc = pathlib.Path(__file__).parent.resolve().as_posix() + "/test_v2_6.csv"
+dataset_loc = pathlib.Path(__file__).parent.resolve().as_posix() + "/test_v2_7.csv"
 
 categories_to_remove = ["finance", "environment_disaster", "health_drugs"]
 
@@ -68,7 +70,9 @@ x_train, x_test, y_train, y_test = train_test_split(
 
 
 cv = CountVectorizer(
-    stop_words="english", tokenizer=steam_tokenize_string, strip_accents="unicode"
+    stop_words="english",
+    tokenizer=stem_tokenize_string,
+    strip_accents="unicode",
 )
 
 # chi2, f_classif, mutual_info_classif
@@ -87,7 +91,9 @@ param_grid = {
         0.5,
         0.85,
         1.0,
+        1.1,
         1.2,
+        1.3,
         1.4,
         1.47,
         1.5,
@@ -105,6 +111,7 @@ grid_search = GridSearchCV(
     pipeline_cv,
     param_grid=param_grid,
     return_train_score=True,
+    cv=10,
     verbose=2,
     n_jobs=-1,
     scoring="f1_macro",
@@ -119,18 +126,23 @@ cnb = grid_search.best_estimator_
 pipeline = make_pipeline(
     CountVectorizer(
         stop_words="english",
-        tokenizer=steam_tokenize_string,
+        tokenizer=stem_tokenize_string,
         strip_accents="unicode",
         vocabulary=new_features,
     ),
     cnb,
 )
 
+test_start_time = time.time()
 y_pred = pipeline.predict(x_test)
+test_end_time = time.time()
 
 print("Accuracy:", accuracy_score(y_test, y_pred))
 print("F1 score:", f1_score(y_test, y_pred, average="macro"))
 print("Recall score: ", recall_score(y_test, y_pred, average="weighted"))
 print("Number of features: ", cnb.n_features_in_)
+print(
+    f"Time required to classify {y_pred.shape[0]} instances: {test_end_time - test_start_time}s"
+)
 
-cloudpickle.dump(cnb, open("classifier.pickle", "wb"))
+cloudpickle.dump(pipeline, open("classifier.pickle", "wb"))
