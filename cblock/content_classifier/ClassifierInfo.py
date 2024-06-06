@@ -118,4 +118,8 @@ class ClassifierInfo:
             "description": self.description,
             "topic_blacklist": self.topic_blacklist,
             "aggressiveness": self.aggressiveness,
+            "aggressiveness_max": self.aggressiveness_max,
+            "aggressiveness_min": self.aggressiveness_min,
+            "aggressiveness_recommended": self.aggressiveness_recommended,
+            "aggressiveness_description": self.aggressiveness_description,
         }
