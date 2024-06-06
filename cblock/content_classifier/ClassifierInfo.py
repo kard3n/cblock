@@ -104,8 +104,8 @@ class ClassifierInfo:
             d["description"],
             d["topic_blacklist"],
             d["aggressiveness"],
-            d["aggressiveness_max"],
             d["aggressiveness_min"],
+            d["aggressiveness_max"],
             d["aggressiveness_recommended"],
             d["aggressiveness_description"],
         )
