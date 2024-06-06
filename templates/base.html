@@ -15,6 +15,9 @@
     <body data-bs-theme="dark">
         <nav class="navbar navbar-expand-lg" >
             <div class="container-fluid">
+                {% block navigation_button %}
+                {% endblock %}
+
                 <a class="navbar-brand flex-grow-1 ms-3" href="/">ContentBlock</a>
 
                 <a class="btn btn-danger" type="button" id="shutdownButton" href="/shutdown">
