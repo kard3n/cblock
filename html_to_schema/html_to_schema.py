@@ -137,7 +137,7 @@ def item_to_cbs(tag_in: Tag) -> str:
     children_had_content: bool = False
     result = "\n" + item_to_line(tag_in, "de")
     for child in tag_in.children:
-        if is_sentence(child.text) and type(child) is not NavigableString:
+        if is_sentence(child.text) and not tag_type_in_blacklist(child):
             for line in tag_to_cbs(child).splitlines():
                 children_had_content = True
                 result += "\n    " + line
@@ -163,7 +163,7 @@ def tag_to_cbs(tag_in: Tag) -> str | None:
         result = item_to_line(tag_in, "")
         # result += "\n#" + tag_in.text.replace("\n", "")
         for child in tag_in.children:
-            if type(child) is not NavigableString:
+            if not tag_type_in_blacklist(child):
                 added_children += 1
 
                 for line in tag_to_cbs(child).splitlines():
