@@ -77,8 +77,6 @@ def check_tag(tag_in: Tag, file: TextIO) -> bool:
                 and is_sentence(item.tag.text)
                 and own_number_attributes + count_attributes(tag_in=item.tag) > 0
             ):
-                print(1, tag_in.attrs.keys(), count_attributes(tag_in=tag_in))
-                print(2, item.tag.attrs.keys(), count_attributes(tag_in=item.tag))
                 result += "\n" + item_to_cbs(tag_in=item.tag)
                 has_generated_entry = True
         else:
