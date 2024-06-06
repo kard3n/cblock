@@ -20,3 +20,11 @@ class OSManagerInterface(ABC):
         Stops the OS from sending traffic through the proxy
         """
         raise NotImplementedError("Not implemented")
+
+    @abstractmethod
+    def install_certificates(self):
+        """
+        Installs the required certificates for mitmproxy to work
+        :return:
+        """
+        raise NotImplementedError("Not implemented")

@@ -85,6 +85,20 @@ class CBlock:
             port=self.config.proxy_port,
         )
 
+        # install certificate if it's the first run
+        if self.config.is_first_run == "True":
+            print(
+                "\nIt appears ContentBlock is starting for the first time."
+                + "\n\tAccept the prompt to allow the installation of the required certificates."
+                + "\n\tIf you face certificate errors, try to reinstall the certificates from the settings of the GUI"
+                + "\n\tWhen using Firefox, please follow the instructions here: http://mitm.it/"
+                + "\n\tIn case of any other errors regarding certificates, contact the developer"
+                + " or search in mitmproxy's documentation.\n"
+            )
+            self.os_manager.install_certificates()
+
+            self.config.set_attribute("is_first_run", "False")
+
         self.shutdown_event = threading.Event()
 
         # catch shutdown signals
