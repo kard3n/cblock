@@ -92,11 +92,12 @@ class ClassifierManager:
 
     def _save_settings(self, classifier_name: str):
         json.dump(
-            self._classifier_info[classifier_name].to_dict(),
-            open(
+            obj=self._classifier_info[classifier_name].to_dict(),
+            fp=open(
                 os.path.join(
                     self._classifier_info[classifier_name].directory_path, "info.json"
                 ),
                 "wt",
             ),
+            indent=4,
         )

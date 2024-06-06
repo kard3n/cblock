@@ -1,1 +1,8 @@
-{"name": "ContentToFile", "nickname": "Content To File", "filename": "ContentToFileClassifier", "description": "Saves all content to a file", "topic_blacklist": [], "aggressiveness": 1.0}
+{
+    "name": "ContentToFile",
+    "nickname": "Content To File",
+    "filename": "ContentToFileClassifier",
+    "description": "Saves all content to a file",
+    "topic_blacklist": [],
+    "aggressiveness": 0.0
+}
