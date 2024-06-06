@@ -43,13 +43,10 @@ def check_tag(tag_in: Tag, file: TextIO) -> bool:
     """
     list_of_unique_children: list[TagDefinition] = []
 
-    to_ret = False
+    # True if this or one of this Tag's children have generated an entry
+    has_generated_entry = False
 
     for child in tag_in.children:
-        print(type(child))
-        if not tag_type_in_blacklist(child) and "class" in child.attrs:
-            print("Name: " + child.name + " Class:" + child.attrs["class"].__str__())
-
         if not has_twin(child, list_of_unique_children) and not tag_type_in_blacklist(
             child
         ):
@@ -61,16 +58,10 @@ def check_tag(tag_in: Tag, file: TextIO) -> bool:
                     tag=child,
                 )
             )
-    print(
-        "    ".join(
-            [
-                item.name + ", " + item.attr_dictionary.__str__()
-                for item in list_of_unique_children
-            ]
-        )
-    )
 
     result: str = ""
+    # Number of not-blacklisted attributes this element has
+    own_number_attributes = count_attributes(tag_in=tag_in)
     for item in list_of_unique_children:
         if item.count > 2:
             # if the item has a count > 2, it is probably a list item
@@ -78,10 +69,18 @@ def check_tag(tag_in: Tag, file: TextIO) -> bool:
             print(is_sentence(f"{item.tag.text}".replace("\n", " ")))
             print(f"{item.tag.text}".replace("\n", " "))"""
 
-            # ensure that no entry has been generated for this item's children and that it has text
-            if not check_tag(item.tag, file) and is_sentence(item.tag.text):
+            # ensure that no entry has been generated for this item's children
+            # and that it has text
+            # and that the attribute count together is not zero (to prevent the removal all occurrences of a tag)
+            if (
+                not check_tag(item.tag, file)
+                and is_sentence(item.tag.text)
+                and own_number_attributes + count_attributes(tag_in=item.tag) > 0
+            ):
+                print(1, tag_in.attrs.keys(), count_attributes(tag_in=tag_in))
+                print(2, item.tag.attrs.keys(), count_attributes(tag_in=item.tag))
                 result += "\n" + item_to_cbs(tag_in=item.tag)
-                to_ret = True
+                has_generated_entry = True
         else:
             check_tag(item.tag, file)
 
@@ -93,7 +92,23 @@ def check_tag(tag_in: Tag, file: TextIO) -> bool:
                 to_file += "\n    " + line
         file.write(to_file)
 
-    return to_ret
+    return has_generated_entry
+
+
+def count_attributes(tag_in: Tag):
+    result = 0
+    for attribute in tag_in.attrs.keys():
+        attr_val = tag_in.attrs[attribute]
+        if not attr_in_blacklist(attribute):
+            if (
+                type(attr_val) is str
+                and len(clean_multival_attr_value(attr_val.split())) > 0
+            ):
+                result += 1
+            elif len(clean_multival_attr_value(attr_val)) > 0:
+                result += 1
+
+    return result
 
 
 def has_twin(tag_in: Tag, list_of_unique_children: list[TagDefinition]) -> bool:
