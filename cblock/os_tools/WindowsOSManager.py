@@ -28,14 +28,3 @@ class WindowsOSManager(OSManagerInterface):
 
     def deactivate_proxy(self):
         winreg.SetValueEx(self.INTERNET_SETTINGS, "ProxyEnable", 0, winreg.REG_DWORD, 0)
-
-    @main_requires_admin
-    def install_certificates(self):
-        subprocess.run(
-            [
-                "certutil",
-                "-addstore",
-                "root",
-                "mitmproxy-ca-cert.cer",
-            ]
-        )
