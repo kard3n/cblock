@@ -88,6 +88,10 @@ class HTMLSchemaParser(SchemaParserInterface):
                     raise SchemaParsingException(
                         '"embedded_schema" tag must be followed by the name of another schema.'
                     )
+            elif item.startswith("precondition:"):
+                result.precondition = regex.compile(
+                    extract_from_inbetween_symbol(item[13:], "'")
+                )
             else:
                 # If it is none of the before, it's an attribute
                 colon_pos: int = item.find(":")

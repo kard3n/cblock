@@ -604,3 +604,60 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
             )
             == f'<div><a href="{generated_content.link}" src="{generated_content.picture}">{generated_content.title}</a><img href="https://www.example.com/test" src="{generated_content.picture}"/></div>'
         )
+
+    def test_edit_precondition(self):
+        generated_content: Content = test_utils.generate_content()
+        self.content_factory.get_content.return_value = generated_content
+        self.content_analyzer.classify.return_value = True
+
+        schema: HTMLSchema = HTMLSchema(
+            html_tag=None,
+            content_tags=[],
+            attributes_regex={},
+            attributes_multival={},
+            embedded_schema=None,
+            children=[
+                HTMLSchema(
+                    html_tag=regex.compile("div"),
+                    content_tags=[ContentTag.CONTAINER, ContentTag.TITLE],
+                    search_recursive=True,
+                    attributes_regex={},
+                    attributes_multival={},
+                    embedded_schema=None,
+                    precondition=regex.compile("PREC"),
+                    children=[],
+                ),
+                HTMLSchema(
+                    html_tag=regex.compile("span"),
+                    content_tags=[ContentTag.DELETE_UNCONDITIONAL],
+                    search_recursive=True,
+                    attributes_regex={},
+                    attributes_multival={},
+                    embedded_schema=None,
+                    precondition=regex.compile("PREC"),
+                    children=[],
+                ),
+            ],
+        )
+
+        random_string: str = test_utils.random_string(10)
+
+        assert (
+            self.editor.edit(input_raw=f"<div>PREC</div>", schema=schema)
+            == f"<html><body><div>{generated_content.title}</div></body></html>"
+        )
+
+        assert (
+            self.editor.edit(input_raw=f"<div>NO PREC</div>", schema=schema)
+            == f"<html><body><div>NO PREC</div></body></html>"
+        )
+
+        assert (
+            self.editor.edit(input_raw=f"<span>PREC</span>", schema=schema)
+            == f"<html><body></body></html>"
+        )
+
+        assert (
+            self.editor.edit(input_raw=f"<span>NO PREC</span>", schema=schema)
+            == f"<html><body><span>NO PREC</span></body></html>"
+        )

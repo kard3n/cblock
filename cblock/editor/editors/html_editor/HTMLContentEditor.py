@@ -179,6 +179,10 @@ class HTMLContentEditor(ContentEditorInterface):
 
         if (
             ContentTag.CONTAINER in schema.content_tags
+            and (
+                schema.precondition is None
+                or regex.match(schema.precondition, "".join(element.contents))
+            )
             and self.content_analyzer.classify(
                 content=self.extract_content_parsed(element=element, schema=schema)
             )
@@ -188,7 +192,10 @@ class HTMLContentEditor(ContentEditorInterface):
                 schema=schema,
                 content=self.content_factory.get_content(),
             )
-        elif ContentTag.DELETE_UNCONDITIONAL in schema.content_tags:
+        elif ContentTag.DELETE_UNCONDITIONAL in schema.content_tags and (
+            schema.precondition is None
+            or regex.match(schema.precondition, "".join(element.contents))
+        ):
             # Deletes the whole element, not just its content
             element.decompose()
         else:

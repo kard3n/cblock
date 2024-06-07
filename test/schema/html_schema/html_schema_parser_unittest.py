@@ -22,6 +22,7 @@ class TestHTTPSchemaParser(unittest.TestCase):
             attributes_regex={},
             attributes_multival={},
             embedded_schema=None,
+            precondition=None,
             children=[
                 HTMLSchema(
                     html_tag=regex.compile("a"),
@@ -34,6 +35,7 @@ class TestHTTPSchemaParser(unittest.TestCase):
                     attributes_multival={},
                     not_attributes=["bad", "attr"],
                     embedded_schema=None,
+                    precondition=None,
                     children=[],
                 )
             ],
@@ -49,6 +51,7 @@ class TestHTTPSchemaParser(unittest.TestCase):
             attributes_regex={},
             attributes_multival={},
             embedded_schema=None,
+            precondition=None,
             children=[
                 HTMLSchema(
                     html_tag=regex.compile("a"),
@@ -60,6 +63,7 @@ class TestHTTPSchemaParser(unittest.TestCase):
                     attributes_regex={"href": regex.compile(r"https:\/\/example\.com")},
                     attributes_multival={},
                     embedded_schema=None,
+                    precondition=None,
                     children=[],
                 )
             ],
@@ -76,6 +80,7 @@ class TestHTTPSchemaParser(unittest.TestCase):
             attributes_multival={},
             attributes_to_edit={},
             embedded_schema=None,
+            precondition=None,
             children=[
                 HTMLSchema(
                     html_tag=regex.compile("a"),
@@ -84,6 +89,7 @@ class TestHTTPSchemaParser(unittest.TestCase):
                     attributes_regex={"href": regex.compile(r"https:\/\/example\.com")},
                     attributes_multival={},
                     embedded_schema=None,
+                    precondition=None,
                     children=[
                         HTMLSchema(
                             html_tag=regex.compile("b"),
@@ -94,6 +100,7 @@ class TestHTTPSchemaParser(unittest.TestCase):
                             attributes_regex={"class": regex.compile(r"headline")},
                             attributes_multival={},
                             embedded_schema=None,
+                            precondition=None,
                             children=[],
                         ),
                         HTMLSchema(
@@ -102,6 +109,7 @@ class TestHTTPSchemaParser(unittest.TestCase):
                             attributes_regex={"class": regex.compile(r"summary")},
                             attributes_multival={},
                             embedded_schema=None,
+                            precondition=None,
                             children=[],
                         ),
                     ],
@@ -110,7 +118,7 @@ class TestHTTPSchemaParser(unittest.TestCase):
         )
 
     def test_parse_string_multiple_children_non_recursive(self):
-        schema: str = r"""html_tag:'a', recursive:'False', content_tags:'e', href: 'https:\/\/example\.com'
+        schema: str = r"""html_tag:'a', recursive:'False', content_tags:'e', href: 'https:\/\/example\.com', precondition:'CONDITION-.*'
     html_tag:'b', content_tags:'at', recursive:'True' ,class!: 'headline title text'
     html_tag:'span', content_tags:'as', recursive:'False', class: 'summary'"""
         assert self.parser.parse_string(schema) == HTMLSchema(
@@ -119,6 +127,7 @@ class TestHTTPSchemaParser(unittest.TestCase):
             attributes_regex={},
             attributes_multival={},
             embedded_schema=None,
+            precondition=None,
             children=[
                 HTMLSchema(
                     html_tag=regex.compile("a"),
@@ -127,6 +136,7 @@ class TestHTTPSchemaParser(unittest.TestCase):
                     attributes_multival={},
                     search_recursive=False,
                     embedded_schema=None,
+                    precondition=regex.compile(r"CONDITION-.*"),
                     children=[
                         HTMLSchema(
                             html_tag=regex.compile("b"),
@@ -138,6 +148,7 @@ class TestHTTPSchemaParser(unittest.TestCase):
                             },
                             attributes_regex={},
                             embedded_schema=None,
+                            precondition=None,
                             children=[],
                         ),
                         HTMLSchema(
@@ -147,6 +158,7 @@ class TestHTTPSchemaParser(unittest.TestCase):
                             attributes_regex={"class": regex.compile(r"summary")},
                             attributes_multival={},
                             embedded_schema=None,
+                            precondition=None,
                             children=[],
                         ),
                     ],

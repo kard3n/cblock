@@ -12,6 +12,7 @@ class HTMLSchema:
 
     Attributes:
         html_tag (Pattern): The html tag that should be matched by this schema element, if none everything is matched (including strings). Can be a regex.
+        precondition (Pattern | None): A precondition that must be met for elements with the DELETE_UNCONDITIONAL or CONTAINER tags
         attributes_regex (Dict[str, Pattern]): A attributes that the element must have to be matched. The value is a regex pattern that must match against the attributes value
         attributes_multival (Dict[str, list(str)]): A list attributes that the element must have to be matched. The value is a list of values the attribute must have
         not_attributes: list[str]: A list of attributes that the elements to match should not have
@@ -23,6 +24,7 @@ class HTMLSchema:
     """
 
     html_tag: Pattern | None = None
+    precondition: Pattern | None = None
     attributes_regex: Dict[str, Pattern] = field(default_factory=dict)
     attributes_multival: Dict[str, list] = field(default_factory=dict)
     not_attributes: list[str] = field(default_factory=list)

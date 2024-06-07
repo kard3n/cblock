@@ -112,6 +112,7 @@ This type of schema is used for HTML document. It is similar to the GenericSchem
 * _content\_tags_: just content tags. Example: "de" for "DELETE" and "ELEMENT"
 * _edit\_attrs_: the elements attributes that should be edited. Contains a whitespace-separated list with values in the style of `attribute_name:contentTag1ContentTag2`. Example for an _href_ and _src_ attribute: `'href:l src:p'`
 * _not\_attrs_: if the element contains one of the attributes, it is ignored. Example to ignore elements with "class" or "src" attributes: 'class src'
+* _precondition_: a precondition that must be met for the element to be matched. Is a regex, and only applies to elements with the DELETE_UNCONDITIONAL or CONTAINER tags
 * all other fields: will be considered attribute names and their value a regex that must match its value.
   * If the name is followed by a "!", the value will be traded as a list of values which must be found in the attribute.
   * In case only elements that contain a link to `example.com`, the following could be added to the rule: `href: 'https:\/\/example\.com'`
