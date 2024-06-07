@@ -10,7 +10,7 @@ class AlwaysFalseClassifier(ContentClassifierInterface):
         self,
         content: ContentExtractionResult,
     ) -> bool:
-        return True
+        return False
 
     def get_supported_topics(self) -> list[str]:
         return []
