@@ -88,15 +88,27 @@ class HTMLSchemaParser(SchemaParserInterface):
                     raise SchemaParsingException(
                         '"embedded_schema" tag must be followed by the name of another schema.'
                     )
+            elif item.startswith("precondition:"):
+                result.precondition = regex.compile(
+                    extract_from_inbetween_symbol(item[13:], "'")
+                )
             else:
                 # If it is none of the before, it's an attribute
                 colon_pos: int = item.find(":")
 
                 if colon_pos < 0:
                     raise SchemaParsingException(f'"{item}" does not contain a value.')
-                result.attributes[item[0:colon_pos]] = regex.compile(
-                    extract_from_inbetween_symbol(item[colon_pos + 1 :], "'")
-                )
+                item_name = item[0:colon_pos]
+                if item_name.endswith("!"):
+                    result.attributes_multival[item_name[0:-1]] = (
+                        extract_from_inbetween_symbol(
+                            item[colon_pos + 1 :], "'"
+                        ).split()
+                    )
+                else:
+                    result.attributes_regex[item_name] = regex.compile(
+                        extract_from_inbetween_symbol(item[colon_pos + 1 :], "'")
+                    )
 
         if result.embedded_schema is not None and result.content_tags != []:
             raise SchemaParsingException(

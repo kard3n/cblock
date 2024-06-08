@@ -1,4 +1,7 @@
+import subprocess
 import winreg
+
+from pyuac import main_requires_admin
 
 from os_tools.OSManagerInterface import OSManagerInterface
 

@@ -4,7 +4,17 @@ class ClassifierInfo:
     """
 
     def __init__(
-        self, name, nickname, filename, description, topic_blacklist, aggressiveness
+        self,
+        name,
+        nickname,
+        filename,
+        description,
+        topic_blacklist,
+        aggressiveness,
+        aggressiveness_min,
+        aggressiveness_max,
+        aggressiveness_recommended,
+        aggressiveness_description,
     ):
         self._name: str = name
         self._nickname: str = nickname
@@ -12,6 +22,10 @@ class ClassifierInfo:
         self._description: str = description
         self._topic_blacklist: list[str] = topic_blacklist
         self._aggressiveness: float = aggressiveness
+        self._aggressiveness_min: float = aggressiveness_min
+        self._aggressiveness_max: float = aggressiveness_max
+        self._aggressiveness_recommended: float = aggressiveness_recommended
+        self._aggressiveness_description: str = aggressiveness_description
 
     @property
     def name(self) -> str:
@@ -38,6 +52,14 @@ class ClassifierInfo:
         self._topic_blacklist = value
 
     @property
+    def directory_path(self) -> str:
+        return self._directory_path
+
+    @directory_path.setter
+    def directory_path(self, value: str) -> None:
+        self._directory_path = value
+
+    @property
     def aggressiveness(self) -> float:
         return self._aggressiveness
 
@@ -46,12 +68,32 @@ class ClassifierInfo:
         self._aggressiveness = value
 
     @property
-    def directory_path(self) -> str:
-        return self._directory_path
+    def aggressiveness_min(self) -> float:
+        return self._aggressiveness_min
 
-    @directory_path.setter
-    def directory_path(self, value: str) -> None:
-        self._directory_path = value
+    @aggressiveness_min.setter
+    def aggressiveness_min(self, value: float) -> None:
+        self._aggressiveness_min = value
+
+    @property
+    def aggressiveness_max(self) -> float:
+        return self._aggressiveness_max
+
+    @aggressiveness_max.setter
+    def aggressiveness_max(self, value: float) -> None:
+        self._aggressiveness_max = value
+
+    @property
+    def aggressiveness_recommended(self) -> float:
+        return self._aggressiveness_recommended
+
+    @property
+    def aggressiveness_description(self) -> str:
+        return self._aggressiveness_description
+
+    @aggressiveness_description.setter
+    def aggressiveness_description(self, value: str) -> None:
+        self._aggressiveness_description = value
 
     @staticmethod
     def from_dict(d: dict):
@@ -62,6 +104,10 @@ class ClassifierInfo:
             d["description"],
             d["topic_blacklist"],
             d["aggressiveness"],
+            d["aggressiveness_min"],
+            d["aggressiveness_max"],
+            d["aggressiveness_recommended"],
+            d["aggressiveness_description"],
         )
 
     def to_dict(self) -> dict:
@@ -72,4 +118,8 @@ class ClassifierInfo:
             "description": self.description,
             "topic_blacklist": self.topic_blacklist,
             "aggressiveness": self.aggressiveness,
+            "aggressiveness_max": self.aggressiveness_max,
+            "aggressiveness_min": self.aggressiveness_min,
+            "aggressiveness_recommended": self.aggressiveness_recommended,
+            "aggressiveness_description": self.aggressiveness_description,
         }

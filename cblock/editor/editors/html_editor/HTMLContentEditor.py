@@ -1,4 +1,5 @@
 import logging
+import traceback
 
 from bs4 import BeautifulSoup, Tag
 from regex import regex
@@ -42,17 +43,10 @@ class HTMLContentEditor(ContentEditorInterface):
         try:
             self.__explore_parsed(element=soup, schema=schema)
         except Exception as e:
-            logging.warning(f"Error editing input: {e}")
+            logging.warning(f"Error editing input: {traceback.format_exc()}")
             return input_raw
 
         return soup.__str__()
-
-        # seems to be redundant, removed for now
-        """return self.__extract_body_if_not_in_input(
-            input_str=input_raw, output_str=soup.__repr__()
-        )"""
-
-        return input_raw
 
     def extract_content(
         self,
@@ -118,18 +112,42 @@ class HTMLContentEditor(ContentEditorInterface):
             for child_schema in schema.children:
                 for matched_element in element.find_all(
                     child_schema.html_tag,
-                    attrs=child_schema.attributes,
+                    attrs=child_schema.attributes_regex,
                     recursive=child_schema.search_recursive,
                 ):
                     # If the matched element does not have one of the blacklisted attributes, edit it
                     if not self.has_attribute_overlap(
                         element=matched_element, attributes=child_schema.not_attributes
+                    ) and self._multival_attributes_match(
+                        matched_element, attributes=child_schema.attributes_multival
                     ):
                         self.extract_content_parsed(
                             matched_element, child_schema, result_container
                         )
 
         return result_container
+
+    def _multival_attributes_match(self, element: Tag, attributes: {}):
+        """
+        Return true if element has all the attributes and they contain all the specified values
+        :param element:
+        :param attributes:
+        :return:
+        """
+
+        for attribute in attributes.keys():
+            if attribute in element.attrs.keys():
+                if type(element.attrs[attribute]) is str:
+                    element_attr_values = element.attrs[attribute].split()
+                else:
+                    element_attr_values = element.attrs[attribute]
+
+                for value in attributes[attribute]:
+                    if value not in element_attr_values:
+                        return False
+            else:
+                return False
+        return True
 
     def has_attribute_overlap(self, element: Tag, attributes: list[str]) -> bool:
         """
@@ -161,6 +179,10 @@ class HTMLContentEditor(ContentEditorInterface):
 
         if (
             ContentTag.CONTAINER in schema.content_tags
+            and (
+                schema.precondition is None
+                or regex.match(schema.precondition, "".join(element.contents))
+            )
             and self.content_analyzer.classify(
                 content=self.extract_content_parsed(element=element, schema=schema)
             )
@@ -170,23 +192,29 @@ class HTMLContentEditor(ContentEditorInterface):
                 schema=schema,
                 content=self.content_factory.get_content(),
             )
-        elif ContentTag.DELETE_UNCONDITIONAL in schema.content_tags:
+        elif ContentTag.DELETE_UNCONDITIONAL in schema.content_tags and (
+            schema.precondition is None
+            or regex.match(schema.precondition, "".join(element.contents))
+        ):
             # Deletes the whole element, not just its content
             element.decompose()
         else:
             for child_schema in schema.children:
                 matched_elements = element.find_all(
                     child_schema.html_tag,
-                    attrs=child_schema.attributes,
+                    attrs=child_schema.attributes_regex,
                     recursive=child_schema.search_recursive,
                 )
                 for child_element in matched_elements:
+                    # don't explore elements with blacklisted attributes or which don't
+                    # have the required multivalued attribute values
                     # check that the child does not have one of the black-listed attributes
-                    if self.has_attribute_overlap(
+                    if not self.has_attribute_overlap(
                         element=child_element, attributes=child_schema.not_attributes
+                    ) and self._multival_attributes_match(
+                        child_element, attributes=child_schema.attributes_multival
                     ):
-                        return
-                    self.__explore_parsed(child_element, child_schema)
+                        self.__explore_parsed(child_element, child_schema)
 
     def edit_container_element(
         self, input_value, schema: HTMLSchema, content: Content
@@ -237,12 +265,14 @@ class HTMLContentEditor(ContentEditorInterface):
             for child_schema in schema.children:
                 matched_elements = element.find_all(
                     child_schema.html_tag,
-                    attrs=child_schema.attributes,
+                    attrs=child_schema.attributes_regex,
                     recursive=child_schema.search_recursive,
                 )
                 for item in matched_elements:
                     if not self.has_attribute_overlap(
                         element=item, attributes=child_schema.not_attributes
+                    ) and self._multival_attributes_match(
+                        item, attributes=child_schema.attributes_multival
                     ):
                         self.__edit_container_element_parsed(
                             element=item, schema=child_schema, content=content

@@ -2,12 +2,19 @@ import sys
 sys.path.append('cblock')
 
 import asyncio
+import ctypes
 import logging
+import os
 import pathlib
 import signal
+import subprocess
 import sys
 import threading
 import time
+
+from mitmproxy.mitmproxy.certs import CertStore
+
+sys.path.append("cblock")
 
 from cblock_addon import CBlockAddonMain
 from configuration.Configuration import Configuration
@@ -149,7 +156,59 @@ class CBlock:
         self.loop.call_soon_threadsafe(self.loop.stop)
 
 
+def install_certificates():
+
+    subprocess.run(
+        [
+            "certutil",
+            "-addstore",
+            "root",
+            pathlib.Path.home().as_posix() + r"/.mitmproxy\mitmproxy-ca-cert.pem",
+        ]
+    )
+
+
+def is_admin():
+    try:
+        return ctypes.windll.shell32.IsUserAnAdmin()
+    except:
+        return False
+
+
 if __name__ == "__main__":
     config = Configuration()
-    cblock = CBlock(config)
-    cblock.run()
+
+    dont_run = False
+
+    # install certificates if it's the first run
+    if config.is_first_run == "True":
+        if is_admin():
+            dont_run = True
+            # create certificates if they don't exist
+            if not os.path.isdir(pathlib.Path.home().as_posix() + r"/.mitmproxy"):
+                os.mkdir(pathlib.Path.home().as_posix() + r"/.mitmproxy")
+                CertStore.create_store(
+                    path=pathlib.Path(pathlib.Path.home().as_posix() + r"/.mitmproxy"),
+                    basename="mitmproxy",
+                    key_size=2048,
+                )
+
+            install_certificates()
+            config.set_attribute("is_first_run", "False")
+            print(
+                "\nIt appears ContentBlock is starting for the first time."
+                + "\n\tAccept the prompt to allow the installation of the required certificates."
+                + "\n\tIf you face certificate errors, try to reinstall the certificates from the settings of the GUI"
+                + "\n\tWhen using Firefox, please follow the instructions here: http://mitm.it/"
+                + "\n\tIn case of any other errors regarding certificates, contact the developer"
+                + " or search in mitmproxy's documentation.\n"
+            )
+        else:
+            # Re-run the program with admin rights
+            # Important: sys.argv[1:] when using with pyinstall
+            ctypes.windll.shell32.ShellExecuteW(
+                None, "runas", sys.executable, " ".join(sys.argv), None, 1
+            )
+    if not dont_run:
+        cblock = CBlock(config)
+        cblock.run()

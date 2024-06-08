@@ -67,7 +67,7 @@ class CBlockAddonMain:
 
         self.schema_reader: SchemaReader = SchemaReader(
             db_manager=self.db_manager,
-            schema_location="cblock/schema_definitions/",
+            schema_location="schema_definitions/",
         )
 
         if not self.db_manager.has_database():
@@ -284,9 +284,9 @@ class CBlockAddonMain:
                 topic_blacklist=self.classifier_manager.classifier_info[
                     self.content_classifier_name
                 ].topic_blacklist,
-                aggressiveness=self.classifier_manager.classifier_info[
+                active_classifier=self.classifier_manager.classifier_info[
                     self.content_classifier_name
-                ].aggressiveness,
+                ].to_dict(),
                 classifiers=[
                     {
                         "name": classifier_info.name,
@@ -295,7 +295,6 @@ class CBlockAddonMain:
                     }
                     for classifier_info in self.classifier_manager.classifier_info.values()
                 ],
-                active_classifier=self.content_classifier_name,
             ),
             {
                 "Content-Type": "text/html",

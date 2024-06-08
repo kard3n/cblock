@@ -1,1 +1,12 @@
-{"name": "AlwaysTrue", "nickname": "Always True", "filename": "AlwaysTrueClassifier", "description": "Always returns True", "topic_blacklist": [], "aggressiveness": 4.0}
+{
+    "name": "AlwaysTrue",
+    "nickname": "Always True",
+    "filename": "AlwaysTrueClassifier",
+    "description": "Always returns True. Therefore, all content is edited",
+    "topic_blacklist": [],
+    "aggressiveness": 0.0,
+    "aggressiveness_max": 0.0,
+    "aggressiveness_min": 0.0,
+    "aggressiveness_recommended": 0.0,
+    "aggressiveness_description": "This classifier does not use aggressiveness"
+}

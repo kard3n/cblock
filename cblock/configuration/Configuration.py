@@ -22,11 +22,15 @@ class Configuration:
             return self.config["application"]["ProxyPort"]
         if item == "application_url":
             return self.config["application"]["ApplicationUrl"]
+        if item == "is_first_run":
+            return self.config["application"]["is_first_run"]
 
     # __set_attr__ causes errors
     def set_attribute(self, key, value):
         if key == "classifier":
             self.config.set("classifier", "classifier", value)
+        if key == "is_first_run":
+            self.config.set("application", "is_first_run", value)
 
         with open(self._config_file, "w") as configfile:
             self.config.write(configfile)
