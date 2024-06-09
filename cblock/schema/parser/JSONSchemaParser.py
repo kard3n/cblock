@@ -77,14 +77,6 @@ class JSONSchemaParser(SchemaParserInterface):
                 element_container.value += element[pos]
                 pos += 1
 
-            # jump quote
-            pos += 1
-
-            if pos < len(element):
-                raise SchemaParsingException(
-                    f'Unexpected character "{element[pos]}" at relative position {pos}'
-                )
-
         # starts with a bracket, must be a list
         elif element[pos] == "[":
             element_container.value_type = ValueType.LIST
