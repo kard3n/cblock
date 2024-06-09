@@ -61,7 +61,7 @@ class GenericSchemaParser(SchemaParserInterface):
                     result.embedded_schema = num
                 else:
                     raise SchemaParsingException(
-                        '"editor_id" tag must be followed by an ID.'
+                        '"schema_id" tag must be followed by an ID.'
                     )
             elif item.startswith("desc"):  # comments are skipped
                 pass
