@@ -1,6 +1,7 @@
 import logging
 import os
 import pickle
+import traceback
 
 from db.DBManagerInterface import DBManagerInterface
 from exceptions.SchemaParsingException import SchemaParsingException
@@ -38,7 +39,7 @@ class SchemaReader:
 
                 except SchemaParsingException as e:
                     logging.warning(
-                        f"The schema with ID {filename} could not be parsed and was therefore not added: {e}"
+                        f"The schema with ID {filename} could not be parsed and was therefore not added: {traceback.format_exc()}"
                     )
 
         self.db_manager.insert_multiple(values=data_to_insert)
@@ -127,7 +128,7 @@ class SchemaReader:
                 pickled_object = pickle.dumps(parser.parse_string(file_content[pos:]))
             except Exception as e:
                 raise SchemaParsingException(
-                    f"Underlying {schema_type} schema could not be parsed: {e}"
+                    f"Underlying {schema_type} schema could not be parsed: {traceback.format_exc()}"
                 )
 
             return [filename[:-4], url, path, schema_type, pickled_object]
