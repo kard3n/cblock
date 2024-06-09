@@ -50,7 +50,7 @@ class GenericSchemaParser(SchemaParserInterface):
                         result.tags.append(ContentTag[ContentTag(letter).name])
 
             elif item.startswith("schema_id:"):
-                id_pos: int = count_whitespaces(item, 10)
+                id_pos: int = count_whitespaces(item, 10) + 1
 
                 num: str = ""
                 while id_pos < len(item) and item[id_pos].isalnum():
