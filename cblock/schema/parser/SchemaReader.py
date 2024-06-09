@@ -20,6 +20,7 @@ class SchemaReader:
         self.schema_location = schema_location
 
     def run(self):
+        print("Reading schemas from '" + self.schema_location + "'.")
         filename_list = os.listdir(f"{self.schema_location}")
 
         self.db_manager.create_schema_table()
@@ -41,6 +42,7 @@ class SchemaReader:
                     )
 
         self.db_manager.insert_multiple(values=data_to_insert)
+        print("Finished reading schemas.")
 
     # Returns a list, with the following content (order): schema name, url, schema type, underlying schema (as string)
     def read_schema(self, directory: str, filename: str) -> list | str:
