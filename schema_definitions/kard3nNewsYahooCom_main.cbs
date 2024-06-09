@@ -1,4 +1,4 @@
-url: yahoo.com
+url: news.yahoo.com
 path: \/(\w*\?)*.*
 type: html
 schema:

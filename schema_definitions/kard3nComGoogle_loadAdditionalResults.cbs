@@ -1,6 +1,0 @@
-url: google.com
-path: \/search\?vet=.*?
-type: generic
-schema:
-pattern:'<div class="MjjYud">(?P<content>.*?)<\/div><\/div><\/div><\/div><\/div>', tags:'e'
-    pattern:'<h3 class="[\w ]*?">(?P<content>[\w ]*?)<\/h3>', tags:'ta'

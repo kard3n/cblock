@@ -1,5 +1,0 @@
-url: news.google.com
-path: /_/DotsSplashUi/data/batchexecute.*
-type: generic
-schema:
-pattern:'\[\[13\,\[13\,\\".*?"\]\,\\"(?P<content>.*?)\\REMOVE"', tags:'eta'

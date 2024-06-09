@@ -2,13 +2,13 @@ url: wsj.com
 path: \/(\w*\?)*.*
 type: html
 schema:
-html_tag:'article', content_tags:'e'
+html_tag:'article', content_tags:'de'
     html_tag:'h3', content_tags:''
         html_tag:'a', content_tags:'ta', edit_attrs:'href:l'
     html_tag:'p', content_tags:''
         html_tag:'span', content_tags:'sa'
     html_tag:'img', edit_attrs:'src:p'
-html_tag:'div', content_tags:'e', data-testid:'.*'
+html_tag:'div', content_tags:'de', data-testid:'.*'
     html_tag:'a', content_tags:'', edit_attrs:'href:l'
     html_tag:'p', content_tags:'ta', data-testid:'flexcard.*'
 

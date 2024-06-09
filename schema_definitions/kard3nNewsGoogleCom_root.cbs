@@ -1,8 +1,0 @@
-url: news.google.com
-path: /home.*
-type: generic
-schema:
-pattern:'<article.*?>(?P<content>.*?)</article>', tags:'e'
-    pattern:'<a class="gPFEn".*?href="./articles/.*?" target="_blank".*?">(?P<content>.*?)</a>', tags:'ta'
-    pattern:'<span class="PJK1m">(?P<content>.*?)</span>', tags:'o'
-    pattern:'<span aria-hidden="true">(?P<content>.*?)</span>', tags:'o'

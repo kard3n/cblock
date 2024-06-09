@@ -1,0 +1,9 @@
+url:
+path:
+type: html
+schema:
+html_tag:'a', content_tags:'e', edit_attrs:'href:l'
+    html_tag:'img', edit_attrs:'src:p'
+    html_tag:'div', content_tags:'d', class:'status-wrapper'
+    html_tag:'span', content_tags:'ta', class:'^title$'
+    html_tag:'h\d', content_tags:'ta'
