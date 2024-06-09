@@ -25,7 +25,7 @@ class TestGenericSchemaParser(unittest.TestCase):
                     pattern=regex.Regex("bb(?P<content>hola)bb"),
                     tags=[ContentTag.ANALYZE],
                     embedded_schema=None,
-                    children=None,
+                    children=[],
                 )
             ],
         )
@@ -33,7 +33,7 @@ class TestGenericSchemaParser(unittest.TestCase):
     def test_parse_string_two(self):
         schema: str = r"""pattern:'bb(?P<content>xxholaxx)bb', tags:'e'
     pattern:'xx(?P<content>hola)xx', tags:'at'"""
-        assert self.parser.parse_string(schema) == GenericSchema(
+        self.assertEqual(GenericSchema(
             pattern=None,
             tags=[],
             embedded_schema=None,
@@ -47,12 +47,27 @@ class TestGenericSchemaParser(unittest.TestCase):
                             pattern=regex.Regex("xx(?P<content>hola)xx"),
                             tags=[ContentTag.ANALYZE, ContentTag.TITLE],
                             embedded_schema=None,
-                            children=None,
+                            children=[],
                         )
                     ],
                 )
             ],
-        )
+        ), self.parser.parse_string(schema))
+
+    def test_parse_embedded_schema(self):
+        schema: str = r"""pattern:'xx(?P<content>hola)xx', tags:'', schema_id:'example_schema-'"""
+        self.assertEqual(GenericSchema(
+            pattern=None,
+            tags=[],
+            embedded_schema=None,
+            children=[GenericSchema(
+                            pattern=regex.Regex("xx(?P<content>hola)xx"),
+                            tags=[],
+                            embedded_schema="example_schema-",
+                            children=[],
+                        )
+            ],
+        ), self.parser.parse_string(schema))
 
     def test_parse_string_multi_root(self):
         schema: str = r"""pattern:'__(?P<content>hola)__', tags:'e'
@@ -66,19 +81,19 @@ pattern:'xx(?P<content>hola)xx', tags:'e'"""
                     pattern=regex.Regex("__(?P<content>hola)__"),
                     tags=[ContentTag.CONTAINER],
                     embedded_schema=None,
-                    children=None,
+                    children=[],
                 ),
                 GenericSchema(
                     pattern=regex.Regex("xx(?P<content>hola)xx"),
                     tags=[ContentTag.CONTAINER],
                     embedded_schema=None,
-                    children=None,
+                    children=[],
                 ),
             ],
         )
 
     def test_parse_string_conflict_tags_and_embedded(self):
-        schema: str = r"pattern:'bb(?P<content>hola)bb', tags:'a', schema_id=20"
+        schema: str = r"pattern:'bb(?P<content>hola)bb', tags:'a', schema_id:'example_schema'"
 
         with raises(SchemaParsingException):
             self.parser.parse_string(schema)
