@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from enum import Enum
 
 from schema.generic_schema.GenericSchema import GenericSchema
+from schema.html_schema.HTMLSchema import HTMLSchema
 from schema.json_schema.JSONSchema import JSONSchema
 
 
@@ -17,7 +18,7 @@ class Schema:
     url: str = None
     path: str = None
     schema_type: SchemaType = None
-    schema: JSONSchema | GenericSchema = None
+    schema: JSONSchema | GenericSchema | HTMLSchema = None
 
 
 # The name of the file is the schema's name. The ID is not specified by the user, the app automatically assigns one
