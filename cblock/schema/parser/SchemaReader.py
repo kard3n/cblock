@@ -19,6 +19,7 @@ class SchemaReader:
     def __init__(self, db_manager: DBManagerInterface, schema_location: str):
         self.db_manager = db_manager
         self.schema_location = schema_location
+        self.factory: SchemaParserFactory = SchemaParserFactory()
 
     def run(self):
         print("Reading schemas from '" + self.schema_location + "'.")
@@ -47,7 +48,6 @@ class SchemaReader:
 
     # Returns a list, with the following content (order): schema name, url, schema type, underlying schema (as string)
     def read_schema(self, directory: str, filename: str) -> list | str:
-        factory: SchemaParserFactory = SchemaParserFactory()
 
         schema_type: str | None = None
         url: str | None = None
@@ -124,7 +124,7 @@ class SchemaReader:
         else:
             # parse schema and pickle the result
             try:
-                parser = factory.get_parser(schema_type)
+                parser = self.factory.get_parser(schema_type)
                 pickled_object = pickle.dumps(parser.parse_string(file_content[pos:]))
             except Exception as e:
                 raise SchemaParsingException(
