@@ -1,6 +1,6 @@
 import random, string
 
-from content_factory.Content import Content
+from content.Content import Content
 
 
 def random_string(

@@ -1,5 +1,5 @@
 from content_classifier.ContentClassifierInterface import ContentClassifierInterface
-from content_factory.ContentFactory import ContentFactory
+from content.ContentFactory import ContentFactory
 from db.DBManagerInterface import DBManagerInterface
 from editor.ContentEditorInterface import ContentEditorInterface
 from schema.SchemaFactory import SchemaFactory

@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 
 from content_classifier.ContentClassifierInterface import ContentClassifierInterface
-from content_factory.Content import Content
-from content_factory.ContentFactory import ContentFactory
+from content.Content import Content
+from content.ContentFactory import ContentFactory
 from editor.ContentExtractionResult import ContentExtractionResult
 
 
