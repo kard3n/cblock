@@ -1,12 +1,10 @@
 from db.DBManagerInterface import DBManagerInterface
 from db.SchemaSearchResult import SchemaSearchResult
-from schema.parser.SchemaParserFactory import SchemaParserFactory
 from utils.Singleton import Singleton
 
 
 class SchemaFactory(metaclass=Singleton):
     def __init__(self, db_manager: DBManagerInterface):
-        self.parser_factory = SchemaParserFactory()
         self.db_manager = db_manager
 
     # returns a parsed schema given its ID
