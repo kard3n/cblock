@@ -1,0 +1,8 @@
+url: bbc.com
+path: /$
+type: html
+schema:
+# TODO: Access is denied by cloudfare protection, mitmproxy issue #4575
+html_tag:'div', content_tags:'e', data-testid:'manchester-card'
+    html_tag:'h2', content_tags:'ta'
+    html_tag:'p', content_tags:'sa'

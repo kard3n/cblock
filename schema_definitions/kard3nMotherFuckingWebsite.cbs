@@ -1,5 +1,0 @@
-url: motherfuckingwebsite.com
-path: /
-type: generic
-schema:
-pattern:'(?P<content>fuck)', tags:'ate'

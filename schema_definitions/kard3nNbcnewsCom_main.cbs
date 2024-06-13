@@ -1,0 +1,22 @@
+url: nbcnews.com
+path: \/(\w*\?)*.*
+type: html
+schema:
+html_tag:'section', content_tags:'de'
+    html_tag:'div', content_tags:'d', class:'container-side__text-content'
+        html_tag:'a', content_tags:'at', edit_attrs:'href:l'
+    html_tag:'div', content_tags:'d', class:'standard-layout__adjacent-related'
+# to process adjacent extra news separately (if not deleted before)
+html_tag:'div', content_tags:'d', class:'standard-layout__adjacent-related'
+    html_tag:'div', content_tags:'e', not_attrs:'class'
+        html_tag:'a', content_tags:'at', edit_attrs:'href:l'
+# deletes script to prevent news overwriting. Does not break the site at all
+html_tag:'script', content_tags:'u'
+# for small news items
+html_tag:'ul'
+    html_tag:'li', content_tags:'e', class:'styles_item.*?'
+        html_tag:'a', edit_attrs:'href:l'
+        html_tag:'img', edit_attrs:'src:p'
+        html_tag:'source', edit_attrs:'srcset:p'
+        html_tag:'h2'
+            html_tag:'a', content_tags:'at'

@@ -1,3 +1,6 @@
+import sys
+sys.path.append('cblock')
+
 import asyncio
 import ctypes
 import logging

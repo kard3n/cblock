@@ -1,6 +1,7 @@
 import logging
 import os
 import pickle
+import traceback
 
 from db.DBManagerInterface import DBManagerInterface
 from exceptions.SchemaParsingException import SchemaParsingException
@@ -18,8 +19,10 @@ class SchemaReader:
     def __init__(self, db_manager: DBManagerInterface, schema_location: str):
         self.db_manager = db_manager
         self.schema_location = schema_location
+        self.factory: SchemaParserFactory = SchemaParserFactory()
 
     def run(self):
+        print("Reading schemas from '" + self.schema_location + "'.")
         filename_list = os.listdir(f"{self.schema_location}")
 
         self.db_manager.create_schema_table()
@@ -37,14 +40,14 @@ class SchemaReader:
 
                 except SchemaParsingException as e:
                     logging.warning(
-                        f"The schema with ID {filename} could not be parsed and was therefore not added: {e}"
+                        f"The schema with ID {filename} could not be parsed and was therefore not added: {traceback.format_exc()}"
                     )
 
         self.db_manager.insert_multiple(values=data_to_insert)
+        print("Finished reading schemas.")
 
     # Returns a list, with the following content (order): schema name, url, schema type, underlying schema (as string)
     def read_schema(self, directory: str, filename: str) -> list | str:
-        factory: SchemaParserFactory = SchemaParserFactory()
 
         schema_type: str | None = None
         url: str | None = None
@@ -121,11 +124,11 @@ class SchemaReader:
         else:
             # parse schema and pickle the result
             try:
-                parser = factory.get_parser(schema_type)
+                parser = self.factory.get_parser(schema_type)
                 pickled_object = pickle.dumps(parser.parse_string(file_content[pos:]))
             except Exception as e:
                 raise SchemaParsingException(
-                    f"Underlying {schema_type} schema could not be parsed: {e}"
+                    f"Underlying {schema_type} schema could not be parsed: {traceback.format_exc()}"
                 )
 
             return [filename[:-4], url, path, schema_type, pickled_object]

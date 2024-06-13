@@ -1,0 +1,15 @@
+url: c-span.org
+path: \/(\w*\?)*.*
+type: html
+schema:
+html_tag:'li', content_tags:'de'
+    html_tag:'img', edit_attrs:'src:p'
+    html_tag:'a', edit_attrs:'href:l'
+    html_tag:'div', content_tags:'d', class:'status-wrapper'
+    html_tag:'span', content_tags:'ta', class:'^title$'
+    html_tag:'span', content_tags:'ta', class:'^text$'
+    html_tag:'h\d', content_tags:'ta'
+    html_tag:'div', content_tags:'', class:'text'
+        html_tag:'p', content_tags:'sa'
+# for the slide on the top of the page. Seems to not be working due to a problem with the JSOn part
+html_tag:'script', embedded_schema:'kard3nCspanOrg_extractJsonFromScript'

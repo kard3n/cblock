@@ -1,0 +1,5 @@
+url:
+path:
+type: generic
+schema:
+pattern:'var slideArr = (?P<content>.*);', tags:'', schema_id:'kard3nCspanOrg_editJson'

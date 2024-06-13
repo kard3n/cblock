@@ -1,0 +1,23 @@
+url: apnews.com
+path: \/(\w*\?)*.*
+type: html
+schema:
+# big main image and text
+html_tag:'div', content_tags:'de', class:'PageListStandardE'
+    html_tag:'div', content_tags:'d', class:'PageListStandardE-leadPromo-media'
+        html_tag:'a', content_tags:'', class:'Link', edit_attrs:'href:l'
+    html_tag:'div', content_tags:'', class:'PageListStandardE-leadPromo-info'
+        html_tag:'a', content_tags:'', class:'Link', edit_attrs:'href:l'
+        html_tag:'span', content_tags:'ta', class:'PagePromoContentIcons-text'
+    html_tag:'div', content_tags:'d', class:'PageListStandardE-items-secondary'
+# For the smaller items
+html_tag:'ol', content_tags:''
+    html_tag:'li', content_tags:'de', recursive:'False'
+        #html_tag:'a', content_tags:'', class:'Link', edit_attrs:'href:l'
+        html_tag:'span', content_tags:'ta', class:'PagePromoContentIcons-text'
+        html_Tag:'picture', content_tags:'d'
+# for the bigger one next to smaller items
+html_tag:'div', content_tags:'de', class:'PageList-items-.*?'
+    #html_tag:'a', content_tags:'', class:'Link', edit_attrs:'href:l'
+    html_tag:'span', content_tags:'ta', class:'PagePromoContentIcons-text'
+    html_Tag:'picture', content_tags:'d'

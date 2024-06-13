@@ -75,10 +75,10 @@ class HTMLSchemaParser(SchemaParserInterface):
                         )
 
             elif item.startswith("embedded_schema:"):
-                id_pos: int = count_whitespaces(item, 16)
+                id_pos: int = count_whitespaces(item, 16) + 1
 
                 num: str = ""
-                while id_pos < len(item) and item[id_pos].isalnum():
+                while id_pos < len(item) and (item[id_pos].isalnum() or item[id_pos] in ["-", "_"]):
                     num += item[id_pos]
                     id_pos += 1
 

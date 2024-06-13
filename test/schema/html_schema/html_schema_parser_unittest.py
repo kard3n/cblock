@@ -41,6 +41,32 @@ class TestHTTPSchemaParser(unittest.TestCase):
             ],
         )
 
+    def test_parse_string_single_line_embedded_schema(self):
+        schema: str = (
+            r"html_tag:'a', content_tags:'', embedded_schema:'test_Schema-'"
+        )
+        self.assertEqual(self.parser.parse_string(schema), HTMLSchema(
+            html_tag=None,
+            content_tags=[],
+            attributes_regex={},
+            attributes_multival={},
+            embedded_schema=None,
+            precondition=None,
+            children=[
+                HTMLSchema(
+                    html_tag=regex.compile("a"),
+                    content_tags=[],
+                    attributes_to_edit={},
+                    attributes_regex={},
+                    attributes_multival={},
+                    not_attributes=[],
+                    embedded_schema='test_Schema-',
+                    precondition=None,
+                    children=[],
+                )
+            ],
+        ))
+
     def test_parse_string_single_line_forbidden_attribute(self):
         schema: str = (
             r"html_tag:'a', content_tags:'a', edit_attrs:'test:at var:d', href: 'https:\/\/example\.com'"

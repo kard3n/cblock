@@ -1,0 +1,13 @@
+url:
+path:
+type: json
+schema:
+{"desktop": [
+    {
+      "firstPost"(kard3nCspanOrg_editExtractedHTML): "All this content is HTMl that must be edited",
+      "sidePosts": [
+        (kard3nC-spanOrg_editExtractedHTML): "All this content is HTMl that must be edited",
+      ],
+    }
+  ]
+}

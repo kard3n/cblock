@@ -50,10 +50,10 @@ class GenericSchemaParser(SchemaParserInterface):
                         result.tags.append(ContentTag[ContentTag(letter).name])
 
             elif item.startswith("schema_id:"):
-                id_pos: int = count_whitespaces(item, 10)
+                id_pos: int = count_whitespaces(item, 10) + 1
 
                 num: str = ""
-                while id_pos < len(item) and item[id_pos].isalnum():
+                while id_pos < len(item) and (item[id_pos].isalnum() or item[id_pos] in ["-", "_"]):
                     num += item[id_pos]
                     id_pos += 1
 
@@ -61,7 +61,7 @@ class GenericSchemaParser(SchemaParserInterface):
                     result.embedded_schema = num
                 else:
                     raise SchemaParsingException(
-                        '"editor_id" tag must be followed by an ID.'
+                        '"schema_id" tag must be followed by an ID.'
                     )
             elif item.startswith("desc"):  # comments are skipped
                 pass

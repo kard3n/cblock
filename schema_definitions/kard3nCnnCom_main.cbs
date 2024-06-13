@@ -1,0 +1,10 @@
+url: edition.cnn.com
+path: \/(\w*\?)*.*
+type: html
+schema:
+html_tag:'div', content_tags:'e', class!:'card', data-uri:'.*?'
+    html_tag:'span', content_tags:'ta', class:'.*?container__headline-text.*?'
+    html_tag:'h2', content_tags:'ta'
+    html_tag:'span', content_tags:'d', class:'.*?container__video-duration.*?'
+    html_tag:'a', content_tags:'', edit_attrs:'href:l'
+    html_tag:'picture', content_tags:'d'

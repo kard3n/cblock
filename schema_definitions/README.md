@@ -75,12 +75,18 @@ Example: Schema that contains the following fields:
 }
 ```
 
+To sum it up, the basic structure of a field is "<name>"<content tags, or embedded schema between parenthesis>: <value>
+
 
 ### generic -> GenericSchema
 This type of schema can be used in cases where none of the other types would work. It uses regular expressions to find the content that should be edited, making use of Python's named-group feature.
 For example, to delete any content that is between double underscores (__) one could use the following rule: `pattern:'__(?P<content>.*?)__', tags:'ed'`.
+
+Options available for each line:
 * pattern: describes which content to match. The content of the `content` group is what is actually going to be edited. Anything that is not part of the _content_ will need to be matched, but is not part of the content that is edited.
-* tags: These are just content tags, just like with any other schema type
+* tags: This contains content tags, just like with any other schema type
+* schema_id: Specified if the content should be edited according to another schema, whose name is this field's value
+* desc: Contains text that describes what this line does.
 
 To have the matched content be edited according to another schema, it is possible to add another field:
 * embedded_schema: when set contains the name of another schema, which is used to edit the content inside the _content_ group.

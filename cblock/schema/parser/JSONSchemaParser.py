@@ -40,7 +40,7 @@ class JSONSchemaParser(SchemaParserInterface):
                         while (
                             element[pos] != ")"
                             and element[pos] != ":"
-                            and (element[pos].isalnum() or element[pos] in ["_"])
+                            and (element[pos].isalnum() or element[pos] in ["_", "-"])
                         ):
                             schema_id += element[pos]
                             pos += 1
@@ -76,14 +76,6 @@ class JSONSchemaParser(SchemaParserInterface):
             ):
                 element_container.value += element[pos]
                 pos += 1
-
-            # jump quote
-            pos += 1
-
-            if pos < len(element):
-                raise SchemaParsingException(
-                    f'Unexpected character "{element[pos]}" at relative position {pos}'
-                )
 
         # starts with a bracket, must be a list
         elif element[pos] == "[":

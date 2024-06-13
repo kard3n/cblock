@@ -1,24 +1,10 @@
-from dataclasses import dataclass
 from enum import Enum
-
-from schema.generic_schema.GenericSchema import GenericSchema
-from schema.json_schema.JSONSchema import JSONSchema
 
 
 class SchemaType(str, Enum):
     GENERIC = "generic"
     JSON = "json"
     HTML = "html"
-
-
-@dataclass
-class Schema:
-    id: str
-    url: str = None
-    path: str = None
-    schema_type: SchemaType = None
-    schema: JSONSchema | GenericSchema = None
-
 
 # The name of the file is the schema's name. The ID is not specified by the user, the app automatically assigns one
 # The user-definition also uses names, which when parsed get converted to IDs

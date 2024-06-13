@@ -130,7 +130,7 @@ class TestJsonSchemaParser(unittest.TestCase):
         )
 
     def test_parse_five(self):
-        schema: str = """{"embedded"(otherSchema):"Some interesting text"}"""
+        schema: str = """{"embedded"(other_Schema-):"Some interesting text"}"""
         assert self.parser.parse_string(schema) == JSONSchema(
             tags=[],
             embedded_schema=None,
@@ -138,7 +138,7 @@ class TestJsonSchemaParser(unittest.TestCase):
             value={
                 "embedded": JSONSchema(
                     tags=[],
-                    embedded_schema="otherSchema",
+                    embedded_schema="other_Schema-",
                     value_type=ValueType.LEAF,
                     value="Some interesting text",
                 )
