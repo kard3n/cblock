@@ -4,7 +4,7 @@ import time
 import joblib
 from cloudpickle import cloudpickle
 from nltk import pos_tag, word_tokenize, SnowballStemmer
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_selection import SelectKBest, chi2, mutual_info_classif, f_classif
 from sklearn.metrics import accuracy_score, f1_score, recall_score
 from sklearn.model_selection import train_test_split, GridSearchCV
@@ -21,7 +21,7 @@ def stem_tokenize_string(string: str):
     tokenized = word_tokenize(string)
 
     for word in tokenized:
-        result.append(stemmer.stem(word).lower())
+        result.append(stemmer.stem(word))
 
     return result
 
@@ -69,14 +69,19 @@ x_train, x_test, y_train, y_test = train_test_split(
 )
 
 
-cv = CountVectorizer(
+cv = TfidfVectorizer(
     stop_words="english",
     tokenizer=stem_tokenize_string,
     strip_accents="unicode",
+    lowercase=True,
+    norm="l2",
+    use_idf=True,
+    sublinear_tf=True,
+    smooth_idf=True,
 )
 
 # chi2, f_classif, mutual_info_classif
-skb = SelectKBest(score_func=mutual_info_classif, k=1000)
+skb = SelectKBest(score_func=mutual_info_classif, k=6000)
 
 x_train_vectorized = cv.fit_transform(x_train)
 
@@ -97,7 +102,6 @@ param_grid = {
         1.4,
         1.47,
         1.5,
-        1.51,
         1.6,
         1.7,
         2.0,
@@ -123,13 +127,22 @@ print("Best parameters: ", grid_search.best_params_)
 
 cnb = grid_search.best_estimator_
 
+vectorizer = TfidfVectorizer(
+    stop_words="english",
+    tokenizer=stem_tokenize_string,
+    strip_accents="unicode",
+    lowercase=True,
+    norm="l2",
+    use_idf=True,
+    sublinear_tf=True,
+    smooth_idf=True,
+    vocabulary=new_features,
+)
+
+vectorizer.fit(x_train)
+
 pipeline = make_pipeline(
-    CountVectorizer(
-        stop_words="english",
-        tokenizer=stem_tokenize_string,
-        strip_accents="unicode",
-        vocabulary=new_features,
-    ),
+    vectorizer,
     cnb,
 )
 y_pred = pipeline.predict(x_test)
@@ -161,10 +174,10 @@ print("Features in train dataset: ", feature_dict_train)
 
 print("Accuracy:", accuracy_score(y_test, y_pred))
 print("F1 score:", f1_score(y_test, y_pred, average="macro"))
-print("Recall score: ", recall_score(y_test, y_pred, average="weighted"))
+print("Recall score: ", recall_score(y_test, y_pred, average="micro"))
 print("Number of features: ", cnb.n_features_in_)
 print(
     f"Time required to classify {y_pred.shape[0] * num_tests} instances: {test_end_time - test_start_time}s"
 )
 
-cloudpickle.dump(pipeline, open("classifier.pickle", "wb"))
+cloudpickle.dump(pipeline, open("../classifier.pickle", "wb"))

@@ -21,7 +21,7 @@ def stem_tokenize_string(string: str):
     tokenized = word_tokenize(string)
 
     for word in tokenized:
-        result.append(stemmer.stem(word).lower())
+        result.append(stemmer.stem(word))
 
     return result
 
@@ -73,10 +73,11 @@ cv = CountVectorizer(
     stop_words="english",
     tokenizer=stem_tokenize_string,
     strip_accents="unicode",
+    lowercase=True,
 )
 
 # chi2, f_classif, mutual_info_classif
-skb = SelectKBest(score_func=mutual_info_classif, k=1000)
+skb = SelectKBest(score_func=mutual_info_classif, k=3400)
 
 x_train_vectorized = cv.fit_transform(x_train)
 
@@ -97,7 +98,6 @@ param_grid = {
         1.4,
         1.47,
         1.5,
-        1.51,
         1.6,
         1.7,
         2.0,
@@ -167,4 +167,4 @@ print(
     f"Time required to classify {y_pred.shape[0] * num_tests} instances: {test_end_time - test_start_time}s"
 )
 
-cloudpickle.dump(pipeline, open("classifier.pickle", "wb"))
+cloudpickle.dump(pipeline, open("../classifier.pickle", "wb"))
