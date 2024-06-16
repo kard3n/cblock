@@ -20,7 +20,7 @@ from jinja2 import Environment, FileSystemLoader
 
 from configuration.Configuration import Configuration
 from content_classifier.ClassifierManager import ClassifierManager
-from content_factory.ContentFactory import ContentFactory
+from content.ContentFactory import ContentFactory
 from db.PathSearchResult import PathSearchResult
 from db.SQLiteManager import SQLiteManager
 from editor.ContentEditorFactory import ContentEditorFactory

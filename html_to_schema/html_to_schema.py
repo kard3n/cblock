@@ -12,6 +12,7 @@ from bs4 import (
     Stylesheet,
     TemplateString,
     element,
+    Comment,
 )
 
 sys.path.append("../cblock")
@@ -25,6 +26,8 @@ class TagDefinition:
     tag: Tag
 
 
+# TODO: clean duplicates after generating schema
+# TODO: reduce some attribute values to base form
 def html_to_schema(html_in: str):
     file = open("resulting_schema.cbs", "wt")
     file.write("")
@@ -184,7 +187,7 @@ def is_sentence(text: str) -> bool:
     Returns:
 
     """
-    return len(regex.findall(pattern=r"""([\w\.&'",_]+\s+){3,}""", string=text)) > 0
+    return len(regex.findall(pattern=r"""([\w\.&'",_]+\s+){2,}""", string=text)) > 0
 
 
 def tag_has_text_child(tag_in: Tag) -> bool:
@@ -216,12 +219,7 @@ def tag_type_in_blacklist(tag) -> bool:
     :param tag:
     :return:
     """
-    if type(tag) in [
-        Script,
-        Stylesheet,
-        NavigableString,
-        TemplateString,
-    ]:
+    if type(tag) in [Script, Stylesheet, NavigableString, TemplateString, Comment]:
         return True
 
     # in case something isn't interpreted correctly
@@ -249,8 +247,14 @@ def clean_multival_attr_value(attrs: [str]) -> list:
     :return:
     """
     result = []
+    attributes_to_remove: [str] = [r"_.*", r".*\(", "dcr-"]
     for item in attrs:
-        if regex.match(r"_.*", item) is None and len(regex.findall(r"\(", item)) == 0:
+        add_item = True
+        for to_remove in attributes_to_remove:
+            if regex.match(to_remove, item) is not None:
+                add_item = False
+
+        if add_item:
             result.append(item)
 
     return result
@@ -293,8 +297,10 @@ def item_to_line(tag: Tag, content_tags: str) -> str:
 
 
 if __name__ == "__main__":
-    # urlretrieve(url="https://yahoo.com", filename="yahoo_test.html")
-    html = open("yahoo_test.html", encoding="utf8").read()
+    print(1)
+    # urlretrieve(url="https://www.nytimes.com/", filename="nyt_test.html")
+    print(2)
+    html = open("nyt_test.html", encoding="utf8").read()
     # html = open("test.html").read()
 
     html_to_schema(html)

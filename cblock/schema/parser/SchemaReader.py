@@ -5,7 +5,7 @@ import traceback
 
 from db.DBManagerInterface import DBManagerInterface
 from exceptions.SchemaParsingException import SchemaParsingException
-from schema.Schema import SchemaType
+from schema.SchemaType import SchemaType
 from schema.parser.SchemaParserFactory import SchemaParserFactory
 from utils import string_utils
 

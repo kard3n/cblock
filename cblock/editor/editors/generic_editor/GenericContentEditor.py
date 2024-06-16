@@ -3,8 +3,8 @@ import logging
 from regex import Match, regex
 
 from content_classifier.ContentClassifierInterface import ContentClassifierInterface
-from content_factory.Content import Content
-from content_factory.ContentFactory import ContentFactory
+from content.Content import Content
+from content.ContentFactory import ContentFactory
 from editor.ContentEditorFactory import ContentEditorFactory
 from editor.ContentEditorInterface import ContentEditorInterface
 from editor.ContentExtractionResult import ContentExtractionResult

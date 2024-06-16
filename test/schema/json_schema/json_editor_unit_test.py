@@ -3,8 +3,8 @@ from unittest.mock import Mock
 
 import test_utils
 from content_classifier.ContentClassifierInterface import ContentClassifierInterface
-from content_factory.Content import Content
-from content_factory.ContentFactory import ContentFactory
+from content.Content import Content
+from content.ContentFactory import ContentFactory
 from db.DBManagerInterface import DBManagerInterface
 from editor.ContentEditorFactory import ContentEditorFactory
 from editor.ContentEditorInterface import ContentEditorInterface
