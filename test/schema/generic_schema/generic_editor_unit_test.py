@@ -4,7 +4,6 @@ from unittest.mock import Mock
 
 from regex import regex
 
-import test_utils
 from content_classifier.ContentClassifierInterface import ContentClassifierInterface
 from content.Content import Content
 from content.ContentFactory import ContentFactory
@@ -16,6 +15,7 @@ from editor.editors.generic_editor.GenericContentEditor import GenericContentEdi
 from schema.ContentTag import ContentTag
 from schema.SchemaFactory import SchemaFactory
 from schema.generic_schema.GenericSchema import GenericSchema
+from test import test_utils
 
 
 class GenericSchemaEditorUnitTest(unittest.TestCase):
@@ -49,7 +49,7 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
                     pattern=regex.Regex("bb(?P<content>hola)bb"),
                     tags=[ContentTag.ANALYZE],
                     embedded_schema=None,
-                    children=None,
+                    children=[],
                 )
             ],
         )
@@ -81,7 +81,7 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
                             pattern=regex.Regex("<p>(?P<content>\w{3})</p>"),
                             tags=[ContentTag.ANALYZE],
                             embedded_schema=None,
-                            children=None,
+                            children=[],
                         )
                     ],
                 )
@@ -122,7 +122,7 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
                     pattern=regex.Regex("_(?P<content>\w{10})_"),
                     tags=[],
                     embedded_schema=embedded_schema_id,
-                    children=None,
+                    children=[],
                 )
             ],
         )
@@ -155,7 +155,7 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
                     pattern=regex.Regex("_(?P<content>\w{10})_"),
                     tags=[ContentTag.TITLE],
                     embedded_schema=None,
-                    children=None,
+                    children=[],
                 )
             ],
         )
@@ -203,7 +203,7 @@ class GenericSchemaEditorUnitTest(unittest.TestCase):
                     pattern=regex.Regex("_(?P<content>\w{10})_"),
                     tags=[],
                     embedded_schema=embedded_schema_id,
-                    children=None,
+                    children=[],
                 )
             ],
         )
