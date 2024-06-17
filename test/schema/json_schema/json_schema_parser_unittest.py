@@ -1,5 +1,6 @@
 import unittest
 
+from exceptions.SchemaParsingException import SchemaParsingException
 from schema.ContentTag import ContentTag
 from schema.json_schema.JSONSchema import JSONSchema, ValueType
 from schema.parser.JSONSchemaParser import JSONSchemaParser
@@ -144,3 +145,7 @@ class TestJsonSchemaParser(unittest.TestCase):
                 )
             },
         )
+
+    def test_parse_conflict_tags_and_embedded(self):
+        schema: str = """{"embedded"(other_Schema-)a:"Some interesting text"}"""
+        self.assertRaises(SchemaParsingException, self.parser.parse_string, schema)
