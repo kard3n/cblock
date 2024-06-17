@@ -1,7 +1,6 @@
 import unittest
 from unittest.mock import Mock
 
-import test_utils
 from content_classifier.ContentClassifierInterface import ContentClassifierInterface
 from content.Content import Content
 from content.ContentFactory import ContentFactory
@@ -13,6 +12,7 @@ from editor.editors.json_editor.JSONContentEditor import JSONContentEditor
 from schema.ContentTag import ContentTag
 from schema.SchemaFactory import SchemaFactory
 from schema.json_schema.JSONSchema import JSONSchema, ValueType
+from test import test_utils
 
 
 class JsonEditorUnitTest(unittest.TestCase):

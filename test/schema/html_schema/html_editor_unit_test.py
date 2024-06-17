@@ -462,19 +462,19 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
 
         random_string: str = test_utils.random_string(10)
 
-        assert (
+        self.assertEqual(
             self.editor.edit(
-                input_raw=f"<div><a>{random_string}</a></div>", schema=schema
-            )
-            == f"<div><a>{generated_content.title}</a></div>"
+                input_raw=f"<html><body><div><a>{random_string}</a></div></body></html>", schema=schema
+            ),
+            f"<html><body><div><a>{generated_content.title}</a></div></body></html>"
         )
 
-        assert (
+        self.assertEqual(
             self.editor.edit(
-                input_raw=f"<div><a>{random_string}\n{random_string}<p></p></a></div>",
+                input_raw=f"<html><body><div><a>{random_string}\n{random_string}<p></p></a></div></body></html>",
                 schema=schema,
-            )
-            == f"<div><a>{generated_content.title}</a></div>"
+            ),
+            f"<html><body><div><a>{generated_content.title}</a></div></body></html>"
         )
 
     def test_edit(self):
@@ -516,19 +516,19 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
 
         random_string: str = test_utils.random_string(10)
 
-        assert (
+        self.assertEqual(
             self.editor.edit(
-                input_raw=f"<div><a>{random_string}</a></div>", schema=schema
-            )
-            == f"<div><a>{generated_content.title}</a></div>"
+                input_raw=f"<html><body><div><a>{random_string}</a></div></body></html>", schema=schema
+            ),
+            f"<html><body><div><a>{generated_content.title}</a></div></body></html>"
         )
 
-        assert (
+        self.assertEqual (
             self.editor.edit(
-                input_raw=f"<div><a>{random_string}\n{random_string}<p></p></a></div>",
+                input_raw=f"<html><body><div><a>{random_string}\n{random_string}<p></p></a></div></body></html>",
                 schema=schema,
-            )
-            == f"<div><a>{generated_content.title}</a></div>"
+            ),
+            f"<html><body><div><a>{generated_content.title}</a></div></body></html>"
         )
 
     def test_edit_with_attributes(self):
@@ -589,20 +589,19 @@ class HTTPSchemaEditorUnitTest(unittest.TestCase):
 
         print(generated_content)
 
-        assert (
+        self.assertEqual(
             self.editor.edit(
-                input_raw=f"<div><a>{random_string_one}</a><a>{random_string_two}</a><img src={random_string_two}/></div>",
+                input_raw=f"<html><body><div><a>{random_string_one}</a><a>{random_string_two}</a><img src={random_string_two}/></div></body></html>",
                 schema=schema,
-            )
-            == f'<div><a>{generated_content.title}</a><a>{generated_content.title}</a><img src="{generated_content.picture}"/></div>'
+            ), f'<html><body><div><a>{generated_content.title}</a><a>{generated_content.title}</a><img src="{generated_content.picture}"/></div></body></html>'
         )
 
         assert (
             self.editor.edit(
-                input_raw=f'<div><a href="https://www.example.com/test" src="https://www.example.com/testimage.png">{random_string_one}</a><img href="https://www.example.com/test" src="https://www.example.com/testimage.png"/></div>',
+                input_raw=f'<html><body><div><a href="https://www.example.com/test" src="https://www.example.com/testimage.png">{random_string_one}</a><img href="https://www.example.com/test" src="https://www.example.com/testimage.png"/></div></body></html>',
                 schema=schema,
             )
-            == f'<div><a href="{generated_content.link}" src="{generated_content.picture}">{generated_content.title}</a><img href="https://www.example.com/test" src="{generated_content.picture}"/></div>'
+            == f'<html><body><div><a href="{generated_content.link}" src="{generated_content.picture}">{generated_content.title}</a><img href="https://www.example.com/test" src="{generated_content.picture}"/></div></body></html>'
         )
 
     def test_edit_precondition(self):
