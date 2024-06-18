@@ -84,7 +84,7 @@
             $.post({
                 url: endpoint,
                 data: JSON.stringify({"topics": to_ret}),
-                dataType:"application/json"})
+                dataType:"json"})
                 .done(function () {
                     make_toast("Success", "Topics edited.")
                 })
@@ -101,14 +101,12 @@
             $.post({
                 url: endpoint,
                 data: JSON.stringify({"aggressiveness": $("#aggressiveness_input").val()}),
-                dataType:"application/json"})
-                .done(function () {
-                    make_toast("Success", "Topics edited.")
+                dataType:"json"})
+                .done(function (event) {
+                    make_toast("Success", "Aggressiveness changed.")
                 })
-                .fail(function () {
-                    make_toast("Error", "Error changing topics.")
-                }).always(function (){
-                    //Nothing for now
+                .fail(function (event) {
+                    make_toast("Error", JSON.stringify(event))
                 });
         }
 
@@ -118,7 +116,7 @@
             $.post({
                 url: endpoint,
                 data: JSON.stringify({"classifier": classifier}),
-                dataType:"application/json"})
+                dataType:"json"})
                 .done(function () {
                     make_toast("Success", "Classifier changed.")
                 })
