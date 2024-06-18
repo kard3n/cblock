@@ -4,3 +4,4 @@ apnews.com: full
 wsj.com: yes, but with reduced user experience due to deleted script
 cnn.com: full, but main headline (h2) is not deleted/edited correctly
 nbcnews.com: full
+msn.com: full
