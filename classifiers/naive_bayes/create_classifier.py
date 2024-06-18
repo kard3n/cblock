@@ -1,18 +1,18 @@
 import pathlib
 import time
 
-import joblib
+import nltk
 from cloudpickle import cloudpickle
-from nltk import pos_tag, word_tokenize, SnowballStemmer
+from nltk import word_tokenize, SnowballStemmer
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_selection import SelectKBest, chi2, mutual_info_classif, f_classif
+from sklearn.feature_selection import SelectKBest,  mutual_info_classif
 from sklearn.metrics import accuracy_score, f1_score, recall_score
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.naive_bayes import ComplementNB
 from sklearn.pipeline import make_pipeline
 
 from classifier_scripts.create_dataset import create_dataset
-
+nltk.download('averaged_perceptron_tagger')
 stemmer = SnowballStemmer("english", ignore_stopwords=False)
 
 
@@ -21,39 +21,11 @@ def stem_tokenize_string(string: str):
     tokenized = word_tokenize(string)
 
     for word in tokenized:
-        result.append(stemmer.stem(word).lower())
+        result.append(stemmer.stem(word))
 
     return result
 
-
-def ner(input_str: str):
-    input_str = "".join(
-        [
-            (
-                x[0] + " "
-                if x[1]
-                in [
-                    "NN",
-                    "NNP",
-                    "NNS",
-                    "VBD",
-                    "VBG",
-                    "VBN",
-                    "VBP",
-                    "VBZ",
-                    "VB",
-                    "JJ",
-                    "JJS",
-                ]
-                else ""
-            )
-            for x in pos_tag(word_tokenize(input_str))
-        ]
-    )
-    return input_str
-
-
-dataset_loc = pathlib.Path(__file__).parent.resolve().as_posix() + "/test_v2_7.csv"
+dataset_loc = pathlib.Path(__file__).parent.resolve().as_posix() + "/dataset_v2_7.csv"
 
 categories_to_remove = ["finance", "environment_disaster", "health_drugs"]
 
@@ -73,10 +45,11 @@ cv = CountVectorizer(
     stop_words="english",
     tokenizer=stem_tokenize_string,
     strip_accents="unicode",
+    lowercase=True,
 )
 
 # chi2, f_classif, mutual_info_classif
-skb = SelectKBest(score_func=mutual_info_classif, k=1000)
+skb = SelectKBest(score_func=mutual_info_classif, k=5500)
 
 x_train_vectorized = cv.fit_transform(x_train)
 
@@ -97,7 +70,6 @@ param_grid = {
         1.4,
         1.47,
         1.5,
-        1.51,
         1.6,
         1.7,
         2.0,
@@ -167,4 +139,4 @@ print(
     f"Time required to classify {y_pred.shape[0] * num_tests} instances: {test_end_time - test_start_time}s"
 )
 
-cloudpickle.dump(pipeline, open("classifier.pickle", "wb"))
+cloudpickle.dump(pipeline, open("../classifier.pickle", "wb"))
