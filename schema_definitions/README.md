@@ -88,9 +88,6 @@ Options available for each line:
 * schema_id: Specified if the content should be edited according to another schema, whose name is this field's value
 * desc: Contains text that describes what this line does.
 
-To have the matched content be edited according to another schema, it is possible to add another field:
-* embedded_schema: when set contains the name of another schema, which is used to edit the content inside the _content_ group.
-
 It is also possible to have a hierarchy of rules, for example if we now instead of deleting the whole content of the previous rule just want to delete any "a" we could do the following:
 ````
 pattern:'__(?P<content>.*?)__', tags:''
