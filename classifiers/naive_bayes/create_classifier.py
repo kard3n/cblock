@@ -11,7 +11,7 @@ from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.naive_bayes import ComplementNB
 from sklearn.pipeline import make_pipeline
 
-from classifier_scripts.create_dataset import create_dataset
+from create_dataset import create_dataset
 nltk.download('averaged_perceptron_tagger')
 stemmer = SnowballStemmer("english", ignore_stopwords=False)
 
