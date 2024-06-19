@@ -1,8 +1,8 @@
 # ContentBlock
+ContentBlock allows you to hide content you don't want to see.
+Improve your browsing experience now!
 
 ## Installation
-### With conda:
- > Make sure that python is installed before continuing
 
 Create venv:
 ````shell
@@ -26,10 +26,10 @@ $ venv/bin/pip install -e "mitmproxy/.[dev]"
 Install cblock's dependencies to environment:
 ````shell
 # Windows
-$ venv\Scripts\pip install -r cblock/requirements_dev.txt
+$ venv\Scripts\pip install -r requirements_dev.txt
 
 # Linux
-$ venv/bin/pip install -r "cblock/requirements_dev.txt"
+$ venv/bin/pip install -r "requirements_dev.txt"
 ````
 
 Enable UTF-8 support:
@@ -44,6 +44,14 @@ $ set PYTHONUTF8=1
 $ export PYTHONUTF8=1
 ````
 
+If the Naive Bayes classifier has not been initialized (its classifier.pickle file is missing),
+then execute the following steps:
+````shell
+venv\Scripts\activate
+cd classifiers/naive_bayes
+python create_classifier.py
+````
+
 ## Execution
 Activate virtual environment:
 ````shell
@@ -53,3 +61,19 @@ $ venv\Scripts\activate
 # Linux
 $ source venv/bin/activate
 ````
+
+Start up application:
+````shell
+# Windows
+$ python cblock.py
+````
+
+## Supported web pages
+The following web pages are currently supported:
+* yahoo.com
+* news.yahoo.com
+* apnews.com
+* cnn.com
+* nbcnews.com
+* msn.com
+* eu.usatoday.com
