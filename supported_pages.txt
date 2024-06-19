@@ -5,3 +5,4 @@ wsj.com: yes, but with reduced user experience due to deleted script
 cnn.com: full
 nbcnews.com: full
 msn.com: full
+eu.usatoday.com: full

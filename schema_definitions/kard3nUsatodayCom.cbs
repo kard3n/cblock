@@ -1,0 +1,13 @@
+url: eu.usatoday.com
+path: \/(\w*\?)*.*
+type: html
+schema:
+# for most stuff
+html_tag:'a', content_tags:'de', class!:'section-helper-row'
+    html_tag:'div', content_tags:'ta', class:'p1-title-spacer'
+    html_tag:'div', content_tags:'ta', class:'display-.*?'
+# removes recent videos and gallery
+html_tag:'promo-story-bucket-short', content_tags:'u'
+# for best photos card
+html_tag:'div', content_tags:'de', class!:'hero-slot-one'
+    html_tag:'div', content_tags:'ta', class:'body-6 p12-description'
