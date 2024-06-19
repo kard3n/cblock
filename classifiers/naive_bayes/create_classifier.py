@@ -25,7 +25,7 @@ def stem_tokenize_string(string: str):
 
     return result
 
-dataset_loc = pathlib.Path(__file__).resolve().as_posix() + "/dataset_v2_7.csv"
+dataset_loc = pathlib.Path(__file__).parent.resolve().as_posix() + "/dataset_v2_7.csv"
 
 categories_to_remove = ["finance", "environment_disaster", "health_drugs"]
 
@@ -139,4 +139,4 @@ print(
     f"Time required to classify {y_pred.shape[0] * num_tests} instances: {test_end_time - test_start_time}s"
 )
 
-cloudpickle.dump(pipeline, open("../classifier.pickle", "wb"))
+cloudpickle.dump(pipeline, open("classifier.pickle", "wb"))
