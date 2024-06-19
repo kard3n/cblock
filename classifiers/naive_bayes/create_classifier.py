@@ -5,14 +5,16 @@ import nltk
 from cloudpickle import cloudpickle
 from nltk import word_tokenize, SnowballStemmer
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_selection import SelectKBest,  mutual_info_classif
+from sklearn.feature_selection import SelectKBest, mutual_info_classif
 from sklearn.metrics import accuracy_score, f1_score, recall_score
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.naive_bayes import ComplementNB
 from sklearn.pipeline import make_pipeline
 
 from create_dataset import create_dataset
-nltk.download('averaged_perceptron_tagger')
+
+nltk.download("averaged_perceptron_tagger")
+nltk.download("punkt")
 stemmer = SnowballStemmer("english", ignore_stopwords=False)
 
 
@@ -24,6 +26,7 @@ def stem_tokenize_string(string: str):
         result.append(stemmer.stem(word))
 
     return result
+
 
 dataset_loc = pathlib.Path(__file__).parent.resolve().as_posix() + "/dataset_v2_7.csv"
 
