@@ -25,7 +25,7 @@ def stem_tokenize_string(string: str):
 
     return result
 
-dataset_loc = pathlib.Path(__file__).parent.resolve().as_posix() + "/dataset_v2_7.csv"
+dataset_loc = pathlib.Path(__file__).resolve().as_posix() + "/dataset_v2_7.csv"
 
 categories_to_remove = ["finance", "environment_disaster", "health_drugs"]
 
