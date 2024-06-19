@@ -1,17 +1,15 @@
 import pathlib
 import time
 
-import joblib
 from cloudpickle import cloudpickle
-from nltk import pos_tag, word_tokenize, SnowballStemmer
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_selection import SelectKBest, chi2, mutual_info_classif, f_classif
+from nltk import word_tokenize, SnowballStemmer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics import accuracy_score, f1_score, recall_score
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.naive_bayes import ComplementNB
 from sklearn.pipeline import make_pipeline
 
-from classifier_scripts.create_dataset import create_dataset
+from classifier_testing.create_dataset import create_dataset
 
 stemmer = SnowballStemmer("english", ignore_stopwords=False)
 
@@ -41,6 +39,16 @@ x_train, x_test, y_train, y_test = train_test_split(
     dataset_x, dataset_y, test_size=0.25, random_state=50, stratify=dataset_y
 )
 
+"""
+    "tfidfvectorizer__stop_words": ["english"],
+    "tfidfvectorizer__tokenizer": [stem_tokenize_string],
+    "tfidfvectorizer__strip_accents": ["unicode"],
+    "tfidfvectorizer__lowercase": [True],
+    "tfidfvectorizer__norm": ["l1", "l2"],
+    "tfidfvectorizer__use_idf": [True, False],
+    "tfidfvectorizer__smooth_idf": [True, False],
+    "tfidfvectorizer__sublinear_tf": [True, False],"""
+
 # Cross Validation
 param_grid = {
     "complementnb__alpha": [
@@ -56,11 +64,16 @@ param_grid = {
     "complementnb__norm": [True, False],
 }
 pipeline = make_pipeline(
-    CountVectorizer(
+    TfidfVectorizer(
         stop_words="english",
         tokenizer=stem_tokenize_string,
         strip_accents="unicode",
         lowercase=True,
+        norm="l2",
+        use_idf=True,
+        sublinear_tf=True,
+        smooth_idf=True,
+        min_df=2,
     ),
     ComplementNB(),
 )
@@ -116,4 +129,4 @@ print(
     f"Time required to classify {y_pred.shape[0] * num_tests} instances: {test_end_time - test_start_time}s"
 )
 
-cloudpickle.dump(pipeline, open("../classifier.pickle", "wb"))
+cloudpickle.dump(pipeline, open("../test/classifier.pickle", "wb"))

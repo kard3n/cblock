@@ -1,17 +1,15 @@
 import pathlib
 import time
 
-import joblib
 from cloudpickle import cloudpickle
-from nltk import pos_tag, word_tokenize, SnowballStemmer
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_selection import SelectKBest, chi2, mutual_info_classif, f_classif
+from nltk import word_tokenize, SnowballStemmer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics import accuracy_score, f1_score, recall_score
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.naive_bayes import ComplementNB
 from sklearn.pipeline import make_pipeline
 
-from classifier_scripts.create_dataset import create_dataset
+from classifier_testing.create_dataset import create_dataset
 
 stemmer = SnowballStemmer("english", ignore_stopwords=False)
 
@@ -24,32 +22,6 @@ def stem_tokenize_string(string: str):
         result.append(stemmer.stem(word))
 
     return result
-
-
-def ner(input_str: str):
-    input_str = "".join(
-        [
-            (
-                x[0] + " "
-                if x[1]
-                in [
-                    "NN",
-                    "NNP",
-                    "NNS",
-                    "VBD",
-                    "VBG",
-                    "VBN",
-                    "VBP",
-                    "VBZ",
-                    "VB",
-                    "JJ",
-                ]
-                else ""
-            )
-            for x in pos_tag(word_tokenize(input_str))
-        ]
-    )
-    return input_str
 
 
 dataset_loc = pathlib.Path(__file__).parent.resolve().as_posix() + "/test_v2_7.csv"
@@ -67,6 +39,16 @@ x_train, x_test, y_train, y_test = train_test_split(
     dataset_x, dataset_y, test_size=0.25, random_state=50, stratify=dataset_y
 )
 
+"""
+    "tfidfvectorizer__stop_words": ["english"],
+    "tfidfvectorizer__tokenizer": [stem_tokenize_string],
+    "tfidfvectorizer__strip_accents": ["unicode"],
+    "tfidfvectorizer__lowercase": [True],
+    "tfidfvectorizer__norm": ["l1", "l2"],
+    "tfidfvectorizer__use_idf": [True, False],
+    "tfidfvectorizer__smooth_idf": [True, False],
+    "tfidfvectorizer__sublinear_tf": [True, False],"""
+
 # Cross Validation
 param_grid = {
     "complementnb__alpha": [
@@ -82,12 +64,15 @@ param_grid = {
     "complementnb__norm": [True, False],
 }
 pipeline = make_pipeline(
-    CountVectorizer(
+    TfidfVectorizer(
         stop_words="english",
         tokenizer=stem_tokenize_string,
         strip_accents="unicode",
-        min_df=2,
         lowercase=True,
+        norm="l2",
+        use_idf=True,
+        sublinear_tf=True,
+        smooth_idf=True,
     ),
     ComplementNB(),
 )
@@ -102,10 +87,7 @@ grid_search = GridSearchCV(
     scoring="f1_macro",
 )
 
-# apply ner
-x_train_new = [ner(item) for item in x_train]
-
-grid_search.fit(x_train_new, y_train)
+grid_search.fit(x_train, y_train)
 
 print("Best parameters: ", grid_search.best_params_)
 
@@ -140,10 +122,10 @@ print("Features in train dataset: ", feature_dict_train)
 
 print("Accuracy:", accuracy_score(y_test, y_pred))
 print("F1 score:", f1_score(y_test, y_pred, average="macro"))
-print("Recall score: ", recall_score(y_test, y_pred, average="weighted"))
+print("Recall score: ", recall_score(y_test, y_pred, average="macro"))
 print("Number of features: ", cnb[1].n_features_in_)
 print(
     f"Time required to classify {y_pred.shape[0] * num_tests} instances: {test_end_time - test_start_time}s"
 )
 
-cloudpickle.dump(pipeline, open("../classifier.pickle", "wb"))
+cloudpickle.dump(pipeline, open("../test/classifier.pickle", "wb"))

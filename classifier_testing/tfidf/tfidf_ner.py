@@ -1,17 +1,18 @@
 import pathlib
 import time
 
-import joblib
+import nltk
 from cloudpickle import cloudpickle
 from nltk import pos_tag, word_tokenize, SnowballStemmer
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
-from sklearn.feature_selection import SelectKBest, chi2, mutual_info_classif, f_classif
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics import accuracy_score, f1_score, recall_score
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.naive_bayes import ComplementNB
 from sklearn.pipeline import make_pipeline
 
-from classifier_scripts.create_dataset import create_dataset
+from classifier_testing.create_dataset import create_dataset
+
+nltk.download("averaged_perceptron_tagger")
 
 stemmer = SnowballStemmer("english", ignore_stopwords=False)
 
@@ -91,7 +92,6 @@ pipeline = make_pipeline(
         use_idf=True,
         sublinear_tf=True,
         smooth_idf=True,
-        min_df=2,
     ),
     ComplementNB(),
 )
@@ -150,4 +150,4 @@ print(
     f"Time required to classify {y_pred.shape[0] * num_tests} instances: {test_end_time - test_start_time}s"
 )
 
-cloudpickle.dump(pipeline, open("../classifier.pickle", "wb"))
+cloudpickle.dump(pipeline, open("../test/classifier.pickle", "wb"))

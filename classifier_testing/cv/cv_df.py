@@ -1,18 +1,15 @@
 import pathlib
 import time
 
-import nltk
 from cloudpickle import cloudpickle
-from nltk import pos_tag, word_tokenize, SnowballStemmer
-from sklearn.feature_extraction.text import TfidfVectorizer
+from nltk import word_tokenize, SnowballStemmer
+from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics import accuracy_score, f1_score, recall_score
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.naive_bayes import ComplementNB
 from sklearn.pipeline import make_pipeline
 
-from classifier_scripts.create_dataset import create_dataset
-
-nltk.download('averaged_perceptron_tagger')
+from classifier_testing.create_dataset import create_dataset
 
 stemmer = SnowballStemmer("english", ignore_stopwords=False)
 
@@ -25,32 +22,6 @@ def stem_tokenize_string(string: str):
         result.append(stemmer.stem(word))
 
     return result
-
-
-def ner(input_str: str):
-    input_str = "".join(
-        [
-            (
-                x[0] + " "
-                if x[1]
-                in [
-                    "NN",
-                    "NNP",
-                    "NNS",
-                    "VBD",
-                    "VBG",
-                    "VBN",
-                    "VBP",
-                    "VBZ",
-                    "VB",
-                    "JJ",
-                ]
-                else ""
-            )
-            for x in pos_tag(word_tokenize(input_str))
-        ]
-    )
-    return input_str
 
 
 dataset_loc = pathlib.Path(__file__).parent.resolve().as_posix() + "/test_v2_7.csv"
@@ -71,10 +42,6 @@ x_train, x_test, y_train, y_test = train_test_split(
 # Cross Validation
 param_grid = {
     "complementnb__alpha": [
-        0.5,
-        0.75,
-        1.0,
-        1.25,
         1.7,
         2.0,
         3.0,
@@ -83,15 +50,12 @@ param_grid = {
     "complementnb__norm": [True, False],
 }
 pipeline = make_pipeline(
-    TfidfVectorizer(
+    CountVectorizer(
         stop_words="english",
         tokenizer=stem_tokenize_string,
         strip_accents="unicode",
+        min_df=2,
         lowercase=True,
-        norm="l2",
-        use_idf=True,
-        sublinear_tf=True,
-        smooth_idf=True,
     ),
     ComplementNB(),
 )
@@ -106,10 +70,7 @@ grid_search = GridSearchCV(
     scoring="f1_macro",
 )
 
-# apply ner
-x_train_new = [ner(item) for item in x_train]
-
-grid_search.fit(x_train_new, y_train)
+grid_search.fit(x_train, y_train)
 
 print("Best parameters: ", grid_search.best_params_)
 
@@ -150,4 +111,4 @@ print(
     f"Time required to classify {y_pred.shape[0] * num_tests} instances: {test_end_time - test_start_time}s"
 )
 
-cloudpickle.dump(pipeline, open("../classifier.pickle", "wb"))
+cloudpickle.dump(pipeline, open("../test/classifier.pickle", "wb"))
