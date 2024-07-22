@@ -22,6 +22,7 @@ Content:
 url: basic_web.com
 path: /data
 type: json
+subdomains: de,en
 schema: # after the schema line, the definition of the underlying specialized schema is specified.
 {}
 ```
@@ -31,6 +32,7 @@ Explanation:
 * _url_: when a file from this URL is received, and _path_ matches too, the contents will be edited according to the underlying specialized schema
 * _path_: the path of the file that should be edited. This can be a regular expression
 * _type_: the type of the schema. For example _json_, _generic_ or _html_
+* _subdomains_: optional field, contains a comma-separated list of allowed subdomains. A non-existent subdomain is added through an empty value (Example: ",,de,en"). If the field is not defined, only URLs without subdomain are matched
 * _schema_: after this line until the end of the file, the definition of the underlying specialized schema is written.
 
 ## ContentTags

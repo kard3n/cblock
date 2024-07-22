@@ -45,9 +45,7 @@ class CBlockAddonMain:
         self.classifier_manager = classifier_manager
 
         self.schema_parser_factory = SchemaParserFactory()
-        self.db_manager = SQLiteManager(
-            database_name="cb_database.db", table_name="cb_schema"
-        )
+        self.db_manager = SQLiteManager(database_name="cb_database.db")
 
         try:
             self.content_classifier = self.classifier_manager.get_classifier(
@@ -72,7 +70,7 @@ class CBlockAddonMain:
 
         if not self.db_manager.has_database():
             logging.warning("No database was found, initializing...")
-            self.db_manager.create_schema_table()
+            self.db_manager.initialize_database()
 
             try:
 

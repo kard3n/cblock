@@ -4,6 +4,7 @@ import pickle
 import traceback
 
 from db.DBManagerInterface import DBManagerInterface
+from db.SchemaDefinition import SchemaDefinition
 from exceptions.SchemaParsingException import SchemaParsingException
 from schema.SchemaType import SchemaType
 from schema.parser.SchemaParserFactory import SchemaParserFactory
@@ -25,7 +26,7 @@ class SchemaReader:
         print("Reading schemas from '" + self.schema_location + "'.")
         filename_list = os.listdir(f"{self.schema_location}")
 
-        self.db_manager.create_schema_table()
+        self.db_manager.initialize_database()
 
         data_to_insert = []
         for filename in filename_list:
@@ -43,15 +44,16 @@ class SchemaReader:
                         f"The schema with ID {filename} could not be parsed and was therefore not added: {traceback.format_exc()}"
                     )
 
-        self.db_manager.insert_multiple(values=data_to_insert)
+        self.db_manager.insert(values=data_to_insert)
         print("Finished reading schemas.")
 
     # Returns a list, with the following content (order): schema name, url, schema type, underlying schema (as string)
-    def read_schema(self, directory: str, filename: str) -> list | str:
+    def read_schema(self, directory: str, filename: str) -> SchemaDefinition:
 
         schema_type: str | None = None
         url: str | None = None
         path: str | None = None
+        allowed_subdomains: list[str] | None = None
         pickled_object: bytes | None = None
 
         found_underlying_schema: bool = False
@@ -94,7 +96,11 @@ class SchemaReader:
 
                 found_underlying_schema = True
                 break
-
+            if file_content[pos:].startswith("subdomains:"):
+                pos = string_utils.count_whitespaces(string=file_content, pos=pos + 11)
+                allowed_subdomains = string_utils.extract_until_symbols(
+                    string=file_content, symbols=["\n"], start_pos=pos, end_pos=None
+                ).split(",")
             else:
                 # invalid row, jump to next
                 while file_content[pos] != "\n" and pos < len(file_content):
@@ -131,4 +137,14 @@ class SchemaReader:
                     f"Underlying {schema_type} schema could not be parsed: {traceback.format_exc()}"
                 )
 
-            return [filename[:-4], url, path, schema_type, pickled_object]
+            if allowed_subdomains is None:
+                allowed_subdomains = []
+
+            return SchemaDefinition(
+                schema_id=filename[:-4],
+                url=url,
+                path=path,
+                schema_type=schema_type,
+                allowed_subdomains=[],
+                pickled_specialized_schema=pickled_object,
+            )

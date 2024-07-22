@@ -2,20 +2,22 @@ from abc import ABC, abstractmethod
 
 from db import SchemaSearchResult
 from db.PathSearchResult import PathSearchResult
+from db.SchemaDefinition import SchemaDefinition
 
 
 class DBManagerInterface(ABC):
 
     @abstractmethod
-    def create_schema_table(self):
+    def initialize_database(self):
         raise NotImplementedError("Not yet implemented")
 
     @abstractmethod
-    def insert(self, values: list[any]):
-        raise NotImplementedError("Not yet implemented")
-
-    @abstractmethod
-    def insert_multiple(self, values: list[list[any]]):
+    def insert(self, values: list[SchemaDefinition]) -> None:
+        """
+        Inserts multiple schemas into the database
+        :param values:
+        :return:
+        """
         raise NotImplementedError("Not yet implemented")
 
     @abstractmethod
