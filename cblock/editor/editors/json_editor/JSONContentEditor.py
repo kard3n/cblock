@@ -1,5 +1,6 @@
 import json
 import logging
+import traceback
 
 from content_classifier.ContentClassifierInterface import ContentClassifierInterface
 from content.Content import Content
@@ -83,7 +84,7 @@ class JSONContentEditor(ContentEditorInterface):
                         )
                     except TypeError as e:
                         logging.warning(
-                            f"Could not access {key} of schema {schema.value} on attribute {input_parsed}: {e}?"
+                            f"Could not access {key} of schema {schema.value} on attribute {key}: {traceback.format_exc()}?"
                         )
 
             elif schema.value_type == ValueType.LIST:
