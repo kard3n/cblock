@@ -1,5 +1,5 @@
 url: yahoo.com
-path: \/(\w*\?)*.*
+path: \/$
 type: html
 schema:
 html_tag:'li', content_tags:'e', data-type:'.*?'
