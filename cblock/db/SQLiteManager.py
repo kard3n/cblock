@@ -31,6 +31,7 @@ class SQLiteManager(DBManagerInterface):
             or self.cursor.execute(
                 f"SELECT name FROM sqlite_schema WHERE name='{self.subdomain_table_name}'"
             ).fetchone()
+            is None
         ):
             return False
         return True
@@ -77,8 +78,9 @@ class SQLiteManager(DBManagerInterface):
         :return:
         """
 
+        # creates ROWID, removes the need for a composite primary key
         create_sentence: str = (
-            f"CREATE TABLE {self.subdomain_table_name}(schema_id NOT NULL PRIMARY KEY, subdomain TEXT NOT NULL) WITHOUT ROWID"
+            f"CREATE TABLE {self.subdomain_table_name}(schema_id NOT NULL, subdomain TEXT NOT NULL)"
         )
 
         # Check if the table exists, if so drops it
@@ -165,7 +167,9 @@ class SQLiteManager(DBManagerInterface):
                 allowed_subdomains.append(subdomain[0])
 
             result.append(
-                PathSearchResult(id=schema[0], path=schema[1], allowed_subdomains=[])
+                PathSearchResult(
+                    id=schema[0], path=schema[1], allowed_subdomains=allowed_subdomains
+                )
             )
 
         return result

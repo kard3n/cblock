@@ -145,6 +145,6 @@ class SchemaReader:
                 url=url,
                 path=path,
                 schema_type=schema_type,
-                allowed_subdomains=[],
+                allowed_subdomains=allowed_subdomains,
                 pickled_specialized_schema=pickled_object,
             )

@@ -89,12 +89,33 @@ class CBlockAddonMain:
     async def response(self, flow: http.HTTPFlow):
         # logging.warning(f"URI: {flow.request.pretty_host + flow.request.path}")
         # logging.warning(f"Pretty host: {flow.request.pretty_host}")
-        paths: list[PathSearchResult] = self.db_manager.get_paths_for_url(
-            url=flow.request.pretty_host.removeprefix("www.")
-        )
+        url = flow.request.pretty_host.removeprefix("www.")
+
+        dot_pos = url[0 : url.rfind(".")].rfind(".")
+        if dot_pos > 0:
+            paths: list[PathSearchResult] = self.db_manager.get_paths_for_url(
+                url=url[dot_pos + 1 :]
+            )
+        else:
+            paths: list[PathSearchResult] = self.db_manager.get_paths_for_url(url=url)
+
+        check_passed: bool
 
         for search_result in paths:
-            if regex.compile(search_result.path).match(flow.request.path) is not None:
+            check_passed = True
+            if search_result.allowed_subdomains:
+                if dot_pos > 0 and url[0:dot_pos] in search_result.allowed_subdomains:
+                    check_passed = True
+                elif "" in search_result.allowed_subdomains:
+                    check_passed = True
+                else:
+                    check_passed = False
+
+            if (
+                check_passed
+                and regex.compile(search_result.path).match(flow.request.path)
+                is not None
+            ):
                 flow.response.text = await self.__edit(
                     schema_id=search_result.id,
                     content=flow.response.text,
