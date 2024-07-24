@@ -1,6 +1,7 @@
 url: yahoo.com
 path: \/$
 type: html
+subdomains: de,us,
 schema:
 html_tag:'li', content_tags:'e', data-type:'.*?'
     html_tag:'h3', content_tags:'ta', edit_attrs:'href:l'

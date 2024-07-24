@@ -1,5 +1,6 @@
 url: yahoo.com
 path: /fp_ms/_rcv/remote\?ctrl=Stream.*?
 type: json
+subdomains: de,us,
 schema:
 {"html"(kard3nYahooCom_loadAdditional_editHTML):""}
