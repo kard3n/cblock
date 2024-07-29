@@ -1,5 +1,5 @@
 url: yahoo.com
-path: \/$
+path: \/(\?guccounter=1)$
 type: html
 subdomains: de,us,
 schema:
