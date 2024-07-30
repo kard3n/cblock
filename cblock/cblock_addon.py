@@ -14,6 +14,7 @@ import logging
 import os
 import threading
 import traceback
+from typing import Type
 
 import regex
 from jinja2 import Environment, FileSystemLoader
@@ -21,6 +22,7 @@ from jinja2 import Environment, FileSystemLoader
 from configuration.Configuration import Configuration
 from content_classifier.ClassifierManager import ClassifierManager
 from content.ContentFactory import ContentFactory
+from db.DBManagerInterface import DBManagerInterface
 from db.PathSearchResult import PathSearchResult
 from db.SQLiteManager import SQLiteManager
 from editor.ContentEditorFactory import ContentEditorFactory
@@ -38,14 +40,16 @@ class CBlockAddonMain:
         config: Configuration,
         classifier_manager: ClassifierManager,
         shutdown_event: threading.Event,
+        db_manager_class: Type[DBManagerInterface] = SQLiteManager,
+        schema_parser_factory: SchemaParserFactory = SchemaParserFactory(),
     ):
         print("Initializing CBlockAddon")
-        self.shutdown_event = shutdown_event
         self.config = config
         self.classifier_manager = classifier_manager
+        self.shutdown_event = shutdown_event
 
-        self.schema_parser_factory = SchemaParserFactory()
-        self.db_manager = SQLiteManager(database_name="cb_database.db")
+        self.db_manager = db_manager_class(database_name="cb_database.db")
+        self.schema_parser_factory = schema_parser_factory
 
         try:
             self.content_classifier = self.classifier_manager.get_classifier(
