@@ -1,14 +1,3 @@
-"""
-Entry point for CBlock
-
-mitmproxy -m regular -s cblock/src/cblock.py
-mitmproxy -m regular --set anticomp=true --set  body_size_limit=3m --set console_eventlog_verbosity=warn -s cblock/src/cblock.py
-
-
-Enable utf-8 support (needs to be done only once per environment):
-conda env config vars set PYTHONUTF8=1
-"""
-
 import json
 import logging
 import os
@@ -29,8 +18,6 @@ from editor.ContentEditorFactory import ContentEditorFactory
 from mitmproxy.mitmproxy import http
 from schema.parser.SchemaParserFactory import SchemaParserFactory
 from schema.parser.SchemaReader import SchemaReader
-
-# TODO configure project root
 
 
 class CBlockAddonMain:
@@ -74,10 +61,9 @@ class CBlockAddonMain:
 
         if not self.db_manager.has_database():
             logging.warning("No database was found, initializing...")
-            self.db_manager.initialize_database()
 
             try:
-
+                self.db_manager.initialize_database()
                 self.schema_reader.run()
             except Exception as e:
                 self.db_manager.close_connection()
@@ -91,8 +77,6 @@ class CBlockAddonMain:
         self.settings_template = self.jinja_environment.get_template("settings.html")
 
     async def response(self, flow: http.HTTPFlow):
-        # logging.warning(f"URI: {flow.request.pretty_host + flow.request.path}")
-        # logging.warning(f"Pretty host: {flow.request.pretty_host}")
         url = flow.request.pretty_host.removeprefix("www.")
 
         dot_pos = url[0 : url.rfind(".")].rfind(".")
@@ -331,7 +315,7 @@ class CBlockAddonMain:
         :return:
         """
         try:
-            self.db_manager.create_schema_table()
+            self.db_manager.initialize_database()
             self.schema_reader.run()
 
             flow.response = http.Response.make(
