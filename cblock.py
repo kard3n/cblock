@@ -1,5 +1,8 @@
 import sys
-sys.path.append('cblock')
+
+from CBlockAddonMain import CBlockAddonMain
+
+sys.path.append("cblock")
 
 import asyncio
 import ctypes
@@ -16,7 +19,6 @@ from mitmproxy.mitmproxy.certs import CertStore
 
 sys.path.append("cblock")
 
-from cblock_addon import CBlockAddonMain
 from configuration.Configuration import Configuration
 from content_classifier.ClassifierManager import ClassifierManager
 from mitmproxy.mitmproxy import options
