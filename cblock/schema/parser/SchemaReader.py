@@ -26,8 +26,6 @@ class SchemaReader:
         print("Reading schemas from '" + self.schema_location + "'.")
         filename_list = os.listdir(f"{self.schema_location}")
 
-        self.db_manager.initialize_database()
-
         data_to_insert = []
         for filename in filename_list:
             result: any = None
