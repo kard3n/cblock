@@ -2,16 +2,13 @@ import datetime
 import logging
 import os.path
 
-from content_classifier.ContentClassifierInterface import ContentClassifierInterface
-from editor.ContentExtractionResult import ContentExtractionResult
 
-
-class ContentToFileClassifier(ContentClassifierInterface):
+class ContentToFileClassifier:
     def __init__(self, topics_to_remove: list[str], aggressiveness: float):
         if not os.path.isdir("extracted_headlines"):
             os.mkdir("extracted_headlines")
 
-    def classify(self, content: ContentExtractionResult) -> bool:
+    def classify(self, content) -> bool:
         if content.title != "":
             with open(
                 r"extracted_headlines/"

@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 import traceback
 from importlib import import_module
 
@@ -16,6 +17,10 @@ class ClassifierManager:
         dir_list = os.listdir(classifier_directory)
 
         print(f"Initializing classifiers from {self._classifier_directory}")
+
+        # Adds path of the executable to PYTHONPATH, so that python can find modules in it
+        # Needed for usage with pyinstaller
+        sys.path.append(os.path.dirname(sys.executable))
 
         for obj in dir_list:
             path = self._classifier_directory + "/" + obj

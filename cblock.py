@@ -17,8 +17,6 @@ import time
 
 from mitmproxy.mitmproxy.certs import CertStore
 
-sys.path.append("cblock")
-
 from configuration.Configuration import Configuration
 from content_classifier.ClassifierManager import ClassifierManager
 from mitmproxy.mitmproxy import options
@@ -62,10 +60,7 @@ class CBlock:
     def __init__(self, config: Configuration):
         self.config = config
 
-        self.classifier_manager = ClassifierManager(
-            classifier_directory=pathlib.Path(__file__).parent.resolve().as_posix()
-            + "/classifiers"
-        )
+        self.classifier_manager = ClassifierManager(classifier_directory="classifiers")
 
         if not len(self.classifier_manager.classifier_info.keys()):
             print("Error: no classifiers found. Aborting.")
@@ -209,7 +204,7 @@ if __name__ == "__main__":
             # Re-run the program with admin rights
             # Important: sys.argv[1:] when using with pyinstall
             ctypes.windll.shell32.ShellExecuteW(
-                None, "runas", sys.executable, " ".join(sys.argv), None, 1
+                None, "runas", sys.executable, " ".join(sys.argv[1:]), None, 1
             )
     if not dont_run:
         cblock = CBlock(config)

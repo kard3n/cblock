@@ -5,3 +5,6 @@ __pycache__
 .db
 venv/*
 .pickle
+_internal/*
+*.exe
+build/*

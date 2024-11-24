@@ -2,11 +2,8 @@ import pathlib
 import pickle
 import nltk
 
-from content_classifier.ContentClassifierInterface import ContentClassifierInterface
-from editor.ContentExtractionResult import ContentExtractionResult
 
-
-class NaiveBayesClassifier(ContentClassifierInterface):
+class NaiveBayesClassifier:
     def __init__(self, topics_to_remove: list[str], aggressiveness: float):
         try:
             nltk.data.find("tokenizers/punkt")
@@ -40,7 +37,7 @@ class NaiveBayesClassifier(ContentClassifierInterface):
         self.aggressiveness = aggressiveness
         self.topics = self.lang_to_classifier[languages[0]].classes_
 
-    def classify(self, content: ContentExtractionResult) -> bool:
+    def classify(self, content) -> bool:
         if content.title != "":
             combined_text = [content.title + " " + content.text]
             topic_probabilities = self.lang_to_classifier[

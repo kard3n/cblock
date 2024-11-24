@@ -1,14 +1,10 @@
-from content_classifier.ContentClassifierInterface import ContentClassifierInterface
-from editor.ContentExtractionResult import ContentExtractionResult
-
-
-class AlwaysFalseClassifier(ContentClassifierInterface):
+class AlwaysFalseClassifier:
     def __init__(self, topics_to_remove: list[str], aggressiveness: float):
         pass
 
     def classify(
         self,
-        content: ContentExtractionResult,
+        content,
     ) -> bool:
         return False
 
