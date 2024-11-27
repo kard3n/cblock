@@ -68,6 +68,13 @@ Start up application:
 $ python cblock.py
 ````
 
+## Packaging/Installer creation
+> For this, you need to have both InnoSetup and pyinstaller installed.
+
+First, create the executable file using pyinstaller: `pyinstaller --noconfirm cblock.spec`.
+
+Then, use InnoSetup to load 'inno_Setup.iss' and generate the installer.
+
 ## Supported web pages
 The following web pages are currently supported:
 * yahoo.com

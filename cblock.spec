@@ -5,6 +5,7 @@ datas = []
 binaries = []
 # nltk, sklearn.pipeline, sklearn.feature_selection and cloudpickle are needed fo the NB classifiers. Remove if they are not needed
 # TODO: find a way to remove sklearn.pipeline, as it consumes a lot of disk space
+# TODO: for some reason, the contents of the classifier training scripts are also imported
 hiddenimports = ['uuid', 'mitmproxy_rs', 'brotli', 'zstandard', 'wsproto', 'ruamel.yaml', 'pyparsing', 'aioquic', 'aioquic.buffer', 'aioquic.quic', 'aioquic.quic.configuration',
 'aioquic.quic.connection', 'kaitaistruct', 'aioquic.h3.connection', 'h2.config', 'h2.connection', 'pyperclip', 'werkzeug', 'asgiref.compatibility', 'asgiref.wsgi', 'flask', 'ldap3',
 'passlib.apache', 'pydivert', 'msgpack', 'xml.dom', 'nltk', 'sklearn.pipeline', 'cloudpickle', 'sklearn.feature_selection']

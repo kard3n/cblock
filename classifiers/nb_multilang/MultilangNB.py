@@ -1,6 +1,6 @@
 import pathlib
-import pickle
 import nltk
+import cloudpickle
 
 
 class NaiveBayesClassifier:
@@ -15,7 +15,7 @@ class NaiveBayesClassifier:
         self.lang_to_classifier: dict = {}
 
         for lang in languages:
-            self.lang_to_classifier[lang] = pickle.load(
+            self.lang_to_classifier[lang] = cloudpickle.load(
                 open(
                     pathlib.Path(__file__).parent.resolve().as_posix()
                     + "/classifier_"
@@ -25,7 +25,7 @@ class NaiveBayesClassifier:
                 )
             )
 
-        self.lang_detector_model = pickle.load(
+        self.lang_detector_model = cloudpickle.load(
             open(
                 pathlib.Path(__file__).parent.resolve().as_posix()
                 + "/language_classifier.pickle",
