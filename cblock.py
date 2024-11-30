@@ -1,6 +1,10 @@
 import sys
+import traceback
 
 from CBlockAddonMain import CBlockAddonMain
+from db.SQLiteManager import SQLiteManager
+from schema.parser.SchemaReader import SchemaReader
+from updater.SchemaUpdater import SchemaUpdater
 
 sys.path.append("cblock")
 
@@ -44,7 +48,13 @@ async def create_mitm_master(
         with_dumper=False,
     )
 
-    master.addons.add(CBlockAddonMain(config, classifier_manager, shutdown_event))
+    master.addons.add(
+        CBlockAddonMain(
+            config=config,
+            classifier_manager=classifier_manager,
+            shutdown_event=shutdown_event,
+        )
+    )
 
     return master
 
@@ -78,14 +88,35 @@ class CBlock:
             print("Aborting...")
             sys.exit(1)
 
-    def run(self):
-
         # get OSManager, exit if the OS isn't supported
         try:
             self.os_manager: OSManagerInterface = get_os_manager()
         except RuntimeError as e:
             logging.error(e)
             sys.exit(0)
+
+    def run(self):
+        db_manager = SQLiteManager(database_name="cb_database.db")
+
+        update_result: bool = asyncio.run(SchemaUpdater.update_schemas())
+        # Update schema sources
+        if update_result or not db_manager.has_database():
+            schema_reader: SchemaReader = SchemaReader(
+                db_manager=db_manager,
+                schema_location="schemas/",
+            )
+
+            try:
+                db_manager.initialize_database()
+                schema_reader.run()
+            except Exception as e:
+                db_manager.close_connection()
+                os.remove("cb_database.db")
+                logging.error(
+                    f"Error while initializing database: {traceback.format_exc()}"
+                )
+        # Important, as another one will be started by CBlockAddonMain
+        db_manager.close_connection()
 
         self.os_manager.activate_proxy(
             host=self.config.proxy_host,
@@ -103,7 +134,9 @@ class CBlock:
         # done like this in order to have the master object that's needed to shut down later
         master = self._run_in_event_loop(
             create_mitm_master(
-                self.config, self.classifier_manager, self.shutdown_event
+                config=self.config,
+                classifier_manager=self.classifier_manager,
+                shutdown_event=self.shutdown_event,
             )
         )
 

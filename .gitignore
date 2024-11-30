@@ -309,3 +309,5 @@ _internal/*
 *.exe
 build/*
 dist/*
+cblock.build/
+cblock.dist/

@@ -24,25 +24,27 @@ class SchemaReader:
 
     def run(self):
         print("Reading schemas from '" + self.schema_location + "'.")
-        filename_list = os.listdir(f"{self.schema_location}")
+        for subdir in os.walk(self.schema_location):
+            filename_list = os.listdir(subdir[0])
 
-        data_to_insert = []
-        for filename in filename_list:
-            result: any = None
-            if filename.endswith(".cbs"):
-                try:
-                    result = self.read_schema(
-                        directory=self.schema_location, filename=filename
-                    )
+            data_to_insert = []
+            for filename in filename_list:
+                result: any = None
+                if filename.endswith(".cbs"):
+                    try:
+                        result = self.read_schema(
+                            directory=subdir[0],
+                            filename=filename,
+                        )
 
-                    data_to_insert.append(result)
+                        data_to_insert.append(result)
 
-                except SchemaParsingException as e:
-                    logging.warning(
-                        f"The schema with ID {filename} could not be parsed and was therefore not added: {traceback.format_exc()}"
-                    )
+                    except SchemaParsingException as e:
+                        logging.warning(
+                            f"The schema with ID {filename} could not be parsed and was therefore not added: {traceback.format_exc()}"
+                        )
 
-        self.db_manager.insert(values=data_to_insert)
+            self.db_manager.insert(values=data_to_insert)
         print("Finished reading schemas.")
 
     # Returns a list, with the following content (order): schema name, url, schema type, underlying schema (as string)

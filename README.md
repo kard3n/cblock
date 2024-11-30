@@ -73,7 +73,17 @@ $ python cblock.py
 
 First, create the executable file using pyinstaller: `pyinstaller --noconfirm cblock.spec`.
 
-Then, use InnoSetup to load 'inno_Setup.iss' and generate the installer.
+Then, use InnoSetup to load 'inno_Setup.iss' and generate the installer. The executable can then be found in the _Output_ folder.
+
+## Adding schema source repositories
+> Currently, only GitHub repositories are supported.
+> Schema sources are updated automatically when ContentBlock starts
+
+New schema sources can be added by adding an entry to the _schema_sources.json_ file in the _schemas_ directory.
+Entries have the following format: `"{OWNER}/{REPO_NAME}:"{RELEASE_VERSION}"`, where _OWNER_ is the name of the repository owner and _REPO\_NAME_ the name of the repository.
+When _RELEASE_VERSION_ is left empty, ContentBlock will automatically get the current version and set the value.
+
+As an example, the entry for the default repository at [github.com/kard3n/cblock_schema](https://github.com/kard3n/cblock_schema), would look like this `"kard3n/cblock_schemas": ""`.
 
 ## Supported web pages
 The following web pages are currently supported:

@@ -29,6 +29,7 @@ class CBlockAddonMain:
         shutdown_event: threading.Event,
         db_manager_class: Type[DBManagerInterface] = SQLiteManager,
         schema_parser_factory: SchemaParserFactory = SchemaParserFactory(),
+        reload_schemas: bool = False,
     ):
         print("Initializing CBlockAddon")
         self.config = config
@@ -59,9 +60,7 @@ class CBlockAddonMain:
             schema_location="schema_definitions/",
         )
 
-        if not self.db_manager.has_database():
-            logging.warning("No database was found, initializing...")
-
+        if reload_schemas:
             try:
                 self.db_manager.initialize_database()
                 self.schema_reader.run()
