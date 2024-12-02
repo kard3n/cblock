@@ -6,8 +6,8 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{DE2BC6A3-E1CE-42FE-BEB7-95F693483C2E}
 AppName=ContentBlock
-AppVersion=0.1
-;AppVerName=ContentBlock 0.1
+AppVersion=0.1.0
+;AppVerName=ContentBlock 0.1.0
 AppPublisher=Jonathan Michael Preiß
 AppPublisherURL=https://github.com/kard3n/cblock
 AppSupportURL=https://github.com/kard3n/cblock
@@ -29,6 +29,7 @@ OutputBaseFilename=cblock_setup
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
+SetupIconFile=cblock_icon.ico
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -39,15 +40,16 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 Source: "dist\cblock\cblock.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "classifiers\*"; DestDir: "{app}\classifiers"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "config\*"; DestDir: "{app}\config"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "schema_definitions\*"; DestDir: "{app}\schema_definitions"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "config\*"; DestDir: "{app}\config"; Flags: onlyifdoesntexist
+Source: "schemas\schema_sources.json"; DestDir: "{app}\schemas"; Flags: onlyifdoesntexist
 Source: "templates\*"; DestDir: "{app}\templates"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "dist\cblock\_internal\*"; DestDir: "{app}\_internal"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "cblock_icon.ico"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
-Name: "{autoprograms}\ContentBlock"; Filename: "{app}\cblock.exe"
-Name: "{autodesktop}\ContentBlock"; Filename: "{app}\cblock.exe"; Tasks: desktopicon
+Name: "{autoprograms}\ContentBlock"; Filename: "{app}\cblock.exe"; IconFilename: "{app}\cblock_icon.ico"
+Name: "{autodesktop}\ContentBlock"; Filename: "{app}\cblock.exe"; Tasks: desktopicon; IconFilename: "{app}\cblock_icon.ico"
 
 [Run]
 Filename: "{app}\cblock.exe"; Description: "{cm:LaunchProgram,ContentBlock}"; Flags: nowait postinstall skipifsilent
