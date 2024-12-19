@@ -1,12 +1,12 @@
 import sys
 import traceback
 
+sys.path.append("cblock")
+
 from CBlockAddonMain import CBlockAddonMain
 from db.SQLiteManager import SQLiteManager
 from schema.parser.SchemaReader import SchemaReader
 from updater.SchemaUpdater import SchemaUpdater
-
-sys.path.append("cblock")
 
 import asyncio
 import ctypes
@@ -19,12 +19,12 @@ import sys
 import threading
 import time
 
-from mitmproxy.mitmproxy.certs import CertStore
+from mitmproxy.certs import CertStore
 
 from configuration.Configuration import Configuration
 from content_classifier.ClassifierManager import ClassifierManager
-from mitmproxy.mitmproxy import options
-from mitmproxy.mitmproxy.tools import dump
+from mitmproxy import options
+from mitmproxy.tools import dump
 from os_tools.OSManagerFactory import get_os_manager
 from os_tools.OSManagerInterface import OSManagerInterface
 
@@ -205,7 +205,7 @@ def is_admin():
         return False
 
 
-if __name__ == "__main__":
+def run():
     config = Configuration()
 
     dont_run = False
@@ -242,3 +242,7 @@ if __name__ == "__main__":
     if not dont_run:
         cblock = CBlock(config)
         cblock.run()
+
+
+if __name__ == "__main__":
+    run()

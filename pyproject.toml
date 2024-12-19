@@ -1,0 +1,49 @@
+[project]
+name = "cblock"
+version = "0.1.0"
+description = "An application that lets you filter unwanted content from the WWW."
+authors = [
+    {name = "Jonathan Michael Preiß", email = "jonathan.preiss@yahoo.de"},
+]
+dependencies = [
+    "pandas>=2.2",
+    "numpy>=2.2",
+    "scikit-learn>=1.4",
+    "nltk>=3.8",
+    "beautifulsoup4>=4.12",
+    "lxml>=5.2",
+    "Jinja2>=3.1",
+    "regex>=2024.5",
+    "cloudpickle>=3.0",
+    "requests>=2.23",
+    "mitmproxy>=11"
+]
+requires-python = ">=3.12, <4"
+readme = "README.md"
+license = {text = "MIT"}
+
+[project.urls]
+Homepage = "https://github.com/kard3n/cblock"
+Repository = "https://github.com/kard3n/cblock.git"
+
+
+[tool.pdm]
+distribution = false
+
+
+[tool.pdm.scripts]
+pre_build = {shell = "set PYTHONUTF8=1"}
+build = {call = "make_installer:build_installer"}
+pre_run = {shell = "set PYTHONUTF8=1"}
+run = {call = "cblock_main:run"}
+
+
+[dependency-groups]
+dev = [
+    "black>=24.4",
+    "pyinstaller>=6.11",
+]
+
+# Prevents the "error: Multiple top-level packages discovered in a flat-layout" error when doing a manual install
+[tool.setuptools]
+py-modules = []

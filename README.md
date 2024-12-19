@@ -2,78 +2,48 @@
 ContentBlock allows you to hide content you don't want to see.
 Improve your browsing experience now!
 
-## Installation
+## Development
 
-Create venv:
+### Installation
+Prerequisites: Python 3.12.x, PDM
+
+#### Using PDM
+Run `pdm install` from a terminal to create a new virtual environment and install all the necessary dependencies.
+
+#### Manual
+```shell
+python -m venv .venv
+.venv\Scripts\pip install -e ../cblock
+```
+
+#### Training the classifiers
+If the classifiers have not been trained, you must do so before attempting to start the application.
+For the default classifiers, you can use the following commands:
 ````shell
-$ python -m venv venv
-````
-
-Clone mitmproxy:
-````shell
-$ git clone https://github.com/mitmproxy/mitmproxy.git
-````
-
-Install mitmproxy to environment:
-````shell
-# Windows
-$ venv\Scripts\pip install -e mitmproxy\.[dev]
-
-# Linux
-$ venv/bin/pip install -e "mitmproxy/.[dev]"
-````
-
-Install cblock's dependencies to environment:
-````shell
-# Windows
-$ venv\Scripts\pip install -r requirements_dev.txt
-
-# Linux
-$ venv/bin/pip install -r "requirements_dev.txt"
-````
-
-Enable UTF-8 support:
-
-> The virtual environment needs to be activated first, as explained in [Execution](#execution)
-
-````shell
-# Windows
-$ set PYTHONUTF8=1
-
-# Linux
-$ export PYTHONUTF8=1
-````
-
-If the Naive Bayes classifier has not been initialized (its classifier.pickle file is missing),
-then execute the following steps:
-````shell
-venv\Scripts\activate
 cd classifiers/naive_bayes
 python create_classifier.py
+cd ../classifiers/nb_multilang
+python train_classifiers.py
 ````
 
-## Execution
-Activate virtual environment:
+
+### Running
+#### Using PDM
+ContentBlock can be started by executing `pdm run run`.
+
+#### Manual
+Alternatively, you can manually activate the virtual environment and then run cblock_main.py
 ````shell
-# Windows
-$ venv\Scripts\activate
-
-# Linux
-$ source venv/bin/activate
+.venv\Scripts\activate
+set PYTHONUTF8=1
+python cblock_main.py
 ````
 
-Start up application:
-````shell
-# Windows
-$ python cblock.py
-````
 
-## Packaging/Installer creation
-> For this, you need to have both InnoSetup and pyinstaller installed.
+### Packaging/Installer creation
+> For this, you need to have InnoSetup installed.
 
-First, create the executable file using pyinstaller: `pyinstaller --noconfirm cblock.spec`.
-
-Then, use InnoSetup to load 'inno_Setup.iss' and generate the installer. The executable can then be found in the _Output_ folder.
+Run `npm run build`. The executable can then be found in the _Output_ folder.
 
 ## Adding schema source repositories
 > Currently, only GitHub repositories are supported.

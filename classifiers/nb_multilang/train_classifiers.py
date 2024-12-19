@@ -1,4 +1,4 @@
-from classifiers.nb_multilang.create_classifier import ClassifierCreator
+from classifiers.nb_multilang.ClassifierCreator import ClassifierCreator
 from classifiers.nb_multilang.create_language_detector import LanguageClassifierCreator
 
 lang_to_param_grid: dict = {

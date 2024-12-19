@@ -52,5 +52,6 @@ Name: "{autoprograms}\ContentBlock"; Filename: "{app}\cblock.exe"; IconFilename:
 Name: "{autodesktop}\ContentBlock"; Filename: "{app}\cblock.exe"; Tasks: desktopicon; IconFilename: "{app}\cblock_icon.ico"
 
 [Run]
-Filename: "{app}\cblock.exe"; Description: "{cm:LaunchProgram,ContentBlock}"; Flags: nowait postinstall skipifsilent
+; Note: removed skipifsilent, so that ContentBlock can restart after install
+Filename: "{app}\cblock.exe"; Description: "{cm:LaunchProgram,ContentBlock}"; Flags: nowait postinstall
 

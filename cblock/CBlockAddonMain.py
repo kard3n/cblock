@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import subprocess
 import threading
 import traceback
 from typing import Type
@@ -15,7 +16,7 @@ from db.DBManagerInterface import DBManagerInterface
 from db.PathSearchResult import PathSearchResult
 from db.SQLiteManager import SQLiteManager
 from editor.ContentEditorFactory import ContentEditorFactory
-from mitmproxy.mitmproxy import http
+from mitmproxy import http
 from schema.parser.SchemaParserFactory import SchemaParserFactory
 from schema.parser.SchemaReader import SchemaReader
 
@@ -143,6 +144,10 @@ class CBlockAddonMain:
                 and flow.request.method == "POST"
             ):  # Shut down ContentBlock
                 await self.process_reload_schemata_post(flow)
+            elif (
+                flow.request.path == "/update" and flow.request.method == "POST"
+            ):  # Update ContentBlock
+                await self.apply_update(flow)
             else:
                 flow.response = http.Response.make(
                     404,
@@ -347,6 +352,24 @@ class CBlockAddonMain:
                 "Content-Type": "text/html",
             },
         )
+
+    async def apply_update(self, flow) -> None:
+        """
+        Process GET requests to /update
+        :return:
+        """
+        flow.response = http.Response.make(
+            status_code=200,
+        )
+
+        subprocess.Popen(
+            [
+                "cblock_setup.exe",
+                "/SILENT",
+                "/CLOSEAPPLICATIONS",
+                "/RESTARTAPPLICATIONS",
+            ]
+        )  # Or /VERYSILENT for no popup
 
     async def __edit(self, schema_id: str, content: str) -> str:
 
