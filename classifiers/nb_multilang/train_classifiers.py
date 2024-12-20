@@ -1,5 +1,10 @@
-from classifiers.nb_multilang.ClassifierCreator import ClassifierCreator
-from classifiers.nb_multilang.create_language_detector import LanguageClassifierCreator
+import os
+import sys
+
+sys.path.append(os.getcwd())
+
+from classifiers.nb_multilang.create_language_classifier import create_language_classifier
+from classifiers.nb_multilang.create_classifier import create_classifier
 
 lang_to_param_grid: dict = {
     "en": {
@@ -48,18 +53,16 @@ lang_to_k_features: dict = {"en": 5500, "de": 2000}
 
 languages: list[str] = ["en", "de"]
 
-creator = ClassifierCreator()
 # Create classifiers for the different languages
 for lang in languages:
-
-    creator.create_classifier(
+    create_classifier(
         language=lang,
         param_grid=lang_to_param_grid[lang],
         select_k_features=lang_to_k_features[lang],
     )
 
 # Create a classifier for language detection
-lang_class_creator = LanguageClassifierCreator()
-lang_class_creator.create_classifier(
+
+create_language_classifier(
     languages=languages, select_k_features_per_language=20
 )

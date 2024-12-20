@@ -15,6 +15,7 @@ from create_dataset import create_dataset
 
 nltk.download("averaged_perceptron_tagger")
 nltk.download("punkt")
+nltk.download('punkt_tab')
 stemmer = SnowballStemmer("english", ignore_stopwords=False)
 
 
