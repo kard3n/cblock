@@ -20,6 +20,12 @@
 
                 <a class="navbar-brand flex-grow-1 ms-3" href="/">ContentBlock</a>
 
+                {% if update_available == True %}
+                    <button type="button" class="btn btn-primary m-3" onclick="update_app()">
+                        <i class="bi bi-box-arrow-in-up"></i>
+                        <span>Update ContentBlock to v{{current_version}}</span>
+                    </button>
+                {% endif %}
                 <a class="btn btn-danger" type="button" id="shutdownButton" href="/shutdown">
                     <i class="bi bi-power h4"></i>
                 </a>
@@ -54,6 +60,24 @@
             $("#toast_container").append(child)
             var toast = new bootstrap.Toast($("#toast_" + toast_name));
             toast.show();
+        }
+
+
+        function update_app(){
+            let endpoint="/update"
+            // Todo: show loading icon until the update is complete
+
+            $.post({
+                url: endpoint,
+                dataType:"json"})
+                .done(function () {
+                    make_toast("Success", "Updates installing.")
+                })
+                .fail(function () {
+                    make_toast("Error", "Error updating ContentBlock.")
+                }).always(function (){
+                    //Nothing for now
+                });
         }
 
     </script>

@@ -44,6 +44,7 @@ Source: "config\*"; DestDir: "{app}\config"; Flags: onlyifdoesntexist
 Source: "schemas\schema_sources.json"; DestDir: "{app}\schemas"; Flags: onlyifdoesntexist
 Source: "templates\*"; DestDir: "{app}\templates"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "dist\cblock\_internal\*"; DestDir: "{app}\_internal"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "pyproject.toml"; DestDir: "{app}"; Flags: ignoreversion
 Source: "cblock_icon.ico"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 

@@ -1,6 +1,8 @@
 import sys
 import traceback
 
+from updater.AppUpdater import AppUpdater
+
 sys.path.append("cblock")
 
 from CBlockAddonMain import CBlockAddonMain
@@ -33,6 +35,7 @@ async def create_mitm_master(
     config: Configuration,
     classifier_manager: ClassifierManager,
     shutdown_event: threading.Event,
+    app_updater: AppUpdater
 ) -> dump.DumpMaster:
     """
     Create a mitmproxy DumpMaster, but without starting it
@@ -53,6 +56,7 @@ async def create_mitm_master(
             config=config,
             classifier_manager=classifier_manager,
             shutdown_event=shutdown_event,
+            app_updater=app_updater,
         )
     )
 
@@ -69,7 +73,7 @@ async def start_master(master: dump.DumpMaster):
 class CBlock:
     def __init__(self, config: Configuration):
         self.config = config
-
+        self.app_updater: AppUpdater = AppUpdater()
         self.classifier_manager = ClassifierManager(classifier_directory="classifiers")
 
         if not len(self.classifier_manager.classifier_info.keys()):
@@ -97,6 +101,11 @@ class CBlock:
 
     def run(self):
         db_manager = SQLiteManager(database_name="cb_database.db")
+
+        if self.app_updater.new_version_available():
+            print("A new application version is available, update through the UI.")
+        else:
+            print("ContentBlock is up-to-date.")
 
         update_result: bool = asyncio.run(SchemaUpdater.update_schemas())
         # Update schema sources
@@ -137,6 +146,7 @@ class CBlock:
                 config=self.config,
                 classifier_manager=self.classifier_manager,
                 shutdown_event=self.shutdown_event,
+                app_updater=self.app_updater
             )
         )
 

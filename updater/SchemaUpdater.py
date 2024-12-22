@@ -5,61 +5,21 @@ import tarfile
 
 import requests
 
+from updater.common import get_newest_version_dict, version_is_higher, strip_version
+
 
 class SchemaUpdater:
-    @staticmethod
-    def strip_version(version_string: str) -> str:
-        version_string.lstrip("v")
-        if version_string.count("-") > 0:
-            version_string = version_string[0 : version_string.index("-")]
-
-        return version_string
-
-    @staticmethod
-    def version_is_higher(version_higher: str, version_lower: str):
-        """
-        Returns true when version_higher > version_lower
-        :param version_higher:
-        :param version_lower:
-        :return:
-        """
-
-        version_higher = SchemaUpdater.strip_version(version_higher).split(".")
-        version_lower = SchemaUpdater.strip_version(version_lower).split(".")
-
-        for num_high, num_low in zip(version_higher, version_lower):
-            if num_high > num_low:
-                return True
-            elif num_high < num_low:
-                return False
-
-        return False
 
     @staticmethod
     async def update_schema_source(
         schema_source: str, current_version: str
     ) -> str | None:
-        version_response = None
-        try:
-            version_response = requests.get(
-                f"https://api.github.com/repos/{schema_source}/releases/latest",
-                timeout=3.5,
-            )
-        except Exception:
-            return None
+        current_version_nr = strip_version(current_version)
+        newest_version_json = get_newest_version_dict(schema_source)
+        newest_version_nr = strip_version(newest_version_json["name"])
 
-        response_json = version_response.json()
-
-        if version_response is None:
-            print(
-                f"Could not retrieve version information for schema {schema_source}: Other Error"
-            )
-        elif version_response.status_code != 200:
-            print(
-                f"Could not retrieve version information for schema {schema_source}: {version_response.status_code}"
-            )
-        elif current_version == "" or SchemaUpdater.version_is_higher(
-            response_json["name"], current_version
+        if newest_version_json is not None and (current_version == "" or version_is_higher(
+            newest_version_nr, current_version_nr)
         ):
             print(f"Downloading update for schema repository '{schema_source}'")
 
@@ -68,7 +28,7 @@ class SchemaUpdater:
 
             asset_response = None
             try:
-                asset_response = requests.get(response_json["tarball_url"], timeout=6.5)
+                asset_response = requests.get(newest_version_json["tarball_url"], timeout=6.5)
             except Exception as e:
                 return None
 
@@ -100,9 +60,9 @@ class SchemaUpdater:
                     os.remove(filename)
 
                     print(
-                        f"Successfully updated schema repository '{schema_source}' from '{current_version}' to {response_json["name"]}"
+                        f"Successfully updated schema repository '{schema_source}' from '{current_version}' to {newest_version_nr}"
                     )
-                    return response_json["name"]
+                    return newest_version_json["name"]
                 except tarfile.TarError:
                     print(f"Could not extract tarball: {filename}")
             else:

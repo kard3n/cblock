@@ -20,10 +20,9 @@ python -m venv .venv
 If the classifiers have not been trained, you must do so before attempting to start the application.
 For the default classifiers, you can use the following commands:
 ````shell
-cd classifiers/naive_bayes
-python create_classifier.py
-cd ../classifiers/nb_multilang
-python train_classifiers.py
+.venv\Scripts\activate
+python classifiers\naive_bayes\create_classifier.py
+python classifiers\nb_multilang\train_classifiers.py
 ````
 
 
