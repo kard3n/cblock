@@ -42,7 +42,7 @@ python cblock_main.py
 ### Packaging/Installer creation
 > For this, you need to have InnoSetup installed.
 
-Run `npm run build`. The executable can then be found in the _Output_ folder.
+Run `pdm run build`. The executable can then be found in the _Output_ folder.
 
 ## Adding schema source repositories
 > Currently, only GitHub repositories are supported.
