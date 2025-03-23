@@ -2,8 +2,8 @@
 
 
 a = Analysis(
-    ['C:\\Users\\pit\\Desktop\\cblock\\cblock.py', 'cblock.spec'],
-    pathex=[],
+    ['cblock_main.py'],
+    pathex=['cblock'],
     binaries=[],
     datas=[],
     hiddenimports=[],
