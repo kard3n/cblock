@@ -18,8 +18,8 @@ from editor.ContentEditorFactory import ContentEditorFactory
 from mitmproxy import http
 from schema.parser.SchemaParserFactory import SchemaParserFactory
 from schema.parser.SchemaReader import SchemaReader
-from updater.AppUpdater import AppUpdater
-from updater.common import version_is_higher
+from updater.ApplicationUpdater import ApplicationUpdater
+from updater.utils import version_is_higher
 
 
 class CBlockAddonMain:
@@ -31,7 +31,7 @@ class CBlockAddonMain:
         shutdown_event: threading.Event,
         db_manager_class: Type[DBManagerInterface] = SQLiteManager,
         schema_parser_factory: SchemaParserFactory = SchemaParserFactory(),
-        app_updater: AppUpdater = AppUpdater(),
+        app_updater: ApplicationUpdater = ApplicationUpdater(),
         reload_schemas: bool = False,
     ):
         print("Initializing CBlockAddon")
@@ -42,11 +42,6 @@ class CBlockAddonMain:
         self.db_manager = db_manager_class(database_name="cb_database.db")
         self.schema_parser_factory = schema_parser_factory
         self.app_updater = app_updater
-
-        self.app_updater.set_proxies({
-            "http": f"http://{config.proxy_host}:{config.proxy_port}",
-            "https": f"http://{config.proxy_host}:{config.proxy_port}",
-        })
 
         try:
             self.content_classifier = self.classifier_manager.get_classifier(
@@ -315,9 +310,9 @@ class CBlockAddonMain:
                     }
                     for classifier_info in self.classifier_manager.classifier_info.values()
                 ],
-                current_version=self.app_updater.get_current_app_version(),
-                newest_version = self.app_updater.get_newest_app_version(),
-                update_available = self.app_updater.new_version_available()
+                current_version=self.app_updater.get_current_application_version(),
+                newest_version=await self.app_updater.get_latest_application_version(),
+                update_available=await self.app_updater.new_version_available(),
             ),
             {
                 "Content-Type": "text/html",
@@ -359,10 +354,21 @@ class CBlockAddonMain:
         """
         flow.response = http.Response.make(
             200,
-            self.settings_template.render(
-                current_version=self.app_updater.get_current_app_version(),
-                newest_version = self.app_updater.get_newest_app_version(),
-                update_available = version_is_higher(self.app_updater.get_newest_app_version(), self.app_updater.get_current_app_version())) if (self.app_updater.get_newest_app_version() is not None and self.app_updater.get_current_app_version() is not None) else False,
+            (
+                self.settings_template.render(
+                    current_version=self.app_updater.get_current_app_version(),
+                    newest_version=self.app_updater.get_newest_app_version(),
+                    update_available=version_is_higher(
+                        self.app_updater.get_newest_app_version(),
+                        self.app_updater.get_current_app_version(),
+                    ),
+                )
+                if (
+                    self.app_updater.get_newest_app_version() is not None
+                    and self.app_updater.get_current_app_version() is not None
+                )
+                else False
+            ),
             {
                 "Content-Type": "text/html",
             },
@@ -377,7 +383,9 @@ class CBlockAddonMain:
             status_code=200,
         )
 
-        self.app_updater.apply_update()
+        updater = ApplicationUpdater()
+
+        await updater.apply_update()
 
     async def __edit(self, schema_id: str, content: str) -> str:
 

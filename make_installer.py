@@ -9,9 +9,9 @@ def build_installer():
     # Creates executable using pyinstaller
     PyInstaller.__main__.run(
         [
-            Path(__file__).parent.absolute().__str__() + "\cblock_main.py",
-            "cblock.spec",
+            Path(__file__).parent.absolute().__str__() + "\cblock.spec",
             "--noconfirm",
+            "--clean"
         ]
     )
 

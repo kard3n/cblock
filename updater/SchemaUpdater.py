@@ -3,74 +3,80 @@ import os
 import shutil
 import tarfile
 
-import requests
-
-from updater.common import get_newest_version_dict, version_is_higher, strip_version
+from updater.AbstractVersionRetriever import AbstractVersionRetriever
+from updater.GithubVersionRetriever import GithubVersionRetriever
+from updater.ResourceDownloader import ResourceDownloader
+from updater.utils import version_is_higher, strip_version
 
 
 class SchemaUpdater:
 
     @staticmethod
     async def update_schema_source(
-        schema_source: str, current_version: str
+        schema_source: str, current_version: str, use_proxy_certificate: bool = True
     ) -> str | None:
         current_version_nr = strip_version(current_version)
-        newest_version_json = get_newest_version_dict(schema_source)
-        newest_version_nr = strip_version(newest_version_json["name"])
+        version_retriever: AbstractVersionRetriever = GithubVersionRetriever()
 
-        if newest_version_json is not None and (current_version == "" or version_is_higher(
-            newest_version_nr, current_version_nr)
-        ):
-            print(f"Downloading update for schema repository '{schema_source}'")
+        try:
+            latest_version_number = await version_retriever.get_latest_version_number(
+                schema_source, use_proxy_certificate=use_proxy_certificate
+            )
+            latest_tarball_url = await version_retriever.get_latest_tarball_url(
+                schema_source, use_proxy_certificate=use_proxy_certificate
+            )
+        except RuntimeError:
+            print(f"Could not retrieve updates for schema {schema_source}")
+        else:
+            if current_version == "" or version_is_higher(
+                latest_version_number, current_version_nr
+            ):
+                print(f"Downloading update for schema repository '{schema_source}'")
 
-            directory_name: str = "schemas/" + schema_source.replace("/", "&")
-            filename: str = f"{directory_name}/{schema_source.replace("/", "&")}.tar.gz"
-
-            asset_response = None
-            try:
-                asset_response = requests.get(newest_version_json["tarball_url"], timeout=6.5)
-            except Exception as e:
-                return None
-
-            if asset_response is None:
-                print(
-                    f"Could not download update for schema repository '{schema_source}': Other Error"
+                directory_name: str = "schemas/" + schema_source.replace("/", "&")
+                filename: str = (
+                    f"{directory_name}/{schema_source.replace("/", "&")}.tar.gz"
                 )
-            elif asset_response.status_code == 200:
-                # Empty the directory
-                SchemaUpdater.override_directory(directory_name=directory_name)
-                # Save tarball of new version
-                with open(filename, "wb") as file:
-                    file.write(asset_response.content)
 
                 try:
-                    members_to_extract = []
-                    with tarfile.open(filename, "r:gz") as tar:
-                        for member in tar.getmembers():
-                            if member.name.endswith(".cbs"):
-                                member.name = member.name.split("/")[1]
-                                members_to_extract.append(member)
-                        tar.extractall(
-                            members=members_to_extract,
-                            path=directory_name,
-                            filter="tar",
+                    async with ResourceDownloader as downloader:
+                        asset_response = await downloader.get(
+                            latest_tarball_url,
+                            use_proxy_certificate=use_proxy_certificate,
                         )
-
-                    # Remove tarball
-                    os.remove(filename)
-
+                except RuntimeError:
                     print(
-                        f"Successfully updated schema repository '{schema_source}' from '{current_version}' to {newest_version_nr}"
+                        f"Could not download update for schema repository '{schema_source}': Other Error"
                     )
-                    return newest_version_json["name"]
-                except tarfile.TarError:
-                    print(f"Could not extract tarball: {filename}")
-            else:
-                print(
-                    f"Could not download update for schema repository '{schema_source}: {asset_response.status_code}'"
-                )
+                else:
+                    # Empty the directory
+                    SchemaUpdater.override_directory(directory_name=directory_name)
+                    # Save tarball of new version
+                    with open(filename, "wb") as file:
+                        file.write(asset_response.content)
 
-        return None
+                    try:
+                        members_to_extract = []
+                        with tarfile.open(filename, "r:gz") as tar:
+                            for member in tar.getmembers():
+                                if member.name.endswith(".cbs"):
+                                    member.name = member.name.split("/")[1]
+                                    members_to_extract.append(member)
+                            tar.extractall(
+                                members=members_to_extract,
+                                path=directory_name,
+                                filter="tar",
+                            )
+
+                        # Remove tarball
+                        os.remove(filename)
+
+                        print(
+                            f"Successfully updated schema repository '{schema_source}' from '{current_version}' to {latest_version_number}"
+                        )
+                        return latest_version_number
+                    except tarfile.TarError:
+                        print(f"Could not extract tarball: {filename}")
 
     @staticmethod
     def override_directory(directory_name: str):
@@ -89,7 +95,7 @@ class SchemaUpdater:
             print(f"Permission denied: create directory '{directory_name}'.")
 
     @staticmethod
-    async def update_schemas() -> bool:
+    async def update_schemas(use_proxy_certificate: bool = True) -> bool:
         """
 
         :return: True if at least one schema has been updated, False otherwise
@@ -101,7 +107,9 @@ class SchemaUpdater:
 
         for schema_source in name_to_version.keys():
             result = await SchemaUpdater.update_schema_source(
-                schema_source, name_to_version[schema_source]
+                schema_source,
+                name_to_version[schema_source],
+                use_proxy_certificate=use_proxy_certificate,
             )
 
             if result is not None:
