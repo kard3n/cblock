@@ -141,12 +141,12 @@ class CBlockAddonMain:
                 await self.process_classifier_post(flow)
             elif (
                 flow.request.path == "/settings" and flow.request.method == "GET"
-            ):  # Shut down ContentBlock
+            ):  # Get settings page
                 await self.process_settings_get(flow)
             elif (
                 flow.request.path == "/reload_schemata"
                 and flow.request.method == "POST"
-            ):  # Shut down ContentBlock
+            ):  # Reload schemata
                 await self.process_reload_schemata_post(flow)
             elif (
                 flow.request.path == "/update" and flow.request.method == "POST"
@@ -175,6 +175,9 @@ class CBlockAddonMain:
             },
         )
 
+    def set_shutdown_event(self):
+        self.shutdown_event.set()
+
     async def process_shutdown_get(self, flow: http.HTTPFlow) -> None:
         """
         Processes GET requests to /shutdown and edits the flow
@@ -182,7 +185,7 @@ class CBlockAddonMain:
         :return:
         """
 
-        self.shutdown_event.set()
+        self.set_shutdown_event()
         flow.response = http.Response.make(
             200,
             "Server shutting down...",
@@ -386,6 +389,7 @@ class CBlockAddonMain:
         updater = ApplicationUpdater()
 
         await updater.apply_update()
+        self.set_shutdown_event()
 
     async def __edit(self, schema_id: str, content: str) -> str:
 
