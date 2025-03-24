@@ -6,7 +6,7 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{DE2BC6A3-E1CE-42FE-BEB7-95F693483C2E}
 AppName=ContentBlock
-AppVersion=0.1.0
+AppVersion=0.1.1
 ;AppVerName=ContentBlock 0.1.0
 AppPublisher=Jonathan Michael Preiß
 AppPublisherURL=https://github.com/kard3n/cblock

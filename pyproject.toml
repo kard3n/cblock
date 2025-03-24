@@ -1,6 +1,6 @@
 [project]
 name = "cblock"
-version = "0.0.0"
+version = "0.1.1"
 description = "An application that lets you filter unwanted content from the WWW."
 authors = [
     {name = "Jonathan Michael Preiß", email = "jonathan.preiss@yahoo.de"},
