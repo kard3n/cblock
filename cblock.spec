@@ -1,12 +1,14 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+# Included to make the classifiers work, remove when better option is available
+classifier_imports = ['nltk.data', 'sklearn.pipeline', 'cloudpickle', 'sklearn.feature_selection']
 
 a = Analysis(
     ['cblock_main.py'],
     pathex=['cblock'],
     binaries=[],
     datas=[],
-    hiddenimports=[],
+    hiddenimports=classifier_imports,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
